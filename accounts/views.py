@@ -283,11 +283,10 @@ def media_view(request):
 
     return render(request, "home/layouts/media_page.html", {'media_by_year': media_by_year})
 
-def photo_gallery(request):
-    all_photos = Photo.objects.all()
-    
-
-    return render(request, "home/layouts/photo_gallery.html", {'all_photos': all_photos})
+def photo_gallery(request, id):
+    album = get_object_or_404(PhotoAlbum, id=id)
+    all_photos = album.photos.all()
+    return render(request, "home/layouts/photo_gallery.html", {'all_photos': all_photos, 'album': album})
 
 def photos(request):
     albums = PhotoAlbum.objects.all()
@@ -1322,16 +1321,16 @@ def admin_add_photo(request, id):
 @login_required
 def admin_update_photo(request, id):
     photo = get_object_or_404(Photo, id=id)
-    album = PhotoAlbum.objects.all()
+    album = photo.album 
 
     if request.method == 'POST':
-        file = request.FILES.getlist('image')
+        files = request.FILES.getlist('image')
 
-        if file:
-            photo.image = file[0]
+        if files:
+            photo.image = files[0]
             photo.save()
 
-            for file in file[1:]:
+            for file in files[1:]:
                 Photo.objects.create(album=photo.album, image=file)
 
             all_photos = photo.album.photos.all()
@@ -1341,12 +1340,11 @@ def admin_update_photo(request, id):
 
         messages.success(request, "Photo updated successfully!")
         return redirect('admin_update_photo', id=photo.id)
-    
 
     return render(request, 'admin/pages/admin_update_photo.html', { 
         'photo': photo, 
-        'album': album
-        })
+        'album': album 
+    })
 
 @login_required
 def delete_photo(request, id):
@@ -1359,10 +1357,12 @@ def delete_photo(request, id):
         if not album.photos.exists():
             album.delete()
             messages.success(request, "Photo deleted and album removed (no photos left).")
+            return redirect("admin_album_list")
+
         else:
             messages.success(request, "Photo deleted successfully!")
+            return redirect("admin_photo_list", album.id)
 
-        return redirect("admin_photo_list")
     
 
 

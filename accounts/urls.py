@@ -31,7 +31,7 @@ urlpatterns = [
     path('complain/', complain_view, name = 'complain' ),
     path('media/', media_view, name = 'media' ),
 
-    path('photos/', photo_gallery, name = 'photos' ),
+    path('photos/<int:id>/', photo_gallery, name = 'photos' ),
     path('photo/', photos, name = 'photo' ),
 
     path('events/', events_view, name = 'events' ),
