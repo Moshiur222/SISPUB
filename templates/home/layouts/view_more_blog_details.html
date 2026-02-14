@@ -1,0 +1,16 @@
+{% extends "home/base/base.html" %}
+
+{% block main %}
+<div class="container mt-5">
+     <a style= "font-size: 20px; margin-top: 25px" href="{% url 'blog' %}" class="btn btn-secondary mt-3">Back</a>
+    <h1 style = "text-align: center; margin-top: 20px; font-size: 50px;">{{ blog.title }}</h1>
+        <p  style = "text-align: end; margin-top: 20px; font-size: 15px ; margin-bottom: 30px"><strong>Date:</strong> {{ blog.date }}</p>
+    {% if blog.image %}
+        <img style = "width: 700rem" src="{{ blog.image.url }}" alt="{{ blog.title }}" class="img-fluid mb-3">
+    {% endif %}
+    
+    <div style = "margin-top: 24px">
+     {{ blog.description|safe }}
+    </div>
+</div>
+{% endblock main %}

@@ -1,0 +1,156 @@
+<!-- Sidebar -->
+
+{% load static %}
+{% load admin_active %}
+
+
+
+
+
+
+<div class="sidebar" data-background-color="dark">
+  <div class="sidebar-wrapper scrollbar scrollbar-inner">
+    <div class="sidebar-content">
+      <ul class="nav nav-secondary">
+        <li class="nav-section">
+          <span class="sidebar-mini-icon">
+            <i class="fa fa-ellipsis-h"></i>
+          </span>
+          <h4 class="text-section">Components</h4>
+        </li>
+        <li class="nav-item {% admin_active 'home_details' %}">
+          <a href="{% url 'home_details' %}">
+            <p>Home</p>
+          </a>
+        </li>
+        <li class="nav-item {% admin_active 'about_details' %}">
+          <a href="{% url 'about_details' %}">
+            <p>About</p>
+          </a>
+        </li>
+              <li class="nav-item {% admin_active 'sispab_founders' 'sispab_executive_com' 'previous_executive_committee' %}">
+                <a data-bs-toggle="collapse" href="#sidebarLayouts">
+                  <p>Commities</p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="sidebarLayouts">
+                  <ul class="nav nav-collapse">
+                    <li class="{% admin_active 'sispab_founders' %}">
+                      <a href="{% url 'sispab_founders' %}">
+                        <span class="sub-item">Sispab Founders</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'sispab_executive_com' %}">
+                      <a href="{% url 'sispab_executive_com' %}">
+                        <span class="sub-item">Current Executive Committee</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'previous_executive_committee' %}">
+                      <a href="{% url 'previous_executive_committee' %}">
+                        <span class="sub-item">Previous Executive Committee</span>
+                      </a>
+                    </li>
+                    {% comment %} <li class="">
+                      <a href="">
+                        <span class="sub-item">Sispab Secretariat</span>
+                      </a>
+                    </li> {% endcomment %}
+                  </ul>
+                </div>
+              </li>
+              <li class="nav-item {% admin_active 'sispab_founders' 'sispab_executive_com' 'previous_executive_committee' %}">
+                <a data-bs-toggle="collapse" href="#sidebarLayouts">
+                  <p>News & Media</p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="sidebarLayouts">
+                  <ul class="nav nav-collapse">
+                    <li class="{% admin_active 'AdminNewa' %}">
+                      <a href="{% url 'AdminNewa' %}">
+                        <span class="sub-item">News</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'admin_add_photo' %}">
+                      <a href="{% url 'admin_Album_list' %}">
+                        <span class="sub-item">Photo Gallery</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'previous_executive_committee' %}">
+                      <a href="{% url 'previous_executive_committee' %}">
+                        <span class="sub-item">Video Gallery</span>
+                      </a>
+                    </li>
+                    {% comment %} <li class="">
+                      <a href="">
+                        <span class="sub-item">Sispab Secretariat</span>
+                      </a>
+                    </li> {% endcomment %}
+                  </ul>
+                </div>
+              </li>
+              
+              <li class="nav-item {% admin_active 'AdminMembersRules' %}">
+                <a data-bs-toggle="collapse" href="#forms">
+                  <p>Commities</p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="forms">
+                  <ul class="nav nav-collapse">
+                    {% comment %} <li class="">
+                      <a href="">
+                        <span class="sub-item">Benefits of Members</span>
+                      </a>
+                    </li>
+                    <li class="">
+                      <a href="">
+                        <span class="sub-item">Advisory Council</span>
+                      </a>
+                    </li>
+                    <li class="">
+                      <a href="">
+                        <span class="sub-item">Member Registration</span>
+                      </a>
+                    </li> {% endcomment %}
+                    <li class="{% admin_active 'AdminMembersRules' %}">
+                      <a href="{% url 'AdminMembersRules' %}">
+                        <span class="sub-item">Membership Rules</span>
+                      </a>
+                    </li> 
+                    {% comment %} <li class="">
+                      <a href="">
+                        <span class="sub-item">Process of-Membership</span>
+                      </a>
+                    </li> {% endcomment %}
+                  </ul>
+                </div>
+              </li>
+              <li class="nav-item {% admin_active 'AdminEvents' %}">
+                <a href="{% url 'AdminEvents' %}">
+                  <p>Events</p>
+                </a>
+              </li>
+              <li class="nav-item {% admin_active 'AdminMedia' %}">
+                <a href="{% url 'AdminMedia' %}">
+                  <p>Media</p>
+                </a>
+              </li>
+              <li class="nav-item {% admin_active 'AdminBlog' %}">
+                <a href="{% url 'AdminBlog' %}">
+                  <p>Blog</p>
+                </a>
+              </li>
+              <li class="nav-item {% admin_active 'AdminCampain' %}">
+                <a href="{% url 'AdminCampain' %}">
+                  <p>Campain</p>
+                </a>
+              </li>
+              <li class="nav-item {% admin_active 'AdminContact' %}">
+                <a href="{% url 'AdminContact' %}">
+                  <p>Contact</p>
+                </a>
+              </li>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>

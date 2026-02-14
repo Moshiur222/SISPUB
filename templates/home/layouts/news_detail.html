@@ -1,0 +1,66 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+.news-detail-header {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: linear-gradient(140deg, rgba(0,72,114,0.9) 0%, rgba(41,17,96,0.8) 100%);
+    color: white;
+    margin-bottom: 40px;
+}
+
+.news-detail-header h1 {
+    font-size: 2.8rem;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+.news-detail-header span {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.news-detail-container {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+}
+
+.news-detail-image {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.news-detail-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #333;
+}
+</style>
+{% endblock extra_css %}
+
+{% block main %}
+<div class="news-detail-header">
+    <h1>{{ news.title }}</h1>
+    {% if news.date %}
+    <span>{{ news.date|date:"F d, Y" }}</span>
+    {% endif %}
+</div>
+
+<div class="news-detail-container">
+    {% if news.image %}
+    <img src="{{ news.image.url }}" alt="{{ news.title }}" class="news-detail-image">
+    {% endif %}
+
+    {% if news.description %}
+    <div class="news-detail-description">
+        {{ news.description|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endblock main %}

@@ -1,0 +1,87 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<form method="post" class="mt-5">
+    {% csrf_token %}
+
+    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Card Header -->
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">Company Goals</h5>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+            <div class="row g-3">
+
+                <!-- Goal Title -->
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Goal Title</label>
+                    <input
+                        name="goal_tittle"
+                        type="text"
+                        class="form-control rounded"
+                        placeholder="Enter Goal Title"
+                        value="{{ goal.goal_tittle|default:'' }}"
+                    />
+                </div>
+
+                <!-- Goal Description with Quill -->
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Goal Description</label>
+                    <!-- Hidden textarea -->
+                    <textarea id="goal_descriptions" name="goal_descriptions" style="display:none;">{{ goal.goal_descriptions|default:'' }}</textarea>
+                    <!-- Quill editor -->
+                    <div id="quill_goal" style="height:200px;"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'home_details' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<script>
+    // Initialize Quill editor
+    const quill = new Quill('#quill_goal', {
+        theme: 'snow',
+        placeholder: 'Enter Goal Description...',
+        modules: { 
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'clean']
+            ] 
+        }
+    });
+
+    // Load existing content from textarea
+    quill.root.innerHTML = document.getElementById('goal_descriptions').value;
+
+    // On submit → copy Quill HTML back to textarea
+    document.querySelector('form').addEventListener('submit', function() {
+        document.getElementById('goal_descriptions').value = quill.root.innerHTML;
+    });
+</script>
+
+{% endblock content %}

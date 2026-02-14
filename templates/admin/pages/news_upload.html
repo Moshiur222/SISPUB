@@ -1,0 +1,115 @@
+{% extends "admin/base/base.html" %}
+
+{% block custom_css %}
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Flatpickr CSS (Custom Date Picker) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+    <div class="card-header bg-warning text-dark text-center">
+        <h5 class="mb-0">Upload News</h5>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="card-body">
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- News Title -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">News Title</label>
+                <input
+                    name="title"
+                    type="text"
+                    class="form-control rounded"
+                    placeholder="Enter news title"
+                    required
+                />
+            </div>
+
+            <!-- Image -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload Screen Shorts</label>
+                <input
+                    type="file"
+                    name="image"
+                    class="form-control"
+                    accept="image/*"
+                />
+            </div>
+
+            <!-- Custom Date Picker -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Date</label>
+                <input
+                    type="text"
+                    name="date"
+                    id="news_date"
+                    class="form-control"
+                    placeholder="Select date"
+                    autocomplete="off"
+                />
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+
+                <!-- Hidden textarea for Django -->
+                <textarea id="description" name="description" hidden></textarea>
+
+                <!-- Quill Editor -->
+                <div id="editor" style="height: 200px;">
+                    {{ news.description|safe }}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a href="{% url 'AdminNewa' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    // Initialize Quill
+    var quill = new Quill('#editor', {
+        theme: 'snow'
+    });
+
+    // Initialize Flatpickr (NO default browser date style)
+    flatpickr("#news_date", {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+
+    // On form submit, send Quill HTML to Django
+    document.querySelector("form").addEventListener("submit", function () {
+        document.getElementById("description").value = quill.root.innerHTML;
+    });
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,235 @@
+{% load static %}
+{% load nav_active %}
+<header class="main-header">
+    <!-- Main Navigation -->
+    <nav class="main-nav sticky">
+        <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-content">
+                {% for info in all_company_info %}
+                <div class="contact-info">
+                    <span class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>Phone: {{info.phone}}</span>
+                    </span>
+                    <span class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email:{{info.email}}</span>
+                    </span>
+                    <span class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Sat-Thu: {{info.office_hours}}</span>
+                    </span>
+                </div>
+                {% endfor %}
+                <div class="social-links">
+                    <a href="#" class="social-link" style="color: #1c8bd4" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link" style="color: #1c8bd4" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-link" style="color: #1c8bd4" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-link" style="color: #1c8bd4" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+                <div class="social-links auth-links">
+                    <a href="{% url 'login' %}" class="auth-link {% active 'login' %}">Login</a>
+                    <span class="auth-separator">|</span>
+                    <a href="{% url 'registration' %}" class="auth-link {% active 'registration' %}">Become a Member</a>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <hr style = " margin: 0; border: #f5f5f5ea solid  0.5px; border-redius: 50%">
+
+        <div class="container nav-container">
+            <!-- Logo -->
+            <div class="logo-container">
+                <a href="{% url 'home' %}" class="logo">
+                    <img src="{% static 'home/images/logos/logo.png' %}" alt="SISPAB Logo" class="logo-img">
+                </a>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item {% active 'home' %}"><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+                    <li class="nav-item dropdown {% active 'about' 'founder' 'vision' 'mission' 'core_values' 'current_executive_commitee' 'previous_committee' 'sisbup_secretariat' %}">
+                        <a href="{% url 'about' %}" class="nav-link">About Us</a>
+
+                            <div class="dropdown-menu" style="min-width: 420px;">
+                                <div style="display: flex; padding: 0 10px;">
+
+                                    <!-- Column 1 -->
+                                    <div style="width: 70%; margin-left: 20px;">
+                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px;">About SiSPUB</a>
+                                        <a href="{% url 'core_values' %}"
+                                        class="dropdown-item {% active 'core_values' %}">
+                                            Core Values
+                                        </a>
+
+                                        <a href="{% url 'vision'%}"
+                                        class="dropdown-item {% active 'vision' %}">
+                                            Vision
+                                        </a>
+                                        <a href="{% url 'mission' %}"
+                                        class="dropdown-item {% active 'mission' %}">
+                                            Mission
+                                        </a>
+                                        <a href="{% url 'founder' %}" class="dropdown-item {% active 'founder' %}"> SISPAB Founders </a>
+                                    </div>
+
+                                    <!-- Column 2 -->
+                                    <div style="width: 100%;">
+                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px;">Our Team</a>
+                                        <a href="{% url 'current_executive_commitee' %}" class="dropdown-item {% active 'current_executive_commitee' %}">
+                                            Current Executive Committee
+                                        </a>
+                                        <a href="{% url 'previous_committee' %}" class="dropdown-item {% active 'previous_committee' %}">
+                                            Previous Executive Committee
+                                        </a>
+                                        <a href="{% url 'sisbup_secretariat' %}" class="dropdown-item {% active 'sisbup_secretariat' %}">
+                                            SISPAB Secretariat
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li>
+
+
+                    <li class="nav-item dropdown {% active 'benefit_od_member' 'advisory_council' 'member_resistation' 'membership_rules' 'process_of_members' %}">
+                        <a href="#" class="nav-link dropdown-toggle">Membership</a>
+                        <div class="dropdown-menu">
+                            <a href="{% url 'benefit_od_member' %}" class="dropdown-item {% active 'benefit_od_member' %}" style="margin-left: 20px;">Benefit of Members</a>
+                            <a href="{% url 'advisory_council' %}" class="dropdown-item {% active 'advisory_council' %}"  style="margin-left: 20px;">Advisory Council</a>
+                            <a href="{% url 'member_resistation' %}" class="dropdown-item {% active 'member_resistation' %}"  style="margin-left: 20px;">Member Registration</a>
+                            <a href="{% url 'membership_rules' %}" class="dropdown-item {% active 'membership_rules' %}"  style="margin-left: 20px;">Membership Rules</a>
+                            <a href="{% url 'process_of_members' %}" class="dropdown-item {% active 'process_of_members' %}"  style="margin-left: 20px;">Process of Membership</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown {% active  'news' 'media' 'video_gallery' %}">
+                        <a href="#" class="nav-link dropdown-toggle">News & Media</a>
+                        <div class="dropdown-menu">
+                            <a href="{% url 'news' %}" class="dropdown-item {% active 'news' %}"  style="margin-left: 20px;">News</a>
+                            <a href="{% url 'photo' %}" class="dropdown-item {% active 'photo' %}"  style="margin-left: 20px;">Photo Gallery</a>
+                            <a href="{% url 'video_gallery' %}" class="dropdown-item {% active 'video_gallery' %}"  style="margin-left: 20px;">Video Gallery</a>
+                        </div>
+                    </li>
+                    {% comment %} <li class="nav-item dropdown {% active  'publication' 'career' 'blog' %}">
+                        <a class="nav-link dropdown-toggle">Resources</a>
+                        <div class="dropdown-menu">
+                            <a href="" class="dropdown-item "  style="margin-left: 20px;">Publication</a>
+                            <a href="" class="dropdown-item "  style="margin-left: 20px;">Career</a>
+                            <a href="{% url 'blog' %}" class="dropdown-item {% active 'blog' %}"  style="margin-left: 20px;">Blogs</a>
+                        </div>
+                    </li> {% endcomment %}
+                    {% comment %} <li class="nav-item dropdown">
+                        <a class="nav-link">Our Initiatives</a>
+
+                            <div class="dropdown-menu" style="min-width: 420px;">
+                                <div style="display: flex; padding: 0 10px;">
+
+                                    <!-- Column 1 -->
+                                    <div style="width: 100%;">
+                                        <a style = "text-decoration: none; color: #000; font-weight: bold;margin-left: 20px; cursor: pointer; font-size: 15px;">Awards</a>
+                                
+                                        <a href="" class="dropdown-item"></a>
+                                    </div>
+
+                                    <!-- Column 2 -->
+                                    <div style="width: 100%;">
+                                        <a style = "text-decoration: none; color: #000; font-weight: bold;margin-left: 20px; cursor: pointer; font-size: 15px;">Events</a>
+                                        <a href="{% url 'meetings' %}" class="dropdown-item {% active 'meetings' %}"  style="margin-left: 20px;">
+                                            Meetings
+                                        </a>
+                                    </div>
+                                    <div style="width: 100%;">
+                                        <a style = "text-decoration: none; color: #000; font-weight: bold;margin-left: 20px; cursor: pointer; font-size: 15px;">Initiatives</a>
+                                        <a href="" class="dropdown-item ">
+                                            
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li> {% endcomment %}
+
+
+                        <li class="nav-item {% active 'complain' %} "><a href="{% url 'complain' %}" class="nav-link">Complain</a></li>
+                        <li class="nav-item  "><a href="" class="nav-link">Career</a></li>
+                        <li class="nav-item {% active 'contact' %} "><a href="{% url 'contact' %}" class="nav-link">Contacts</a></li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="nav-actions">
+            <div class="search-wrapper" id="autocomplete">
+                <input
+                    type="text"
+                    id="search-input"
+                    class="search-input"
+                    name="search"
+                    list="global-search-list"
+                    placeholder="What are you looking for?"
+                >
+                <datalist id="global-search-list">
+                    {% for name, url in global_search_items %}
+                        <option value="{{ name }}" data-url="{{ url }}">
+                    {% endfor %}
+                </datalist>
+
+                <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+
+            <button class="menu-toggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+
+        </div>
+    </nav>
+</header>
+
+<script>
+const searchWrapper = document.querySelector('.search-wrapper');
+const searchBtn = document.querySelector('.search-btn');
+
+searchBtn.addEventListener('click', () => {
+    searchWrapper.classList.toggle('active');
+    if(searchWrapper.classList.contains('active')){
+        searchWrapper.querySelector('.search-input').focus();
+    }
+
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('search-input');
+    const options = document.querySelectorAll('#global-search-list option');
+
+    input.addEventListener('change', function() {
+        const val = this.value;  // user input
+        let url = null;
+
+        // Find the option with the same value
+        options.forEach(option => {
+            if(option.value === val) {
+                url = option.getAttribute('data-url');
+            }
+        });
+
+        // Redirect to the URL if found
+        if(url) {
+            window.location.href = url;
+        }
+    });
+});
+
+
+</script>
+
+
+

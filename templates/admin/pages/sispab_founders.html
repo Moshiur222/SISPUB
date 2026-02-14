@@ -1,0 +1,69 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<div class="card mt-4">
+
+<div class="card mt-4">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">SISPAB Founders</h5>
+       <a href = "{% url 'add_founder' %}" class="btn btn-sm btn-success">
+                Add
+       </a>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Founder Name</th>
+                        <th>Designation</th>
+                        <th>Company</th>
+                        <th>Image</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for info in founders_info %}
+                    <tr>
+                        <td>{{ info.counter }}</td>
+                        <td>{{ info.founder_name }}</td>
+                        <td>{{info.designation}}</td>
+                        <td>{{info.company}}</td>
+                        <td>
+                            {% if info.founder_image %}
+                                <img src="{{ info.founder_image.url }}" alt="Image 3" class="img-fluid rounded" style="max-height: 100px;">
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'founder_update' info.id %}" class="btn btn-sm btn-warning" title="Edit Gallery">Edit</a>
+                            <form action="{% url 'founder_delete' info.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this gallery?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No gallery entries found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

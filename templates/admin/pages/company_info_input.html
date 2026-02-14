@@ -1,0 +1,79 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <!-- Card Header -->
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">Company Information</h5>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Company Name</label>
+                    <input name="company_name" type="text" value = "company.company_name" class="form-control rounded" placeholder="Enter Company Name">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Phone</label>
+                    <input name="phone" type="text" value = "company.phone" class="form-control rounded" placeholder="Enter Company Phone No">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Email</label>
+                    <input name="email" type="email" value = "email" class="form-control rounded" placeholder="Enter Company Email">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Office Hours</label>
+                    <input name="office_hours" type="text" value = "company.office_hours" class="form-control rounded" placeholder="Enter Office Hours">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Friday</label>
+                    <input name="friday" type="text" value = "company.friday" class="form-control rounded" placeholder="Enter Friday Hours">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">House No</label>
+                    <input name="house_no" type="text" class="form-control rounded" placeholder="Enter House No">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Block</label>
+                    <input name="block" type="text" value = "company.block" class="form-control rounded" placeholder="Enter Block">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">District</label>
+                    <input name="district"  type="text" value = "company.district" class="form-control rounded" placeholder="Enter District">
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Company Cirtificate</label>
+                    <input name="cirtificate" type="file" value = "company.cirtificate.url" class="form-control rounded" accept="image/*">
+                </div>
+
+
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Country</label>
+                    <input name="country" value = "company.country" type="text" class="form-control rounded" placeholder="Enter Country">
+                </div>
+            </div>
+        </div>
+        <!-- Card Footer -->
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'home_details' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+{% endblock content %}

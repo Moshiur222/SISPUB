@@ -1,3 +1,1449 @@
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from datetime import datetime
+from collections import defaultdict
+from django.db import transaction
+from .models import *
+from .utils import send_sms
+import random
 
-# Create your views here.
+
+# home_view start
+
+def home_view(request):
+    context = {
+        "gellaries": Gellary.objects.all(),
+        "videos": Video.objects.all(),
+        "goals": Goal.objects.all(),
+    }
+    return render(request, "home/layouts/home.html", context)
+
+
+def about_view(request):
+    return render(request, "home/layouts/about.html", {'about_para': AboutParagraph.objects.all(), "about_albums":AboutAlbum.objects.all(), "company_info": Company_info.objects.all()})
+
+def vision(request):
+    vision = Vision.objects.all()
+    context = {
+        "vision" : vision,
+    }
+    return render(request, "home/layouts/vision.html", context)
+
+def core_values(request):
+    core_values = CoreValues.objects.all()
+    context = {
+        "core_values" : core_values,
+    }
+    return render(request, "home/layouts/core_values.html", context)
+
+def mission(request):
+    mission = Mission.objects.all()
+    context = {
+        "mission" : mission,
+    }
+    return render(request, "home/layouts/mission.html", context)
+
+def founder_view(request):
+    founders = FoundersInfo.objects.all()
+    context = {
+        'founders' : founders
+    }
+    return render(request, "home/layouts/founder.html", context)
+
+def current_executive_commitee(request):
+    commitees = SispabExecutiveCom.objects.all()
+    context = {
+        'commitees': commitees
+    }
+    return render(request, "home/layouts/current_executive_commitee.html", context)
+
+def previous_committee(request):
+    commitees = PreviousExecutiveCommittee.objects.all()
+    context = {
+        'commitees' : commitees
+    }
+    return render(request, "home/layouts/previous_committee.html", context)
+
+def membership_rules(request):
+    rules_titles = MembershipRules.objects.all()
+    context = {
+        'rules_titles' : rules_titles,
+    }
+    return render(request, "home/layouts/membership_rules.html", context)
+
+
+def process_of_members(request):
+    return render(request, "home/layouts/process_of_members.html")
+
+def sisbup_secretariat(request):
+    return render(request, "home/layouts/sisbup_secretariat.html")
+
+
+def benefit_od_member(request):
+    return render(request, "home/layouts/benefit_of_member.html")
+
+def advisory_council(request):
+    return render(request, "home/layouts/advisory_council.html")
+
+def member_resistation(request):
+    return render(request, "home/layouts/member_resistation.html")
+
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        if not email or not password:
+            messages.error(request, "Email and password are required")
+            return render(request, "home/layouts/login.html")
+
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            if user.user_type == 1:
+                messages.success(request, "Welcome to Sispub")
+                return redirect("dashboard")
+            else:
+                messages.success(request, "Login Succesfully")                    
+                return redirect("home")
+
+        else:
+            messages.error(request, "Invalid email or password")
+
+    return render(request, "home/layouts/login.html")
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, "Logout")
+    return redirect('login')
+
+
+
+def bd_phone_validator(value):
+    """
+    Valid Bangladeshi phone number
+    Format: 01XXXXXXXXX (11 digits)
+    """
+    pattern = r'^01[3-9]\d{8}$'
+    if not re.match(pattern, value):
+        raise ValidationError(
+            "Please enter a valid mobile number (example: 017XXXXXXXX)"
+        )
+
+
+def registration_view(request):
+    if request.method == "POST" and "otp_code" in request.POST:
+        user_otp = request.POST.get("otp_code")
+        session_otp = request.session.get("otp")
+        reg_data = request.session.get("reg_data")
+
+        if not reg_data:
+            messages.error(request, "Session has expired. Please try again.")
+            return redirect("registration")
+
+        if str(user_otp) != str(session_otp):
+            messages.error(request, "Invalid OTP. Please try again.")
+            return render(request, "home/layouts/resistation.html", {"otp_sent": True})
+
+        try:
+            with transaction.atomic():
+
+                user = User.objects.create_user(
+                    email=reg_data["email"],
+                    password=reg_data["password"],
+                    user_type=2
+                )
+                aggregator = Aggregator(
+                    user=user,
+                    name=reg_data["name"],
+                    company_name=reg_data["company_name"],
+                    phone=reg_data["phone"],
+                    brtc_licence_no=reg_data["brtc_licence_no"],
+                    address=reg_data["address"]
+                )
+                aggregator.full_clean()
+                aggregator.save()
+
+            request.session.flush()
+            messages.success(request, "Account created successfully! Please log in.")
+            return redirect("registration")
+
+        except ValidationError as e:
+            messages.error(request, e.messages[0])
+
+        except Exception as e:
+            messages.error(request, str(e))
+
+        return render(request, "home/layouts/resistation.html", {"otp_sent": True})
+
+    elif request.method == "POST":
+        reg_data = {
+            "name": request.POST.get("name"),
+            "company_name": request.POST.get("company_name"),
+            "email": request.POST.get("email"),
+            "password": request.POST.get("password"),
+            "phone": request.POST.get("phone"),
+            "brtc_licence_no": request.POST.get("brtc_licence_no"),
+            "address": request.POST.get("address"),
+        }
+
+        if User.objects.filter(email=reg_data["email"]).exists():
+            messages.error(request, "An account with this email already exists.")
+            return redirect("registration")
+
+        otp = str(random.randint(100000, 999999))
+
+        request.session["reg_data"] = reg_data
+        request.session["otp"] = otp
+        request.session.modified = True
+
+        sms_text = f"Your OTP code is {otp}. Do not share this code with anyone."
+        sms_response = send_sms(reg_data["phone"], sms_text)
+
+        print("SMS RESPONSE:", sms_response)
+
+        if sms_response.get("code") != "445000":
+            messages.error(request, "Failed to send OTP. Please try again.")
+            return redirect("registration")
+
+        return render(request, "home/layouts/resistation.html", {"otp_sent": True})
+
+    return render(request, "home/layouts/resistation.html", {"otp_sent": False})
+
+
+def contact_view(request):
+    
+    return render(request, "home/layouts/contact_page.html")
+
+
+def blog_view(request):
+    blogs = Blog.objects.all().order_by('-date')
+
+    return render(request, "home/layouts/blog_page.html", {
+        "blogs": blogs
+    })
+    
+def news_view(request):
+    newses = News.objects.all().order_by('-date')
+    return render(request, "home/layouts/news.html", { "newses": newses })
+
+def news_detail_view(request, id):
+    news = get_object_or_404(News, id=id)
+    return render(request, "home/layouts/news_detail.html", { "news": news })
+
+
+def view_more(request, id):
+    blog = get_object_or_404(Blog, id=id)
+    return render(request, "home/layouts/view_more_blog_details.html", {"blog": blog})
+
+def complain_view(request):
+    aggregators = Aggregator.objects.all()
+
+    if request.method == "POST":
+        try:
+            aggregator_id = request.POST.get("aggregator")
+            aggregator = Aggregator.objects.get(id=aggregator_id) if aggregator_id else None
+
+            complain = ComplainList(
+                name=request.POST.get("name"),
+                email=request.POST.get("email"),
+                phone=request.POST.get("phone"),
+                aggregator=aggregator,
+                issue=request.POST.get("issue"),
+                suggestion=request.POST.get("suggestion"),
+            )
+            complain.full_clean()
+            complain.save()
+
+            messages.success(request, "Your complain has been submitted successfully!")
+            return redirect("complain")
+
+        except ValidationError as e:
+
+            for field, errors in e.message_dict.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+        except Aggregator.DoesNotExist:
+            messages.error(request, "Selected aggregator does not exist.")
+
+    return render(request, "home/layouts/complain.html", {"aggregators": aggregators})
+
+
+
+def media_view(request):
+    all_media = PhotoGallery.objects.all().order_by('year')
+    
+    media_by_year = {}
+    for media in all_media:
+        media_by_year.setdefault(media.year, []).append(media)
+
+    return render(request, "home/layouts/media_page.html", {'media_by_year': media_by_year})
+
+def photo_gallery(request):
+    all_photos = Photo.objects.all()
+    
+
+    return render(request, "home/layouts/photo_gallery.html", {'all_photos': all_photos})
+
+def photos(request):
+    albums = PhotoAlbum.objects.all()
+
+    context = {
+        'albums': albums
+    }
+    return render(request, "home/layouts/gallery.html", context)
+
+
+def events_view(request):
+    events = Events.objects.all()
+    events_meetings = Events_Meetings.objects.all()
+    context = {
+        "events": events,
+        "events_meetings": events_meetings
+    }
+    return render(request, "home/layouts/events.html", context)
+
+
+def video_gallery(request):
+    events = Events.objects.all()
+    events_meetings = Events_Meetings.objects.all()
+    context = {
+        "events": events,
+        "events_meetings": events_meetings
+    }
+    return render(request, "home/layouts/video_gallery.html", context)
+
+
+def meetings(request):
+
+    events_meetings = Events_Meetings.objects.all().order_by('title')
+
+
+    grouped_events = defaultdict(list)
+    for event in events_meetings:
+        grouped_events[event.title].append(event)
+
+
+    grouped_events = dict(grouped_events)
+
+    context = {
+        "grouped_events": grouped_events,
+    }
+    return render(request, "home/layouts/meetings.html", context)
+
+#home_view end
+
+
+# admin_view start
+@login_required
+def dashboard(request):
+    return render (request, "admin/pages/dashboard.html")
+@login_required
+def home_details(request):
+    return render (request, 'admin/pages/home_details.html', {"all_company_info" : Company_info.objects.all(), 
+                                                              "all_gellary": Gellary.objects.all(),  
+                                                              "videos": Video.objects.all(), 
+                                                              "all_video": Video.objects.all(),
+                                                              "all_goal": Goal.objects.all(),
+                                                              })
+@login_required
+def company_info_input(request):
+
+    try:
+        company = Company_info.objects.get(id=1)
+    except Company_info.DoesNotExist:
+        company = None
+
+    if request.method == "POST":
+        company_name = request.POST.get("company_name")
+        phone = request.POST.get("phone")
+        email = request.POST.get("email")
+        office_hours = request.POST.get("office_hours")
+        friday = request.POST.get("friday")
+        house_no = request.POST.get("house_no")
+        block = request.POST.get("block")
+        district = request.POST.get("district")
+        cirtificate = request.POST.get("cirtificate")
+        country = request.POST.get("country")
+
+        if company is None:
+            company = Company_info.objects.create(
+                company_name=company_name,
+                phone=phone,
+                email=email,
+                office_hours=office_hours,
+                friday=friday,
+                house_no=house_no,
+                block=block,
+                district=district,
+                cirtificate=cirtificate,
+                country=country
+            )
+        else:
+            company.company_name = company_name
+            company.phone = phone
+            company.email = email
+            company.office_hours = office_hours
+            company.friday = friday
+            company.house_no = house_no
+            company.block = block
+            company.district = district
+            company.country = country
+            company.save()
+
+        messages.success(request, "Company information updated successfully!")
+        return redirect("company_info_input")
+
+    return render(request, "admin/pages/company_info_input.html", {"company": company})
+
+
+@login_required
+def video_input(request, id):
+    video = get_object_or_404(Video, id=id)
+
+    if request.method == "POST":
+        video.title = request.POST.get("title")
+        video.url = request.POST.get("url")
+        video.description = request.POST.get("description")
+        video.save()
+
+        messages.success(request, "Video updated successfully!")
+        return redirect("video_input", video.id)
+
+    return render(request, "admin/pages/video_input.html", { "video": video })
+
+@login_required
+def gallry_input(request):
+    if request.method == "POST":
+        g_name = request.POST.get("gellary_name")
+        year = request.POST.get("year")
+        description = request.POST.get("description")
+        image = request.FILES.get("image")
+        image1 = request.FILES.get("image1")
+        image2 = request.FILES.get("image2")
+
+        g = Gellary.objects.create(
+            gellary_name=g_name,
+            year=year,
+            description=description,
+            image=image,
+            image1=image1,
+            image2=image2,
+        )
+        
+        messages.success(request, " Photo has been added successfully!")
+        return redirect("gallry_input")  
+    current_year = datetime.now().year
+    return render(request, "admin/pages/gallry_input.html", {'year_list': range(current_year, current_year - 30, -1), })
+
+@login_required
+def gallry_update(request, gellary_id):
+    gallery = get_object_or_404(Gellary, id=gellary_id)
+
+    if request.method == "POST":
+        gallery.gellary_name = request.POST.get("gellary_name")
+
+        year = request.POST.get("year")
+        gallery.year = int(year) if year else None
+
+        gallery.description = request.POST.get("description")
+
+        if request.FILES.get("image"):
+            gallery.image = request.FILES.get("image")
+        if request.FILES.get("image1"):
+            gallery.image1 = request.FILES.get("image1")
+        if request.FILES.get("image2"):
+            gallery.image2 = request.FILES.get("image2")
+
+        gallery.save()
+        messages.success(request, "Updated Successfully")
+        return redirect("gallry_update", gellary_id=gallery.id)
+
+    current_year = datetime.now().year
+
+    context = {
+        "galleries": gallery,
+        "year_list": range(current_year, current_year - 30, -1),
+    }
+
+    return render(request, "admin/pages/gallry_update.html", context)
+
+
+@login_required
+def gallry_delete(request, gellary_id):
+    gallery = get_object_or_404(Gellary, id=gellary_id)
+    if request.method == "POST":
+        gallery.delete()
+        messages.success(request, 'Photo deleted Succesfully')
+        return redirect("home_details")
+    return render(request, "admin/pages/home_details.html", {"gallery": gallery})
+
+@login_required
+def goal_input(request):
+    return render (request, 'admin/pages/goal_input.html')
+
+@login_required
+def goal_update(request, goal_id):
+    goal = get_object_or_404(Goal, id=goal_id)
+
+    if request.method == "POST":
+        goal.goal_tittle = request.POST.get("goal_tittle")
+        goal.goal_descriptions = request.POST.get("goal_descriptions")
+
+        goal.save()
+        messages.success(request, 'Updated Successfully')
+        return redirect("goal_input") 
+
+    return render(request, "admin/pages/goal_input.html", {"goal": goal})
+
+@login_required
+@login_required
+def about_details(request):
+    context = {
+        'about_paragraph': AboutParagraph.objects.all(),
+        'about_albums': AboutAlbum.objects.all(),
+        'vision': Vision.objects.all(),
+        'missions': Mission.objects.all(),
+        'core_values': CoreValues.objects.all(),
+    }
+    return render(request, "admin/pages/about_details.html", context)
+
+
+@login_required
+def update_story(request, id):
+    story = get_object_or_404(AboutParagraph, id=id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        descriptions = request.POST.get("descriptions")
+
+        if not title:
+            messages.error(request, "Title cannot be empty")
+            return render(request, "admin/pages/update_story.html", {"story": story})
+
+        story.title = title
+        story.descriptions = descriptions
+        story.save()
+        messages.success(request,'Story has been Updated')
+        return redirect("update_story", id=story.id)
+
+    return render(request, "admin/pages/update_story.html", {"story": story})
+
+@login_required
+def update_vision(request, id):
+    vision = get_object_or_404(Vision, id=id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        descriptions = request.POST.get("descriptions")
+
+        if not title:
+            messages.error(request, "Title cannot be empty")
+            return render(request, "admin/pages/update_story.html", {"vision": vision})
+
+        vision.title = title
+        vision.descriptions = descriptions
+        vision.save()
+        messages.success(request,'Vision has been Updated')
+        return redirect("update_story", id=vision.id)
+
+    return render(request, "admin/pages/update_vision.html", {"vision": vision})
+
+
+@login_required
+def update_mission(request, id):
+    mission = get_object_or_404(Mission, id=id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        descriptions = request.POST.get("descriptions")
+
+        if not title:
+            messages.error(request, "Title cannot be empty")
+            return render(request, "admin/pages/update_mission.html", {"mission": mission})
+
+        mission.title = title
+        mission.descriptions = descriptions
+        mission.save()
+        messages.success(request,'Mission has been Updated')
+        return redirect("update_story", id=mission.id)
+
+    return render(request, "admin/pages/update_mission.html", {"mission": mission})
+
+@login_required
+def update_core_values(request, id):
+    core_values = get_object_or_404(CoreValues, id=id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        descriptions = request.POST.get("descriptions")
+
+        if not title:
+            messages.error(request, "Title cannot be empty")
+            return render(request, "admin/pages/update_core_values.html", {"mission": mission})
+
+        core_values.title = title
+        core_values.descriptions = descriptions
+        core_values.save()
+        messages.success(request,'Core Values has been Updated')
+        return redirect("update_story", id=core_values.id)
+
+    return render(request, "admin/pages/update_core_values.html", {"core_values": core_values})
+
+@login_required
+def album_input(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        image_1 = request.FILES.get("image_1")
+        image_2 = request.FILES.get("image_2")
+        image_3 = request.FILES.get("image_3")
+        descriptions = request.POST.get("descriptions")
+
+        g = AboutAlbum.objects.create(
+            title=title,
+            image_1=image_1,
+            image_2=image_2,
+            image_3=image_3,
+            descriptions=descriptions,
+        )
+        messages.success(request,'Photo hase been Uploaded')
+        return redirect("album_input")  
+
+    return render(request, "admin/pages/album_input.html")
+
+@login_required
+def album_update(request, id):
+    about_albums = get_object_or_404(AboutAlbum, id=id)
+
+    if request.method == "POST":
+        about_albums.title = request.POST.get("title")
+        if request.FILES.get("image_1"):
+            about_albums.image_1 = request.FILES.get("image_1")
+        if request.FILES.get("image_2"):
+            about_albums.image_2 = request.FILES.get("image_2")
+        if request.FILES.get("image_3"):
+            about_albums.image_3 = request.FILES.get("image_3")
+        about_albums.descriptions = request.POST.get("descriptions")
+        about_albums.save()
+        messages.success(request, 'Photo has been Updated')
+        return redirect("album_update", id=about_albums.id)
+
+    return render(request, "admin/pages/album_update.html", {"about_albums": about_albums})
+
+@login_required
+def album_delete(request, id):
+    about_albums = get_object_or_404(AboutAlbum, id=id)
+    if request.method == "POST":
+        about_albums.delete()
+        messages.success(request,'Photo has been Deleted')
+        return redirect("about_details")
+    return render(request, "admin/pages/about_details.html", {"about_albums": about_albums})
+
+
+
+
+@login_required
+def co_sponsers(request):
+
+    if request.method == "POST":
+        image_1 = request.FILES.get("image_1")
+        image_2 = request.FILES.get("image_2")
+        image_3 = request.FILES.get("image_3")
+        image_4 = request.FILES.get("image_4")
+        image_5 = request.FILES.get("image_5")
+
+        g = Co_sponsers.objects.create(
+            image_1=image_1,
+            image_2=image_2,
+            image_3=image_3,
+            image_4=image_4,
+            image_5=image_5,
+        )
+        messages.success(request,'Co-ponser has been created')
+        return redirect("co_sponsers")  
+
+    return render(request, "admin/pages/co_sponsers.html")
+
+
+@login_required
+def sponser_update(request, id):
+    sponsers = get_object_or_404(Co_sponsers, id=id)
+
+    if request.method == "POST":
+        if request.FILES.get("image_1"):
+            sponsers.image_1 = request.FILES.get("image_1")
+
+        if request.FILES.get("image_2"):
+            sponsers.image_2 = request.FILES.get("image_2")
+
+        if request.FILES.get("image_3"):
+            sponsers.image_3 = request.FILES.get("image_3")
+
+        if request.FILES.get("image_4"):
+            sponsers.image_4 = request.FILES.get("image_4")
+
+        if request.FILES.get("image_5"):
+            sponsers.image_5 = request.FILES.get("image_5")
+        sponsers.save()
+        messages.success(request,'Co-sposer has been Updated')
+        return redirect("sponser_update", id=sponsers.id)
+
+    return render(request, "admin/pages/sponser_update.html", {"sponsers": sponsers})
+
+@login_required
+def sponser_delete(request, id):
+    sponsers = get_object_or_404(Co_sponsers, id=id)
+    if request.method == "POST":
+        sponsers.delete()
+        messages.success(request,'Co-sponser has been deleted')
+        return redirect("about_details")
+
+
+
+
+
+@login_required
+def sispab_founders(request):
+    founders_info = FoundersInfo.objects.all()
+    context = {
+        'founders_info': founders_info
+    }
+    return render(request, "admin/pages/sispab_founders.html", context)
+@login_required
+def add_founder(request):
+    if request.method == "POST":
+        founder_name = request.POST.get("founder_name")
+        designation = request.POST.get("designation")
+        company = request.POST.get("company")
+        founder_image = request.FILES.get("founder_image")
+       
+
+        g = FoundersInfo.objects.create(
+            founder_name=founder_name,
+            designation=designation,
+            company=company,
+            founder_image=founder_image,
+        )
+        messages.success(request,'Fouduner has been created')
+        return redirect("add_founder")  
+
+    return render(request, "admin/pages/add_founder.html")
+@login_required
+def founder_update(request, id):
+    info = get_object_or_404(FoundersInfo, id=id)
+
+    if request.method == "POST":
+        info.founder_name = request.POST.get("founder_name")
+        info.designation = request.POST.get("designation")
+        info.company = request.POST.get("company")
+        if request.FILES.get("founder_image"):
+            info.founder_image = request.FILES.get("founder_image")
+        info.save()
+        messages.success(request,'Founder has been Updated')
+        return redirect("founder_update",  id=info.id)
+
+    return render(request, "admin/pages/founder_update.html", {"info": info})
+
+@login_required
+def founder_delete(request, id):
+    info = get_object_or_404(FoundersInfo, id=id)
+    if request.method == "POST":
+        info.delete()
+        messages.success(request,'Founder has been Deleted')
+        return redirect("sispab_founders")
+    return render(request, "admin/pages/sispab_founders.html", {"info's": info})
+
+
+
+
+@login_required
+def sispab_executive_com(request):
+    sispab_executive_com = SispabExecutiveCom.objects.all()
+    context = {
+        'sispab_executive_com_info': sispab_executive_com
+    }
+    return render(request, "admin/pages/sispab_executive_com.html", context)
+
+@login_required
+def add_sispab_executive_com(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        position = request.POST.get("position")
+        image = request.FILES.get("image")
+
+        SispabExecutiveCom.objects.create(
+            name=name,
+            position=position,
+            image=image
+        )
+        messages.success(request, 'Created Successfully')
+        return redirect("add_sispab_executive_com")
+
+    return render(request, "admin/pages/add_sispab_executive_com.html")
+
+@login_required
+def sispab_executive_com_update(request, id):
+    info = get_object_or_404(SispabExecutiveCom, id=id)
+
+    if request.method == "POST":
+        info.name = request.POST.get("name")
+        info.position = request.POST.get("position")
+        if request.FILES.get("image"):
+            info.image = request.FILES.get("image")
+        info.save()
+        messages.success(request,'Updated Successfully')
+        return redirect("sispab_executive_com_update",  id=info.id)
+
+    return render(request, "admin/pages/sispab_executive_com_info.html", {"info": info})
+
+@login_required
+def sispab_executive_com_delete(request, id):
+    info = get_object_or_404(SispabExecutiveCom, id=id)
+    if request.method == "POST":
+        info.delete()
+        messages.success(request,'Deleted Successfully')
+        return redirect("sispab_executive_com")
+    return render(request, "admin/pages/sispab_executive_com.html", {"info's": info})
+
+@login_required
+def previous_executive_committee(request):
+    previous_executive_committee = PreviousExecutiveCommittee.objects.all()
+    context = {
+        'previous_executive_committee_info': previous_executive_committee
+    }
+    return render(request, "admin/pages/previous_executive_committee.html", context)
+
+@login_required
+def add_previous_executive_committee(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        position = request.POST.get("position")
+        designation = request.POST.get("designation")
+        company = request.POST.get("company")
+        image = request.FILES.get("image")
+
+        PreviousExecutiveCommittee.objects.create(
+            name=name,
+            position=position,
+            designation=designation,
+            company=company,
+            image=image
+        )
+        messages.success(request, 'Created Successfully')
+        return redirect("add_previous_executive_committee")
+
+    return render(request, "admin/pages/add_previous_executive_committee.html")
+
+@login_required
+def previous_executive_committee_update(request, id):
+    info = get_object_or_404(PreviousExecutiveCommittee, id=id)
+
+    if request.method == "POST":
+        info.name = request.POST.get("name")
+        info.position = request.POST.get("position")
+        info.designation = request.POST.get("designation")
+        info.company = request.POST.get("company")
+        if request.FILES.get("image"):
+            info.image = request.FILES.get("image")
+        info.save()
+        messages.success(request,'Updated Successfully')
+        return redirect("previous_executive_committee_update",  id=info.id)
+
+    return render(request, "admin/pages/previous_executive_committee_update.html", {"info": info})
+
+@login_required
+def previous_executive_committee_delete(request, id):
+    info = get_object_or_404(PreviousExecutiveCommittee, id=id)
+    if request.method == "POST":
+        info.delete()
+        messages.success(request,'Deleted Successfully')
+        return redirect("previous_executive_committee")
+    return render(request, "admin/pages/previous_executive_committee.html", {"info's": info})
+
+@login_required
+def AdminEvents(request):
+    events = Events.objects.all()
+    meetings = Events_Meetings.objects.all()
+    context = {
+        'meetings': meetings,
+        'events': events
+    }
+    return render(request, "admin/pages/events.html", context)
+
+
+@login_required
+def upload_video(request):
+    if request.method == "POST":
+        title_text = request.POST.get("title")
+        description_text = request.POST.get("description")
+        url_1 = request.POST.get("url_1")
+        url_2 = request.POST.get("url_2")
+
+        event_title = EventTitle.objects.create(
+            title=title_text,
+            description=description_text
+        )
+
+        Events.objects.create(
+            title=event_title,
+            url_1=url_1,
+            url_2=url_2
+        )
+
+        messages.success(request, "Video uploaded successfully!")
+        return redirect("upload_video")
+
+    return render(request, "admin/pages/upload_video.html")
+
+
+
+
+@login_required
+def video_update(request, id):
+    info = get_object_or_404(Events, id=id)
+
+    if request.method == "POST":
+        title_text = request.POST.get("title")
+        description_text = request.POST.get("description")
+
+        if info.title:
+            info.title.title = title_text
+            info.title.description = description_text
+            info.title.save()
+        else:
+
+            event_title = EventTitle.objects.create(
+                title=title_text,
+                description=description_text
+            )
+            info.title = event_title
+
+        info.url_1 = request.POST.get("url_1")
+        info.url_2 = request.POST.get("url_2")
+        info.save()
+
+        messages.success(request, "Updated Successfully")
+        return redirect("video_update", id=info.id)
+
+    return render(request, "admin/pages/video_update.html", {"info": info})
+
+
+@login_required
+def video_delete(request, id):
+    info = get_object_or_404(Events, id=id)
+    if request.method == "POST":
+        info.delete()
+        messages.success(request,'Deleted Successfully')
+        return redirect("AdminEvents")
+    return render(request, "admin/pages/events.html")
+
+@login_required
+def meeting_create(request):
+    if request.method == "POST":
+        Events_Meetings.objects.create(
+            title=request.POST.get("title"),
+            url=request.POST.get("url"),
+            description=request.POST.get("description"),
+        )
+        messages.success(request, "Meeting video uploaded successfully!")
+        return redirect("meeting_create")
+    
+    return render(request, "admin/pages/meeting_create.html", {"action": "Add"})
+
+
+@login_required
+def meeting_update(request, id):
+    meeting = get_object_or_404(Events_Meetings, id=id)
+
+    if request.method == "POST":
+        meeting.title = request.POST.get("title")
+        meeting.url = request.POST.get("url")
+        meeting.description = request.POST.get("description")
+        meeting.save()
+
+        messages.success(request, "Meeting video updated successfully!")
+        # Use the correct URL name
+        return redirect("meeting_video_update", id=meeting.id)
+
+    return render(
+        request,
+        "admin/pages/meeting_update.html",
+        {"meeting": meeting}
+    )
+
+@login_required
+def meeting_delete(request, id):
+    meeting = get_object_or_404(Events_Meetings, id=id)
+    if request.method == "POST":
+        meeting.delete()
+        messages.success(request, "Meeting video deleted successfully!")
+        return redirect("AdminEvents")
+
+
+
+
+
+@login_required
+def AdminMedia(request):
+    media = PhotoGallery.objects.all()
+    context = {
+        "media": media
+    }
+    return render(request, "admin/pages/AminMedia.html", context)
+
+@login_required
+def AdminMediaUpload(request):
+    if request.method == "POST":
+        PhotoGallery.objects.create(
+            title=request.POST.get("title"),
+            year=request.POST.get("year"),
+            description=request.POST.get("description"),
+            image=request.FILES.get("image"),
+        )
+        messages.success(request, "Uploaded successfully")
+        
+        return redirect("AdminMediaUpload")
+    return render(request, "admin/pages/Admin_Media_Upload.html")
+
+@login_required
+def AdminMediaUpdate(request, id):
+    media = get_object_or_404(PhotoGallery, id=id)
+
+    if request.method == "POST":
+        media.title = request.POST.get("title")
+        media.year = request.POST.get("year")
+        media.description = request.POST.get("description")
+
+        if request.FILES.get("image"):
+            media.image = request.FILES.get("image")
+
+        media.save()
+        messages.success(request, "Updated successfully")
+        return redirect("AdminMediaUpdate", media.id)
+
+    return render(request, "admin/pages/Admin_Media_Update.html", {
+        "media": media
+    })
+
+@login_required
+def AdminMediaDelete(request, id):
+    media = get_object_or_404(PhotoGallery, id=id)
+
+    if request.method == "POST":
+        media.delete()
+        messages.success(request, "Deleted successfully")
+
+    return redirect("AdminMedia")
+
+@login_required
+def AdminBlog(request):
+    blogs = Blog.objects.all()
+    context = {
+        "blogs": blogs
+    }
+    return render(request, "admin/pages/AdminBlog.html", context)
+
+@login_required
+def add_blogs(request):
+    if request.method == "POST":
+        Blog.objects.create(
+            title=request.POST.get("title"),
+            image=request.FILES.get("image"), 
+            date=request.POST.get("date") or None,
+            description=request.POST.get("description"),
+        )
+        messages.success(request, "Blog uploaded successfully")
+        return redirect("add_blogs")
+    return render(request, "admin/pages/add_blogs.html")
+
+@login_required
+def blog_update(request, id):
+    blog = get_object_or_404(Blog, id=id)
+
+    if request.method == "POST":
+        blog.title = request.POST.get("title")
+        blog.date = request.POST.get("date") or None
+        blog.description = request.POST.get("description") or None
+
+        if request.FILES.get("image"):
+            blog.image = request.FILES.get("image")
+
+        blog.save()
+        messages.success(request, "Blog updated successfully")
+        return redirect("AdminBlog")
+
+    return render(request, "admin/pages/block_update.html", {"blog": blog})
+
+@login_required
+def blog_delete(request, id):
+    blog = get_object_or_404(Blog, id=id)
+    if request.method == "POST":
+        blog.delete()
+        messages.success(request, "Blog deleted successfully")
+        return redirect("AdminBlog")
+    return redirect("AdminBlog")
+
+@login_required
+def AdminCampain(request):
+    complains = ComplainList.objects.all()
+    context = {
+        "complains":complains
+    }
+    return render(request, "admin/pages/complain_list.html", context)
+
+@login_required
+def complain_update(request, id):
+    complain = get_object_or_404(ComplainList, id=id)
+
+    if request.method == "POST":
+        complain.name = request.POST.get("name")
+        complain.email = request.POST.get("email")
+        complain.phone = request.POST.get("phone") 
+        complain.issue = request.POST.get("issue")
+        complain.suggetion = request.POST.get("suggetion")
+
+        try:
+            complain.full_clean()
+            complain.save()
+
+            messages.success(request, "Complain updated successfully")
+            return redirect("AdminCampain")
+
+        except ValidationError as e:
+            if "phone" in e.message_dict:
+                messages.error(request, e.message_dict["phone"][0])
+            else:
+                messages.error(request, "Invalid data submitted")
+
+    return render(
+        request,
+        "admin/pages/complain_update.html",
+        {"complain": complain}
+    )
+
+@login_required
+def complain_delete(request, id):
+    complain = get_object_or_404(ComplainList, id=id)
+    if request.method == "POST":
+        complain.delete()
+        messages.success(request, "Complain deleted successfully")
+        return redirect("AdminCampain")
+
+@login_required
+def AdminContact(request):
+    contact = Contact_list.objects.all()
+    context = {
+        'contacts': contact
+    }
+    return render(request, "admin/pages/contact_list.html", context)
+
+
+@login_required
+def contact_update(request, id):
+    contact = get_object_or_404(Contact_list, id=id)
+
+    if request.method == "POST":
+        contact.name = request.POST.get("name")
+        contact.email = request.POST.get("email")
+        contact.address = request.POST.get("address")
+        contact.business_name = request.POST.get("business_name")
+        contact.message = request.POST.get("message")
+
+        contact.save()
+        messages.success(request, "Contact updated successfully!")
+        return redirect("AdminContact")
+
+    return render(request, "admin/pages/contact_update.html", {"contact": contact})
+
+@login_required
+def contact_delete(request, id):
+    contact = get_object_or_404(Contact_list, id=id)
+
+    if request.method == "POST":
+        contact.delete()
+        messages.success(request, "Contact deleted successfully!")
+        return redirect("AdminContact")
+
+    return render(request, "admin/pages/contact_list.html", {"contact": contact})
+
+
+@login_required
+def AdminMembersRules(request):
+    membership_rules = MembershipRules.objects.all()
+    context = {
+         "membership_rules": membership_rules,
+    }
+    return render(request, "admin/pages/membership_rules.html", context)
+
+@login_required
+def AdminMembersRulesAdd(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        rules = request.POST.get("rules")
+
+        MembershipRules.objects.create(
+            title=title,
+            description=description,
+            rules=rules,
+        )
+        messages.success(request, "Membership rules added successfully!")
+        return redirect("AdminMembersRulesAdd")
+
+    return render(request, "admin/pages/add_rules_title_descriptions.html")
+
+
+@login_required
+def AdminMembersRulesUpdate(request, id):
+    membership = get_object_or_404(MembershipRules, id=id)
+
+    if request.method == "POST":
+        membership.title = request.POST.get("title")
+        membership.description = request.POST.get("description")
+        membership.rules = request.POST.get("rules")
+        membership.save()
+
+        messages.success(
+            request,
+            "Membership rule updated successfully!"
+        )
+        return redirect("AdminMembersRulesUpdate", id=id)
+
+    return render(
+        request,
+        "admin/pages/membership_rules_update.html",
+        {"membership": membership}
+    )
+
+
+@login_required
+def AdminMembersRulesDelete(request, id):
+    membership = get_object_or_404(MembershipRules, id=id)
+
+    if request.method == "POST":
+        membership.delete()
+        messages.success(request, "Membership Title Descriptions deleted successfully!")
+        return redirect("AdminMembersRules")
+
+
+@login_required
+def AdminNewa(request):
+    newses = News.objects.all()
+    return render(request, "admin/pages/admin_news.html", {"newses": newses})
+
+@login_required
+def AdminAddNews(request):
+    if request.method == "POST":
+        News.objects.create(
+            title=request.POST.get("title"),
+            image=request.FILES.get("image"), 
+            date=request.POST.get("date") or None,
+            description=request.POST.get("description"),
+        )
+        messages.success(request, "News uploaded successfully")
+        return redirect("AdminAddNews")
+    return render(request, "admin/pages/news_upload.html")
+
+
+
+@login_required
+def AdminUpdateNews(request, id):
+    newses = get_object_or_404(News, id=id)
+
+    if request.method == "POST":
+        newses.title = request.POST.get("title")
+        
+        if request.FILES.get("image"):
+            newses.image = request.FILES.get("image")
+        
+        newses.date = request.POST.get("date") or None
+        newses.description = request.POST.get("description")
+        
+        newses.save()
+
+        messages.success(request, "News updated successfully")
+        return redirect("news_update", id=newses.id)
+
+    return render(request, "admin/pages/news_update.html", {
+        "newses": newses
+    })
+
+
+@login_required
+def AdminNewswDelete(request, id):
+    news = get_object_or_404(News, id=id)
+    if request.method == "POST":
+        news.delete()
+        messages.success(request, "News deleted successfully!")
+        return redirect("AdminNewa")
+    
+
+
+@login_required
+def admin_photo_list(request, id):
+    album = get_object_or_404(PhotoAlbum, id = id)
+    photos = album.photos.all()
+    context = {
+        'album': album,
+        'photos': photos
+    }
+    return render(request, 'admin/pages/photo_gallery.html', context)
+
+@login_required
+def admin_add_photo(request, id):
+    album = get_object_or_404(PhotoAlbum, id=id)
+    if request.method == 'POST':
+        files = request.FILES.getlist('images')
+
+        if files:
+            photos = []
+            for file in files:
+                photo = Photo.objects.create(album=album, image=file)
+                photos.append(photo)
+
+            album.banner = random.choice(photos).image
+            album.save()
+
+            messages.success(request, "Photos added successfully!")
+            return redirect('admin_photo_list', id=album.id)
+        else:
+            messages.error(request, "Please select at least one image.")
+
+    context = {
+        'album': album
+    }
+    return render(request, 'admin/pages/admin_add_photo.html', context)
+
+
+@login_required
+def admin_update_photo(request, id):
+    photo = get_object_or_404(Photo, id=id)
+    album = PhotoAlbum.objects.all()
+
+    if request.method == 'POST':
+        file = request.FILES.getlist('image')
+
+        if file:
+            photo.image = file[0]
+            photo.save()
+
+            for file in file[1:]:
+                Photo.objects.create(album=photo.album, image=file)
+
+            all_photos = photo.album.photos.all()
+            if all_photos:
+                photo.album.banner = random.choice(all_photos).image
+                photo.album.save()
+
+        messages.success(request, "Photo updated successfully!")
+        return redirect('admin_update_photo', id=photo.id)
+    
+
+    return render(request, 'admin/pages/admin_update_photo.html', { 
+        'photo': photo, 
+        'album': album
+        })
+
+@login_required
+def delete_photo(request, id):
+    photo = get_object_or_404(Photo, id=id)
+    album = photo.album
+
+    if request.method == "POST":
+        photo.delete()
+
+        if not album.photos.exists():
+            album.delete()
+            messages.success(request, "Photo deleted and album removed (no photos left).")
+        else:
+            messages.success(request, "Photo deleted successfully!")
+
+        return redirect("admin_photo_list")
+    
+
+
+@login_required
+def admin_Album_list(request):
+    album = PhotoAlbum.objects.all()
+    context = {
+        'album': album
+    }
+    return render(request, 'admin/pages/album_list.html', context)
+
+@login_required
+def admin_add_album(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        banner = request.FILES.get('banner')
+
+        if title and banner:
+            PhotoAlbum.objects.create(title=title, banner=banner)
+            messages.success(request, "Album created successfully!")
+            return redirect('admin_add_album')
+        else:
+            messages.error(request, "Please enter a title and select a banner image.")
+
+    return render(request, 'admin/pages/admin_add_album.html')
+
+@login_required
+def admin_update_album(request, id):
+    album = get_object_or_404(PhotoAlbum, id=id)
+
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        file = request.FILES.get('banner')
+
+        # Update title
+        if title and title.strip() != "":
+            album.title = title
+            album.save()
+
+        # Update banner image
+        if file:
+            album.banner = file
+            album.save()
+
+        messages.success(request, "Album updated successfully!")
+        return redirect('admin_update_album', id=album.id)
+
+    return render(request, 'admin/pages/admin_update_album.html', { 'album': album })
+
+@login_required
+def delete_album(request, id):
+    photo = get_object_or_404(PhotoAlbum, id=id)
+
+    if request.method == "POST":
+        photo.delete()
+        messages.success(request, "Album deleted successfully!")
+        return redirect("admin_Album_list")
+
+
+
+
+
+
+
+
+
+# admin_view end
+
+
+#common for all
+def contact_submit(request):
+   if request.method == "POST":
+        Contact_list.objects.create(
+            name=request.POST.get("name"),
+            email=request.POST.get("email"),
+            address=request.POST.get("address"),
+            business_name=request.POST.get("residential_business"),
+            message=request.POST.get("message"),
+        )
+
+
+        messages.success(request, "Thank you! Your message has been sent successfully.")
+        return redirect(request.META.get("HTTP_REFERER", "/"))
+   

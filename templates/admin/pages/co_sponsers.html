@@ -1,0 +1,70 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="card mt-5 shadow-sm mx-auto" style="max-width: 1000px;">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <!-- Card Header -->
+        <div class="card-header bg-warning text-dark text-center py-2">
+            <h5 class="mb-0 fw-bold">Co Sponsors</h5>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+            <label class="form-label fw-bold">Upload Images</label>
+            <div class="d-flex flex-row flex-nowrap gap-3 overflow-auto py-2">
+                {% for i in "12345" %}
+                <div class="text-center" style="min-width: 150px;">
+                    <input
+                        type="file"
+                        name="image_{{ i }}"
+                        class="form-control"
+                        accept="image/*"
+                        onchange="previewImage(this, 'preview{{ i }}')"
+                    />
+                    <img
+                        id="preview{{ i }}"
+                        src="#"
+                        alt="Preview"
+                        class="img-fluid rounded mt-2 shadow-sm"
+                        style="display: none; max-height: 150px; border: 1px solid #ddd;"
+                    >
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'about_details' %}" class="btn btn-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4">Submit</button>
+        </div>
+    </div>
+</form>
+
+<script>
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+    }
+}
+</script>
+{% endblock content %}

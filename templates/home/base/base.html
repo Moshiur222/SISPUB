@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!-- saved from url=(0023)https://www.sispab.org/ -->
+<html lang="en-US" class="js">
+{% load static %}
+<head>
+	{% include "home/layouts/head.html" %}	
+	{% block extra_css %}{% endblock extra_css %}
+</head>
+
+<body class="home wp-singular page-template-default page page-id-30 wp-theme-Divi et-tb-has-template et-tb-has-footer et_pb_button_helper_class et_fixed_nav et_show_nav et_primary_nav_dropdown_animation_fade et_secondary_nav_dropdown_animation_fade et_header_style_left et_cover_background et_pb_gutter windows et_pb_gutters3 et_pb_pagebuilder_layout et_no_sidebar et_divi_theme et-db chrome" style="overflow-x: hidden;">
+	{% include "home/layouts/header.html" %}
+				 <!-- .container -->
+			<!-- #main-header -->
+			{% block main %}{% endblock main %}    
+    {% include "home/layouts/footer.html" %}
+	{% block extra_js %}{% endblock extra_js %}
+    {% include "home/layouts/js.html" %}
+</body>
+
+</html>

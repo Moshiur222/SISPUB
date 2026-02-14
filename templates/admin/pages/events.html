@@ -1,0 +1,147 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">All Events</h5>
+        <a href="{% url 'upload_video' %}" class="btn btn-sm btn-warning">
+            Upload Video
+        </a>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="videoTable" class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Video URL</th>
+                        <th>Video URL</th>
+                        <th>Description</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ event.title }}</td>
+                       <td>
+                    <iframe width="560" height="315"
+                        src="{{ event.embed_url_1 }}"
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
+                    </iframe>
+                </td>
+                <td>
+                    <iframe width="560" height="315"
+                        src="{{ event.embed_url_2 }}"
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
+                    </iframe>
+                </td>
+
+                        <td>{{ video.description|truncatechars:50 }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'video_update' event.id %}" class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+                            <form action="{% url 'video_delete' event.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this video?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No videos found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">All Meetings</h5>
+        <a href="{% url 'meeting_create' %}" class="btn btn-sm btn-warning">
+            Upload Videos
+        </a>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="videoTable" class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Video URL</th>
+                        <th>Description</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                {% for meeting in meetings %}
+                <tbody>
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ meeting.title }}</td>
+
+        <td>
+            {% if meeting.embed_url %}
+            <iframe width="560" height="315" src="{{meeting.embed_url}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            {% endif %}
+        </td>
+
+        <td>{{ meeting.description|truncatechars:50 }}</td>
+
+        <td class="text-center">
+            <a href="{% url 'meeting_video_update' meeting.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <form action="{% url 'meeting_video_delete' meeting.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Are you sure you want to delete this video?')">
+                    Delete
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="10" class="text-center text-muted">
+            No meetings found
+        </td>
+    </tr>
+</tbody>
+{% endfor %}
+
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

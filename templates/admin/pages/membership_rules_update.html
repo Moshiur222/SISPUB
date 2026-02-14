@@ -1,0 +1,100 @@
+{% extends "admin/base/base.html" %}
+
+{% block custom_css %}
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{% endblock custom_css %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Card Header -->
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">Update Rules Title & Descriptions</h5>
+        </div>
+
+        <!-- Title -->
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Rule Title</label>
+                <input
+                    type="text"
+                    name="title"
+                    class="form-control rounded"
+                    placeholder="Enter title"
+                    value="{{ membership.title }}"
+                    required
+                >
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+
+                <!-- Hidden textarea -->
+                <textarea name="description" id="description" hidden></textarea>
+
+                <!-- Quill Editor -->
+                <div id="descriptionEditor" style="height: 180px;">
+                    {{ membership.description|safe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Rules -->
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Rules</label>
+
+                <!-- Hidden textarea -->
+                <textarea name="rules" id="rules" hidden></textarea>
+
+                <!-- Quill Editor -->
+                <div id="rulesEditor" style="height: 180px;">
+                    {{ membership.rules|safe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'AdminMembersRules' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update Rule</button>
+        </div>
+    </div>
+</form>
+{% endblock content %}
+
+{% block custom_js %}
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<script>
+    var descriptionQuill = new Quill('#descriptionEditor', {
+        theme: 'snow'
+    });
+
+    var rulesQuill = new Quill('#rulesEditor', {
+        theme: 'snow'
+    });
+
+    // Copy Quill content into hidden textarea before submit
+    document.querySelector('form').onsubmit = function () {
+        document.getElementById('description').value = descriptionQuill.root.innerHTML;
+        document.getElementById('rules').value = rulesQuill.root.innerHTML;
+    };
+</script>
+{% endblock custom_js %}

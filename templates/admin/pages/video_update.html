@@ -1,0 +1,79 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<form method="post" class="mt-5">
+    {% csrf_token %}
+
+    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Header -->
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">Update Event Video</h5>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Video Title</label>
+                <input
+                    name="title"
+                    type="text"
+                    class="form-control rounded"
+                    value="{{ info.title }}"
+                    placeholder="Enter Video Title"
+                />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Video URL 1</label>
+                <input
+                    name="url_1"
+                    type="url"
+                    class="form-control rounded"
+                    value="{{ info.url_1 }}"
+                    placeholder="Enter Video URL 1"
+                />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Video URL 2</label>
+                <input
+                    name="url_2"
+                    type="url"
+                    class="form-control rounded"
+                    value="{{ info.url_2 }}"
+                    placeholder="Enter Video URL 2"
+                />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Video Description</label>
+                <textarea
+                    name="description"
+                    class="form-control rounded"
+                    rows="3"
+                    placeholder="Enter Video Description"
+                >{{ info.description }}</textarea>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'AdminEvents' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+
+    </div>
+</form>
+{% endblock content %}

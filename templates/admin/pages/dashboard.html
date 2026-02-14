@@ -1,0 +1,26 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+  {% if messages %}
+    <div class="d-flex justify-content-center mt-5">
+      <div class="col-12 col-md-6 col-lg-5 text-center">
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show auto-dismiss" role="alert">
+            <strong>{{ message }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Auto dismiss script -->
+  <script>
+    setTimeout(function () {
+      const alerts = document.querySelectorAll('.auto-dismiss');
+      alerts.forEach(function (alert) {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+      });
+    }, 1500);
+  </script>
+{% endblock content %}

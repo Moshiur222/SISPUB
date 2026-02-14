@@ -1,0 +1,95 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+
+<!-- ✅ QUILL CSS (ADDED) -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<form method="post" class="mt-5">
+    {% csrf_token %}
+
+    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Card Header -->
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">Vision</h5>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+            <div class="row g-3">
+
+                <!-- Title -->
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Title</label>
+                    <input
+                        name="title"
+                        type="text"
+                        class="form-control rounded"
+                        placeholder="Enter Title"
+                        value="{{ vision.title }}"
+                    />
+                </div>
+
+                <!-- Description -->
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Description</label>
+
+                    <!-- 🔹 ORIGINAL TEXTAREA (UNCHANGED) -->
+                    <textarea
+                        id="description"
+                        name="descriptions"
+                        class="form-control rounded"
+                        rows="7"
+                        style="min-height:160px;"
+                    >{{ vision.descriptions }}</textarea>
+
+                    <div id="quill-editor" style="height: 220px;"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'about_details' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </div>
+</form>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<script>
+    const textarea = document.getElementById("description");
+    textarea.style.display = "none";
+
+    const quill = new Quill("#quill-editor", {
+        theme: "snow",
+        placeholder: "Enter Description...",
+        modules: {
+            toolbar: [
+                [{ header: [1, 2, 3, false] }],
+                ["bold", "italic", "underline"],
+                [{ list: "ordered" }, { list: "bullet" }],
+                ["link", "blockquote"],
+                ["clean"]
+            ]
+        }
+    });
+
+    quill.root.innerHTML = textarea.value;
+
+    textarea.closest("form").addEventListener("submit", function () {
+        textarea.value = quill.root.innerHTML;
+    });
+</script>
+
+{% endblock content %}

@@ -1,0 +1,146 @@
+{% extends "home/base/base.html" %}
+{% block title %}Login{% endblock title %}
+
+{% block extra_css %}
+<!-- Bootstrap CSS -->
+{% endblock extra_css %}
+
+{% block main %}
+<style>
+    /* Scoped styles for the login container */
+    .login-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(140deg, rgba(0, 72, 114, 0.9) 0%, rgba(41, 17, 96, 0.8) 100%);
+        padding: 20px;
+    }
+
+    .login-card {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .login-card h2 {
+        margin-bottom: 25px;
+        color: #333;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .login-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .error-msg {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: none;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2>Login</h2>
+
+        <!-- Display Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger alert-dismissible fade show auto-dismiss" style = "color : red; text-align : center" role="alert">
+                    <strong>{{ message }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+
+        <form id="loginForm" method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <div id="passwordError" class="error-msg">
+                    Password must be at least 6 characters.
+                </div>
+            </div>
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+    </div>
+</div>
+
+{% endblock main %}
+
+{% block extra_js %}
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Client-side password validation
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('passwordError');
+
+        if (password.length < 4) {
+            event.preventDefault();
+            errorDiv.style.display = 'block';
+        } else {
+            errorDiv.style.display = 'none';
+        }
+    });
+
+    setTimeout(function () {
+      const alerts = document.querySelectorAll('.auto-dismiss');
+      alerts.forEach(function (alert) {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+      });
+    }, 4000);
+  </script>
+{% endblock extra_js %}

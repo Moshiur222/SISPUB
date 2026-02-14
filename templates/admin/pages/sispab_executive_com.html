@@ -1,0 +1,67 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<div class="card mt-4">
+
+<div class="card mt-4">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Sispab Executive Committee</h5>
+       <a href = "{% url 'add_sispab_executive_com' %}" class="btn btn-sm btn-success">
+                Add
+       </a>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Photo</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                {% for info in sispab_executive_com_info %}
+                <tbody>
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{info.name}}</td>
+                        <td>{{info.position}}</td>
+                        <td>
+                            {% if info.image %}
+                                <img src="{{ info.image.url }}" alt="Image 3" class="img-fluid rounded" style="max-height: 100px;">
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'sispab_executive_com_update' info.id %}" class="btn btn-sm btn-warning" title="Edit Gallery">Edit</a>
+                            <form action="{% url 'sispab_executive_com_delete' info.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this gallery?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No gallery entries found
+                        </td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,339 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+<head>
+{% block extra_css %}
+<style>
+.et_pb_row_1 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+    margin-bottom: 50px !important;
+}
+
+.et_pb_row_1 .et_pb_column {
+    flex: 0 0 32% !important;
+    max-width: 32% !important;
+    box-sizing: border-box !important;
+    padding: 0 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.et_pb_row_1 .passport-photo {
+    width: 400px !important;
+    height: 500px !important;
+    overflow: hidden !important;
+    border-radius: 6px !important;
+    background: #f5f5f5 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+}
+
+.et_pb_row_1 .passport-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    display: block !important;
+    transition: transform 0.3s ease !important;
+}
+
+.et_pb_row_1 .et_pb_column > div:last-child {
+    width: 400px !important;
+    text-align: left !important;
+    margin: 10px auto 0 !important;
+    padding: 0 !important;
+}
+
+.et_pb_row_1 .et_pb_column > div:last-child > div p {
+    text-align: left !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+}
+
+.et_pb_row_1 .et_pb_column > div:last-child > div p span:first-child {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    display: block !important;
+    margin-bottom: 5px !important;
+    text-align: left !important;
+    color: #333 !important;
+}
+
+/* Designation and company - NO huge gap */
+.et_pb_row_1 .et_pb_column > div:last-child > div p span:last-child {
+    font-size: 14px !important;
+    display: block !important;
+    text-align: left !important;
+    line-height: 1.4 !important;
+    color: #666 !important;
+    margin-top: 0 !important; /* NO top margin */
+}
+
+/* Company link styling */
+.et_pb_row_1 .et_pb_column > div:last-child > div p span:last-child a {
+    color: #0073aa !important;
+    text-decoration: none !important;
+    transition: color 0.3s ease !important;
+}
+
+/* Apply same styles to other rows */
+.et_pb_row_2, .et_pb_row_3 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+    margin-bottom: 50px !important;
+}
+
+.et_pb_row_2 .et_pb_column,
+.et_pb_row_3 .et_pb_column {
+    flex: 0 0 32% !important;
+    max-width: 32% !important;
+    box-sizing: border-box !important;
+    padding: 0 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.et_pb_row_2 .passport-photo,
+.et_pb_row_3 .passport-photo {
+    width: 400px !important;
+    height: 500px !important;
+    overflow: hidden !important;
+    border-radius: 6px !important;
+    background: #f5f5f5 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+}
+
+.et_pb_row_2 .passport-photo img,
+.et_pb_row_3 .passport-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    display: block !important;
+}
+
+/* Text styling for other rows - NO huge gap */
+.et_pb_row_2 .et_pb_column > div:last-child,
+.et_pb_row_3 .et_pb_column > div:last-child {
+    width: 400px !important;
+    text-align: left !important;
+    margin: 10px auto 0 !important;
+    padding: 0 !important;
+}
+
+.et_pb_row_2 .et_pb_column > div:last-child > div,
+.et_pb_row_3 .et_pb_column > div:last-child > div {
+    text-align: left !important;
+    line-height: 1.4 !important;
+}
+
+.et_pb_row_2 .et_pb_column > div:last-child > div span:first-child,
+.et_pb_row_3 .et_pb_column > div:last-child > div span:first-child {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    display: block !important;
+    margin-bottom: 5px !important; /* SMALL gap */
+    text-align: left !important;
+    color: #333 !important;
+}
+
+.et_pb_row_2 .et_pb_column > div:last-child > div span:last-child,
+.et_pb_row_3 .et_pb_column > div:last-child > div span:last-child {
+    font-size: 14px !important;
+    display: block !important;
+    text-align: left !important;
+    line-height: 1.4 !important;
+    color: #666 !important;
+    margin-top: 0 !important; /* NO top margin */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+    .et_pb_row_1 .passport-photo,
+    .et_pb_row_2 .passport-photo,
+    .et_pb_row_3 .passport-photo {
+        width: 350px !important;
+        height: 437px !important;
+    }
+    
+    .et_pb_row_1 .et_pb_column > div:last-child,
+    .et_pb_row_2 .et_pb_column > div:last-child,
+    .et_pb_row_3 .et_pb_column > div:last-child {
+        width: 350px !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .et_pb_row_1,
+    .et_pb_row_2,
+    .et_pb_row_3 {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+    
+    .et_pb_row_1 .et_pb_column,
+    .et_pb_row_2 .et_pb_column,
+    .et_pb_row_3 .et_pb_column {
+        flex: 0 0 48% !important;
+        max-width: 48% !important;
+        margin-bottom: 30px !important;
+    }
+    
+    .et_pb_row_1 .passport-photo,
+    .et_pb_row_2 .passport-photo,
+    .et_pb_row_3 .passport-photo {
+        width: 380px !important;
+        height: 475px !important;
+    }
+    
+    .et_pb_row_1 .et_pb_column > div:last-child,
+    .et_pb_row_2 .et_pb_column > div:last-child,
+    .et_pb_row_3 .et_pb_column > div:last-child {
+        width: 380px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .et_pb_row_1,
+    .et_pb_row_2,
+    .et_pb_row_3 {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    
+    .et_pb_row_1 .et_pb_column,
+    .et_pb_row_2 .et_pb_column,
+    .et_pb_row_3 .et_pb_column {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 40px !important;
+    }
+    
+    .et_pb_row_1 .passport-photo,
+    .et_pb_row_2 .passport-photo,
+    .et_pb_row_3 .passport-photo {
+        width: 400px !important;
+        height: 500px !important;
+        max-width: 90% !important;
+    }
+    
+    .et_pb_row_1 .et_pb_column > div:last-child,
+    .et_pb_row_2 .et_pb_column > div:last-child,
+    .et_pb_row_3 .et_pb_column > div:last-child {
+        width: 90% !important;
+        max-width: 400px !important;
+        text-align: center !important;
+    }
+}
+</style>
+{% endblock extra_css %}
+</head>
+
+{% block main %}
+<article id="post-56" class="post-56 page type-page status-publish hentry">
+    <div class="entry-content">
+        <div class="et-l et-l--post">
+            <div class="et_builder_inner_content et_pb_gutters3">
+                <div class="et_pb_section et_pb_section_0 et_section_regular">
+                    <div class="et_pb_row et_pb_row_0">
+                        <div class="et_pb_column et_pb_column_4_4 et_pb_column_0  et_pb_css_mix_blend_mode_passthrough et-last-child">
+                            <div class="et_pb_module et_pb_text et_pb_text_0  et_pb_text_align_center et_pb_bg_layout_light">
+                                <div class="et_pb_text_inner" style="margin-top: 150px; margin-bottom: 50px; font-weight: 700">
+                                    <h2>Previous Executive Committee</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="et_pb_row et_pb_row_1">
+                        <!-- Column 1-3 -->
+                        {% for commitees in commitees %}
+                        <div class="et_pb_column et_pb_column_1_3 et_pb_column_1 et_pb_css_mix_blend_mode_passthrough">
+                            <div class="passport-photo">
+                                <img 
+                                    src="{{ commitees.image.url }}" 
+                                    alt="{{ commitees.name }}" 
+                                    title="{{ commitees.name }}">
+                            </div>
+
+                            <div>
+                                <div>
+									<p style="font-size: 20px; font-weight: bold">
+										<span>{{ commitees.name }}</span>
+                                        <span>Position : {{ commitees.position }}<br>
+										Company Designation: {{ commitees.designation }}<br>
+										Company Name : <a href ="">{{ commitees.company }}</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock main %}
+
+{% block extra_js %}
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/Divi/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="application/javascript">
+    (function() {
+        var file     = ["https:\/\/www.sispab.org\/wp-content\/et-cache\/56\/et-divi-dynamic-tb-299-56-late.css"];
+        var handle   = document.getElementById('divi-style-inline-inline-css');
+        var location = handle.parentNode;
+
+        if (0===document.querySelectorAll('link[href="' + file + '"]').length) {
+            var link  = document.createElement('link');
+            link.rel  = 'stylesheet';
+            link.id   = 'et-dynamic-late-css';
+            link.href = file;
+
+            location.insertBefore(link, handle.nextSibling);
+        }
+    })();
+</script>
+<script type="text/javascript" src="./SISPAB Founders _ SISPAB - SMS &amp; Information Service Providers Association of Bangladesh_files/jquery.min.js.download" id="jquery-core-js"></script>
+<script type="text/javascript" src="./SISPAB Founders _ SISPAB - SMS &amp; Information Service Providers Association of Bangladesh_files/jquery-migrate.min.js.download" id="jquery-migrate-js"></script>
+<script type="text/javascript" id="jquery-js-after">
+/* <![CDATA[ */
+jqueryParams.length&&$.each(jqueryParams,function(e,r){if("function"==typeof r){var n=String(r);n.replace("$","jQuery");var a=new Function("return "+n)();$(document).ready(a)}});
+//# sourceURL=jquery-js-after
+/* ]]> */
+</script>
+<script type="text/javascript" id="divi-custom-script-js-extra">
+/* <![CDATA[ */
+var DIVI = {"item_count":"%d Item","items_count":"%d Items"};
+var et_builder_utils_params = {"condition":{"diviTheme":true,"extraTheme":false},"scrollLocations":["app","top"],"builderScrollLocations":{"desktop":"app","tablet":"app","phone":"app"},"onloadScrollLocation":"app","builderType":"fe"};
+var et_frontend_scripts = {"builderCssContainerPrefix":"#et-boc","builderCssLayoutPrefix":"#et-boc .et-l"};
+var et_pb_custom = {"ajaxurl":"https://www.sispab.org/wp-admin/admin-ajax.php","images_uri":"https://www.sispab.org/wp-content/themes/Divi/images","builder_images_uri":"https://www.sispab.org/wp-content/themes/Divi/includes/builder/images","et_frontend_nonce":"1bfc0912cd","subscription_failed":"Please, check the fields below to make sure you entered the correct information.","et_ab_log_nonce":"f45e9e0207","fill_message":"Please, fill in the following fields:","contact_error_message":"Please, fix the following errors:","invalid":"Invalid email","captcha":"Captcha","prev":"Prev","previous":"Previous","next":"Next","wrong_captcha":"You entered the wrong number in captcha.","wrong_checkbox":"Checkbox","ignore_waypoints":"no","is_divi_theme_used":"1","widget_search_selector":".widget_search","ab_tests":[],"is_ab_testing_active":"","page_id":"56","unique_test_id":"","ab_bounce_rate":"5","is_cache_plugin_active":"no","is_shortcode_tracking":"","tinymce_uri":"https://www.sispab.org/wp-content/themes/Divi/includes/builder/frontend-builder/assets/vendors","accent_color":"#7EBEC5","waypoints_options":[]};
+var et_pb_box_shadow_elements = [];
+//# sourceURL=divi-custom-script-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="./SISPAB Founders _ SISPAB - SMS &amp; Information Service Providers Association of Bangladesh_files/scripts.min.js.download" id="divi-custom-script-js"></script>
+<script type="text/javascript" src="./SISPAB Founders _ SISPAB - SMS &amp; Information Service Providers Association of Bangladesh_files/common.js.download" id="et-core-common-js"></script>
+<script type="text/javascript" id="et-builder-modules-script-sticky-js-extra">
+/* <![CDATA[ */
+var et_pb_sticky_elements = [];
+//# sourceURL=et-builder-modules-script-sticky-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="./SISPAB Founders _ SISPAB - SMS &amp; Information Service Providers Association of Bangladesh_files/sticky-elements.js.download" id="et-builder-modules-script-sticky-js"></script>
+{% endblock extra_js %}

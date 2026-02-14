@@ -1,0 +1,102 @@
+{% extends "admin/base/base.html" %}
+
+{% block custom_css %}
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+    /* Make Quill editor look nice */
+    #editor {
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        padding: 8px;
+        min-height: 150px;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+    <div class="card-header bg-warning text-dark text-center">
+        <h5 class="mb-0">Upload Media</h5>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Media Title</label>
+                <input
+                    name="title"
+                    type="text"
+                    class="form-control rounded"
+                    placeholder="Enter media title"
+                    required
+                />
+            </div>
+
+            <!-- Image -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload Image</label>
+                <input type="file" name="image" class="form-control" accept="image/*" required>
+            </div>
+
+            <!-- Year -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Year</label>
+                <input
+                    type="number"
+                    name="year"
+                    class="form-control"
+                    placeholder="2025"
+                    required
+                />
+            </div>
+
+            <!-- Description using Quill -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                <!-- Hidden textarea to submit content -->
+                <textarea id="description" name="description" hidden></textarea>
+                <!-- Quill editor -->
+                <div id="editor" style="height: 200px;"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a href="{% url 'AdminMedia' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<script>
+    // Initialize Quill
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Enter media description here...'
+    });
+
+    // On form submit, copy Quill HTML to hidden textarea
+    document.querySelector("form").onsubmit = function () {
+        document.getElementById("description").value = quill.root.innerHTML;
+    };
+</script>
+{% endblock custom_js %}

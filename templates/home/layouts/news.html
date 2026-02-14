@@ -1,0 +1,283 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* --- Header Section --- */
+.news-header {
+    text-align: center;
+    padding: 70px 20px 50px;
+    background: linear-gradient(140deg, rgba(0,72,114,0.9) 0%, rgba(41,17,96,0.85) 100%);
+    color: white;
+    margin-bottom: 50px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.news-header h1 {
+    font-size: 3rem;
+    font-weight: 400;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+.news-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* --- Grid Layout --- */
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 35px;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto 70px;
+}
+
+/* --- News Card --- */
+.news-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+/* --- Image --- */
+.news-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 3px solid #3498db;
+    transition: transform 0.4s ease;
+}
+
+.news-card:hover .news-image {
+    transform: scale(1.05);
+}
+
+/* --- Content --- */
+.news-title {
+    font-size: 1.4rem;
+    margin: 15px 20px 8px;
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.news-date {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin: 0 20px 15px;
+}
+
+.news-description {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 20px 20px;
+    flex-grow: 1;
+}
+
+/* --- Read More --- */
+.news-read-more {
+    display: inline-block;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0 20px 20px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.news-read-more:hover {
+    color: #2980b9;
+    padding-right: 15px;
+}
+
+.news-read-more:hover::after {
+    content: " →";
+    position: absolute;
+    right: 0;
+}
+
+/* --- Modal Popup --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.6);
+    padding: 40px 20px;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    position: relative;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #888;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 6px;
+}
+
+/* --- No News --- */
+.no-news {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #666;
+}
+</style>
+{% endblock extra_css %}
+
+{% block main %}
+<div class="news-header">
+    <h1 style = " color: #fff">What's New</h1>
+    <p>Stay updated with the latest news, announcements, and events</p>
+</div>
+
+<div class="news-grid">
+    {% for news in newses %}
+    <div class="news-card">
+        {% if news.image %}
+        <img data-src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
+        {% else %}
+        <div class="news-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;">
+            <span>No Image</span>
+        </div>
+        {% endif %}
+
+        <h3 class="news-title" style = "color : #000">{{ news.title }}</h3>
+
+        {% if news.date %}
+        <span class="news-date">{{ news.date|date:"F d, Y" }}</span>
+        {% endif %}
+
+        <a href="#" class="news-read-more" data-id="{{ news.id }}"
+           data-title="{{ news.title|escapejs }}"
+           data-date="{{ news.date|date:'F d, Y' }}"
+           data-image="{% if news.image %}{{ news.image.url }}{% endif %}"
+           data-description="{{ news.description|escapejs }}">Read Full Story</a>
+    </div>
+    {% empty %}
+    <div class="no-news">
+        <h3>No News Available</h3>
+        <p>Check back later for updates</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal Structure -->
+<div id="news-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <img id="modal-image" src="" alt="">
+        <h2 id="modal-title"></h2>
+        <p id="modal-date" style="color: #7f8c8d;"></p>
+        <div id="modal-description" style="margin-top: 15px;"></div>
+    </div>
+</div>
+{% endblock main %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lazy load images
+    const images = document.querySelectorAll('.news-image');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.tagName === 'IMG' && img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.onload = () => { img.style.opacity = '1'; }
+                }
+                observer.unobserve(img);
+            }
+        });
+    }, { rootMargin: '50px' });
+    images.forEach(img => {
+        if (img.tagName === 'IMG') {
+            img.style.opacity = '0';
+            img.style.transition = 'opacity 0.3s';
+            imageObserver.observe(img);
+        }
+    });
+
+    // Modal popup
+    const modal = document.getElementById('news-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDate = document.getElementById('modal-date');
+    const modalDesc = document.getElementById('modal-description');
+    const closeBtn = document.querySelector('.modal-close');
+
+    const readMoreLinks = document.querySelectorAll('.news-read-more');
+    readMoreLinks.forEach(link => {
+        link.addEventListener('click', function(e){
+            e.preventDefault();
+            modal.style.display = 'block';
+            modalTitle.textContent = this.dataset.title;
+            modalDate.textContent = this.dataset.date;
+            modalDesc.innerHTML = this.dataset.description;
+            if(this.dataset.image){
+                modalImage.src = this.dataset.image;
+                modalImage.style.display = 'block';
+            } else {
+                modalImage.style.display = 'none';
+            }
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if(e.target === modal){
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock extra_js %}

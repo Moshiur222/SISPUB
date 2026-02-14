@@ -1,0 +1,132 @@
+{% extends "home/base/base.html" %}
+
+{% block extra_css %}
+<!-- All the CSS from your original file goes here -->
+<!-- I'm including just the critical parts that relate to events display -->
+<style>
+    .et_pb_video .et_pb_video_overlay_hover:hover {
+        background-color: rgba(0,0,0,.6);
+    }
+    
+    .et_pb_text h1 {
+        letter-spacing: 14px;
+        line-height: 2.3em;
+    }
+    
+    body.safari .et_pb_text h1,
+    body.uiwebview .et_pb_text h1,
+    body.iphone .et_pb_text h1 {
+        font-variant-ligatures: no-common-ligatures;
+    }
+    
+    .et_pb_text {
+        text-shadow: 0.08em 0.08em 0.08em rgba(0,0,0,0.4);
+        background-color: rgba(0,3,61,0.05);
+        box-shadow: -3px 6px 33px 0px rgba(0,0,0,0.3);
+    }
+</style>
+{% endblock extra_css %}
+
+{% block main %}
+<article id="post-77" class="post-77 page type-page status-publish hentry">
+    <div class="entry-content">
+        <div class="et-l et-l--post">
+            <div class="et_builder_inner_content et_pb_gutters3">
+                <!-- Header Section -->
+                <div class="et_pb_section et_pb_section_0 et_pb_section_parallax et_pb_with_background et_pb_fullwidth_section et_section_regular">
+                    <span class="et_parallax_bg_wrap">
+                        <span class="et_parallax_bg" style="background-image: url('https://www.sispab.org/wp-content/uploads/2023/07/IMG-20220529-WA0053.jpg');"></span>
+                    </span>
+                    
+                    <section class="et_pb_module et_pb_fullwidth_header et_pb_fullwidth_header_0 et_hover_enabled et_pb_text_align_center et_pb_bg_layout_dark">
+                        <div class="et_pb_fullwidth_header_container center">
+                            <div class="header-content-container center">
+                                <div class="header-content">
+                                    <h1 class="et_pb_module_header">Video Gallery</h1>
+                                    <div class="et_pb_header_content_wrapper"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="et_pb_fullwidth_header_overlay"></div>
+                        <div class="et_pb_fullwidth_header_scroll"></div>
+                    </section>
+                </div>
+                
+                <!-- Contact Navigation -->
+                <div class="et_pb_section et_pb_section_1 et_section_specialty et_section_transparent">
+                    <div class="et_pb_row et_pb_gutters2">
+                        <div class="et_pb_column et_pb_column_1_2 et_pb_column_0 et_pb_css_mix_blend_mode_passthrough et_pb_column_single">
+                            <div class="et_pb_module et_pb_blurb et_pb_blurb_0 et_pb_text_align_right et_pb_blurb_position_top et_pb_bg_layout_dark et_had_animation">
+                                <div class="et_pb_blurb_content">
+                                    <div class="et_pb_blurb_container">
+                                        <h4 class="et_pb_module_header"><a href="https://www.sispab.org/events/#">Connecting Bangladesh</a></h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="et_pb_column et_pb_column_1_2 et_pb_column_1 et_pb_specialty_column et_pb_css_mix_blend_mode_passthrough et-last-child">
+                            <div class="et_pb_row_inner et_pb_row_inner_0 et_pb_row_1-4_1-4">
+                                <div class="et_pb_column et_pb_column_1_4 et_pb_column_inner et_pb_column_inner_0 et_pb_column_empty"></div>
+                                <div class="et_pb_column et_pb_column_1_4 et_pb_column_inner et_pb_column_inner_1 et-last-child">
+                                    <div class="et_pb_button_module_wrapper et_pb_button_0_wrapper et_pb_button_alignment_center et_pb_module et_had_animation">
+                                        <a style="color: #fff; background: #2573f9; font-family: 'Open Sans', Helvetica, Arial, Lucida, sans-serif; font-size: 15px; text-decoration: none; width: 180px; border: 20px solid #2573f9; border-radius: 30px;" href="{% url 'contact' %}">Contact Us</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Road Show Events Section -->
+                    {% if events %}
+                    {% for event in events %}
+                    <div class="et_pb_section et_pb_section_2 et_section_regular">
+                        <!-- Event Title -->
+                        {% if event.title.title %}
+                        <div class="et_pb_row et_pb_row_0">
+                            <div class="et_pb_column et_pb_column_4_4 et_pb_column_2 et_pb_css_mix_blend_mode_passthrough et-last-child">
+                                <div class="et_pb_module et_pb_text et_pb_text_0 et_pb_text_align_left et_pb_bg_layout_light">
+                                    <div class="et_pb_text_inner">
+                                        <h1 style="text-align: center;">{{ event.title.title }}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    
+                        <!-- Videos Row -->
+                        <div class="et_pb_row et_pb_row_1">
+                            {% if event.embed_url_1 %}
+                            <div class="et_pb_column et_pb_column_1_2 et_pb_column_3 et_pb_css_mix_blend_mode_passthrough">
+                                <div class="et_pb_module et_pb_video et_pb_video_{{ forloop.counter0 }}">
+                                    <div class="et_pb_video_box">
+                                        <div class="fluid-width-video-wrapper" style="padding-top: 56.25%;">
+                                            <iframe title="{{ event.title }}" src="{{ event.embed_url_1 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        
+                            {% if event.embed_url_2 %}
+                            <div class="et_pb_column et_pb_column_1_2 et_pb_column_4 et_pb_css_mix_blend_mode_passthrough et-last-child">
+                                <div class="et_pb_module et_pb_video et_pb_video_{{ forloop.counter0|add:events.count }}">
+                                    <div class="et_pb_video_box">
+                                        <div class="fluid-width-video-wrapper" style="padding-top: 56.25%;">
+                                            <iframe title="{{ event.title }}" src="{{ event.embed_url_2 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    
+                        <!-- Description Row -->
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock main %}

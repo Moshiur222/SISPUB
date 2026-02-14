@@ -1,0 +1,96 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+{% load embed_video_tags %}
+{% block title %}home{% endblock title %}
+{% block extra_css %}
+<style>
+
+	.responsive-video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+}
+
+.responsive-video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+</style>
+{% endblock extra_css %}
+{% block main %}
+	<!-- hero Section -->
+<div id="et-main-area">
+				<div id="main-content">
+					<article id="post-30" class="post-30 page type-page status-publish hentry">
+						<div class="entry-content">
+							<div class="et-l et-l--post">
+								<div class="et_builder_inner_content et_pb_gutters3">
+									<div class="et_pb_section et_pb_section_1 et_section_specialty et_section_transparent">
+									</div>
+										<div class="et_pb_row et_pb_row_8">
+											<div
+											class="et_pb_column et_pb_column_4_4 et_pb_column_20  et_pb_css_mix_blend_mode_passthrough et-last-child">
+											<div
+											class="et_pb_module et_pb_text et_pb_text_4  et_pb_text_align_center et_pb_bg_layout_light">
+											{% for vision in vision %}
+											<div class="et_pb_text_inner">
+												<p  style = "margin-bottom: 100px">Vision</p>
+												<h2>{{vision.title}}</h2>
+											</div>
+											</div>
+											</div>
+											</div>
+											<div class="et_pb_row et_pb_row_9 et_pb_equal_columns et_pb_gutters3">
+											<div
+												class="et_pb_column et_pb_column_4_4 et_pb_column_21  et_pb_css_mix_blend_mode_passthrough et-last-child">
+                                                <div class="et_pb_with_border et_pb_module et_pb_testimonial et_pb_testimonial_1 clearfix et_pb_text_align_left et_pb_bg_layout_light et_pb_icon_off et_pb_testimonial_no_image et_had_animation"
+                                                    style="">
+                                                    <div style="background-image:url(https://www.sispab.org/wp-content/uploads/2023/04/quote-dark.png)"
+                                                        class="et_pb_testimonial_portrait"></div>
+                                                    <div class="et_pb_testimonial_description" style="margin-left: 62px;">
+                                                        <div class="et_pb_testimonial_description_inner">
+                                                            <div class="et_pb_testimonial_content">
+                                                                <div id="goal-quill-{{ forloop.counter }}" class="quill-readonly" style="text-align: justify;">
+                                                                    {{ vision.descriptions|safe }}
+                                                                </div>
+                                                            </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                        <p class="et_pb_testimonial_meta"></p>
+                                                    </div>
+                                                </div>
+											</div>
+										</div>
+				
+									</div>
+								</div>
+							</div>
+						</div>
+					</article>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock main %}
+
+{% block custom_js %}
+<!-- Include Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    // Initialize all goal descriptions as READONLY Quill editors
+    document.querySelectorAll('.quill-readonly').forEach(function(div) {
+        new Quill(div, {
+            theme: 'snow',
+            readOnly: true,
+            modules: {
+                toolbar: false
+            }
+        });
+    });
+</script>
+{% endblock custom_js %}

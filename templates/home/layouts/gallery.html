@@ -1,0 +1,112 @@
+{% extends "home/base/base.html" %}
+
+{% block extra_css %}
+    <style>
+        .gallery-section {
+            padding: 150px 20px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            position: relative;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .gallery-title::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background: #28a745;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: 300px;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%);
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .gallery-item:hover .overlay {
+            opacity: 1;
+        }
+
+        .overlay span {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover .overlay span {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+            }
+        }
+    </style>
+{% endblock extra_css %}
+
+{% block main %}
+
+<div class="gallery-section">
+    <h2 class="gallery-title">Our Photo Gallery</h2>
+    <a href = "{% url 'photos' %}">
+         <div class="gallery-grid">
+        {% for album in albums %}
+            <div class="gallery-item">
+                <img src="{{ album.banner.url }}" alt="{{ album.title }}">
+                <div class="overlay">
+                    <span>{{ album.title }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    </a>
+</div>
+
+{% endblock main %}

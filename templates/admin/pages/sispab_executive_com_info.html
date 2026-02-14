@@ -1,0 +1,102 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Header -->
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">SISPAB Executive Committee Information</h5>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+
+            <!-- Name -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Name</label>
+                <input
+                    type="text"
+                    name="name"
+                    value="{{ info.name }}"
+                    class="form-control rounded"
+                    placeholder="Name"
+                    required
+                >
+            </div>
+
+            <!-- Position -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Position</label>
+                <input
+                    type="text"
+                    name="position"
+                    value="{{ info.position }}"
+                    class="form-control rounded"
+                    placeholder="Position"
+                    required
+                >
+            </div>
+
+            <!-- Photo -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Photo</label>
+
+                <div class="col-md-4 text-center">
+                    <input
+                        type="file"
+                        name="image"
+                        class="form-control"
+                        accept="image/*"
+                        onchange="previewImage(this, 'preview1')"
+                    >
+
+                    {% if info.image %}
+                        <img id="preview1"
+                             src="{{ info.image.url }}"
+                             class="img-fluid rounded mt-2"
+                             style="max-height:150px;">
+                    {% else %}
+                        <img id="preview1"
+                             class="img-fluid rounded mt-2"
+                             style="display:none; max-height:150px;">
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'sispab_executive_com' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock content %}

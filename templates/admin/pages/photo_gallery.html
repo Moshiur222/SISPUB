@@ -1,0 +1,45 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"> {{ album.title }}</h5>
+        <a href="{% url 'admin_add_photo' album.id %}" class="btn btn-sm btn-success">Add Photo</a>
+    </div>
+
+    <div class="card-body table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Photo</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in photos %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        {% if p.image %}
+                        <img src="{{ p.image.url }}" alt="Photo" class="img-fluid rounded" style="max-height: 100px;">
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'admin_update_photo' p.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <form action="{% url 'delete_photo' p.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this photo?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No photos found in this album</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,153 @@
+{% extends "admin/base/base.html" %}
+
+{% block custom_css %}
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+<!-- Quill preview control (NO DESIGN CHANGE) -->
+<style>
+.quill-preview {
+    max-height: 70px;
+    overflow: hidden;
+}
+.quill-preview p {
+    margin-bottom: 4px;
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="card mt-4">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Rule Title & Description</h5>
+        <a href="{% url 'AdminMembersRulesAdd' %}" class="btn btn-sm btn-success">Add Rules</a>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="membershipRulesTable" class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Rules Description</th>
+                        <th>Rules</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for membership in membership_rules %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+
+                        <td>{{ membership.title }}</td>
+
+                        <!-- Quill HTML: Description -->
+                        <td>
+                            <div class="quill-preview">
+                                {{ membership.description|safe|default:"-" }}
+                            </div>
+                        </td>
+
+                        <!-- Quill HTML: Rules -->
+                        <td>
+                            <div class="quill-preview">
+                                {{ membership.rules|safe|default:"-" }}
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <a href="{% url 'AdminMembersRulesUpdate' membership.id %}" class="btn btn-sm btn-warning">
+                                Update
+                            </a>
+
+                            <form action="{% url 'AdminMembersRulesDelete' membership.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this membership?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No membership rules found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('#membershipRulesTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['copy', 'excel', 'pdf', 'print'],
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50, 100],
+        columnDefs: [
+            { orderable: false, targets: [4] },
+            { searchable: false, targets: 0 }
+        ],
+        language: {
+            emptyTable: "No membership rules found",
+            info: "Showing _START_ to _END_ of _TOTAL_ rules",
+            infoEmpty: "Showing 0 to 0 of 0 rules",
+            infoFiltered: "(filtered from _MAX_ total rules)",
+            lengthMenu: "Show _MENU_ rules",
+            search: "Search:",
+            zeroRecords: "No matching rules found",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
+            }
+        },
+        drawCallback: function () {
+            var pageInfo = this.api().page.info();
+            this.api().column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                cell.innerHTML = pageInfo.start + i + 1;
+            });
+        }
+    });
+});
+</script>
+
+<!-- Quill JS (only for rendering stored HTML, no editor here) -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+{% endblock custom_js %}

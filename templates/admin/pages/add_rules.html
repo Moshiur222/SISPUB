@@ -1,0 +1,91 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+
+<form method="post" id="ruleForm">
+    {% csrf_token %}
+
+    <div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">Add Rule</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Rules</label>
+                
+                <div id="editor" style="height: 250px; background: white;" class="rounded-bottom"></div>
+                
+                <input type="hidden" name="rules" id="rules-input">
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'AdminMembersRules' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Add Rule</button>
+        </div>
+    </div>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
+<script>
+    // 1. Initialize the Editor
+    const quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Write your rules here...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'header': [1, 2, 3, false] }],
+                ['clean']                                         // remove formatting button
+            ]
+        }
+    });
+
+    // 2. Sync Quill data to the hidden input before form submission
+    const form = document.getElementById('ruleForm');
+    const hiddenInput = document.getElementById('rules-input');
+
+    form.onsubmit = function(e) {
+        // Get the HTML content from the editor
+        const htmlContent = quill.root.innerHTML;
+
+        // Check if the editor is empty (Quill usually leaves a <p><br></p>)
+        if (quill.getText().trim().length === 0) {
+            alert("Please provide the rule content.");
+            e.preventDefault(); // Prevent form submission
+            return false;
+        }
+
+        // Assign the HTML to the hidden input that Django will process
+        hiddenInput.value = htmlContent;
+    };
+</script>
+
+<style>
+    /* Optional: Fixes the border of the toolbar to look better with Bootstrap */
+    .ql-toolbar.ql-snow {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        background-color: #f8f9fa;
+    }
+    .ql-container.ql-snow {
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+</style>
+
+{% endblock content %}

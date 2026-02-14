@@ -1,0 +1,129 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Card Header -->
+        <div class="card-header bg-warning text-dark text-center">
+            <h5 class="mb-0">Photo Album Update</h5>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Title</label>
+                <input
+                    name="title"
+                    type="text"
+                    class="form-control rounded"
+                    value="{{ about_albums.title }}"
+                    placeholder="Enter Album Title"
+                />
+            </div>
+
+            <!-- Images -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload Images</label>
+                <div class="row g-3">
+
+                    <!-- Image 1 -->
+                    <div class="col-md-4 text-center">
+                        <input type="file" name="image_1" class="form-control"
+                               accept="image/*"
+                               onchange="previewImage(this, 'preview1')">
+
+                        {% if about_albums.image_1 %}
+                            <img id="preview1" src="{{ about_albums.image_1.url }}"
+                                 class="img-fluid rounded mt-2"
+                                 style="max-height:150px;">
+                        {% else %}
+                            <img id="preview1" class="img-fluid rounded mt-2"
+                                 style="display:none; max-height:150px;">
+                        {% endif %}
+                    </div>
+
+                    <!-- Image 2 -->
+                    <div class="col-md-4 text-center">
+                        <input type="file" name="image_2" class="form-control"
+                               accept="image/*"
+                               onchange="previewImage(this, 'preview2')">
+
+                        {% if about_albums.image_2 %}
+                            <img id="preview2" src="{{ about_albums.image_2.url }}"
+                                 class="img-fluid rounded mt-2"
+                                 style="max-height:150px;">
+                        {% else %}
+                            <img id="preview2" class="img-fluid rounded mt-2"
+                                 style="display:none; max-height:150px;">
+                        {% endif %}
+                    </div>
+
+                    <!-- Image 3 -->
+                    <div class="col-md-4 text-center">
+                        <input type="file" name="image_3" class="form-control"
+                               accept="image/*"
+                               onchange="previewImage(this, 'preview3')">
+
+                        {% if about_albums.image_3 %}
+                            <img id="preview3" src="{{ about_albums.image_3.url }}"
+                                 class="img-fluid rounded mt-2"
+                                 style="max-height:150px;">
+                        {% else %}
+                            <img id="preview3" class="img-fluid rounded mt-2"
+                                 style="display:none; max-height:150px;">
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                <textarea
+                    name="descriptions"
+                    class="form-control rounded"
+                    rows="3"
+                    placeholder="Enter Album Description"
+                >{{ about_albums.descriptions }}</textarea>
+            </div>
+
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer d-flex justify-content-center gap-2">
+            <a href="{% url 'about_details' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock content %}

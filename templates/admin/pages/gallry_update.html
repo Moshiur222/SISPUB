@@ -1,0 +1,119 @@
+{% extends "admin/base/base.html" %}
+
+{% block custom_css %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{% endblock custom_css %}
+
+{% block content %}
+<div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
+    <div class="card-header bg-warning text-dark text-center">
+        <h5 class="mb-0">Edit Gallery</h5>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Gallery Name -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Gallery Name</label>
+                <input
+                    name="gellary_name"
+                    type="text"
+                    class="form-control rounded"
+                    value="{{ galleries.gellary_name }}"
+                />
+            </div>
+
+            <!-- Images -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload Images</label>
+                <div class="row g-3">
+                    <div class="col-md-4 text-center">
+                        {% if galleries.image %}
+                            <img src="{{ galleries.image.url }}" class="img-fluid rounded mb-2" style="max-height: 150px;">
+                        {% endif %}
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-md-4 text-center">
+                        {% if galleries.image1 %}
+                            <img src="{{ galleries.image1.url }}" class="img-fluid rounded mb-2" style="max-height: 150px;">
+                        {% endif %}
+                        <input type="file" name="image1" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-md-4 text-center">
+                        {% if galleries.image2 %}
+                            <img src="{{ galleries.image2.url }}" class="img-fluid rounded mb-2" style="max-height: 150px;">
+                        {% endif %}
+                        <input type="file" name="image2" class="form-control" accept="image/*">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Year -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Year</label>
+                    <select name="year" class="form-select rounded">
+                        <option value="">Select Year</option>
+                        {% for y in year_list %}
+                            <option value="{{ y }}" {% if galleries.year|stringformat:"s" == y|stringformat:"s" %}selected{% endif %}>
+                                {{ y }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+            <!-- Description (Quill Editor) -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                <!-- Quill editor container -->
+                <div id="quill-editor" style="height: 200px;">
+                    {{ galleries.description|safe }}
+                </div>
+                <!-- Hidden input to store HTML -->
+                <input type="hidden" name="description" id="description-input">
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a href="{% url 'home_details' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    // Initialize Quill editor
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ header: [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline'],
+                ['link', 'image', 'code-block'],
+                [{ list: 'ordered' }, { list: 'bullet' }],
+                ['clean']
+            ]
+        }
+    });
+
+    // Copy Quill content to hidden input on form submit
+    var form = document.querySelector('form');
+    form.onsubmit = function() {
+        document.querySelector('#description-input').value = quill.root.innerHTML;
+    };
+</script>
+{% endblock custom_js %}
