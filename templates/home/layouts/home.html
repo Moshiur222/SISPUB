@@ -95,10 +95,10 @@
 												<div
 													class="et_pb_module et_pb_text et_pb_text_0  et_pb_text_align_left et_pb_bg_layout_light">
 													<div class="et_pb_text_inner">
-														<h1 style="text-align: left;"><strong>SISPAB – SMS &amp;
-																Information Service Providers Association of
-																Bangladesh</strong>
-                                                            </h1>
+														{% for hero_area in hero_areas %}
+														<h1 style="text-align: left;"><strong>{{ hero_area.tittle }}</strong>
+                                                        </h1>
+														{% endfor %}
 													</div>
 												</div>
 											</div>
@@ -120,17 +120,9 @@
 																</p>
 																<p style="text-align: justify;">
 																</p>
-																<p style="text-align: justify;">SISPAB was constituted
-																	in 2019 as a non-governmental society. The
-																	Association is dedicated to the advancement of
-																	modern communication through the establishment of
-																	world-class mobile-based digital products and
-																	services and to delivering the benefits of
-																	innovative communication services to consumers – SME
-																	and large businesses of Bangladesh. SISPAB is the
-																	only trade association in Bangladesh that, addresses
-																	the full ecosystem of marketers, techies and media
-																	companies.</p>
+																{% for hero_area in hero_areas %}
+																<p style="text-align: justify;">{{ hero_area.descriptions }}</p>
+																	{% endfor %}
 															</div>
 														</div>
 													</div>

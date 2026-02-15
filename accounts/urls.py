@@ -54,8 +54,8 @@ urlpatterns = [
     path('gallry_update/<int:gellary_id>/', gallry_update, name='gallry_update'),
     path('gallry_delete/<int:gellary_id>/', gallry_delete, name='gallry_delete'),
 
-    path('goal_input/', goal_input, name = 'goal_input' ),
-    path('goal_update/<int:goal_id>/', goal_update, name='goal_update'),
+    path('hero_area_input/', hero_area_input, name = 'hero_area_input' ),
+    path('hero_area_update/<int:id>/', hero_area_update, name='hero_area_update'),
 
 
     path('about_details/', about_details, name='about_details'),

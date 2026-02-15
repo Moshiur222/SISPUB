@@ -99,12 +99,13 @@ class Video(models.Model):
 
 
 
-class Goal(models.Model):
-    goal_tittle = models.CharField(max_length=50)
-    goal_descriptions = models.TextField(null=True)
+class HeroArea(models.Model):
+    tittle = models.CharField(max_length=50)
+    descriptions = models.TextField(null=True)
+    image = models.ImageField(upload_to="media/", null=True)
     
     def __str__(self):
-        return self.goal_tittle
+        return self.tittle
 
 
 class AboutParagraph(models.Model):

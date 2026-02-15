@@ -67,6 +67,57 @@
   </div>
 </div>
 
+
+
+{% for hero_area in hero_areas %}
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Hero Area</h5>
+    <a href="{% url 'hero_area_update' hero_area.id %}" class="btn btn-sm btn-warning">Edit</a>
+  </div>
+
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Photo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ forloop.counter }}</td>
+
+            <!-- FIXED -->
+            <td>{{ hero_area.tittle }}</td>
+
+            <td>
+              <div class="quill-readonly">
+                {{ hero_area.descriptions|truncatewords:10|safe }}
+              </div>
+            </td>
+
+            <td>
+              {% if hero_area.image %}
+                <img src="{{ hero_area.image.url }}" alt="Hero Area Photo" class="img-fluid rounded" width="100">
+              {% else %}
+                No Image
+              {% endif %}
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+
+
 <!-- Videos -->
 {% for video in videos %}
 <div class="card mt-4">
@@ -77,91 +128,6 @@
 
   <div class="card-body text-center">
     <iframe width="560" height="315" src="{{ video.embed_url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </div>
-</div>
-{% endfor %}
-
-<!-- Gallery -->
-<div class="card mt-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Photo Gallery List</h5>
-    <a href="{% url 'gallry_input' %}" class="btn btn-sm btn-success">Add</a>
-  </div>
-
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Gallery Name</th>
-            <th>Image 1</th>
-            <th>Image 2</th>
-            <th>Image 3</th>
-            <th>Description</th>
-            <th class="text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for gallery in all_gellary %}
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ gallery.gellary_name }}</td>
-            <td>{% if gallery.image %}<img src="{{ gallery.image.url }}" class="img-fluid rounded" style="max-height:100px">{% endif %}</td>
-            <td>{% if gallery.image1 %}<img src="{{ gallery.image1.url }}" class="img-fluid rounded" style="max-height:100px">{% endif %}</td>
-            <td>{% if gallery.image2 %}<img src="{{ gallery.image2.url }}" class="img-fluid rounded" style="max-height:100px">{% endif %}</td>
-            <td>
-              <div id="gallery-quill-{{ forloop.counter }}" class="quill-readonly">{{ gallery.description|safe }}</div>
-            </td>
-            <td class="text-center">
-              <a href="{% url 'gallry_update' gallery.id %}" class="btn btn-sm btn-warning">Edit</a>
-              <form action="{% url 'gallry_delete' gallery.id %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-danger"
-                  onclick="return confirm('Are you sure?')">Delete</button>
-              </form>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="text-center text-muted">No gallery entries found</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- Goals -->
-{% for goal in all_goal %}
-<div class="card mt-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Company Goals</h5>
-    <a href="{% url 'goal_update' goal.id %}" class="btn btn-sm btn-warning">Edit</a>
-  </div>
-
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Goal Title</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ goal.goal_tittle }}</td>
-            <td>
-              <div id="goal-quill-{{ forloop.counter }}" class="quill-readonly">{{ goal.goal_descriptions|safe }}</div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 </div>
 {% endfor %}

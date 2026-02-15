@@ -17,7 +17,7 @@ def home_view(request):
     context = {
         "gellaries": Gellary.objects.all(),
         "videos": Video.objects.all(),
-        "goals": Goal.objects.all(),
+        "hero_areas": HeroArea.objects.all(),
     }
     return render(request, "home/layouts/home.html", context)
 
@@ -343,11 +343,9 @@ def dashboard(request):
     return render (request, "admin/pages/dashboard.html")
 @login_required
 def home_details(request):
-    return render (request, 'admin/pages/home_details.html', {"all_company_info" : Company_info.objects.all(), 
-                                                              "all_gellary": Gellary.objects.all(),  
+    return render (request, 'admin/pages/home_details.html', {"all_company_info" : Company_info.objects.all(),
                                                               "videos": Video.objects.all(), 
-                                                              "all_video": Video.objects.all(),
-                                                              "all_goal": Goal.objects.all(),
+                                                              "hero_areas": HeroArea.objects.all(),
                                                               })
 @login_required
 def company_info_input(request):
@@ -482,24 +480,31 @@ def gallry_delete(request, gellary_id):
     return render(request, "admin/pages/home_details.html", {"gallery": gallery})
 
 @login_required
-def goal_input(request):
-    return render (request, 'admin/pages/goal_input.html')
+def hero_area_input(request):
+    return render (request, 'admin/pages/hero_area_input.html')
 
 @login_required
-def goal_update(request, goal_id):
-    goal = get_object_or_404(Goal, id=goal_id)
+def hero_area_update(request, id):
+    hero_area = get_object_or_404(HeroArea, id=id)
 
     if request.method == "POST":
-        goal.goal_tittle = request.POST.get("goal_tittle")
-        goal.goal_descriptions = request.POST.get("goal_descriptions")
+        hero_area.tittle = request.POST.get("tittle")
+        hero_area.descriptions = request.POST.get("descriptions")
 
-        goal.save()
-        messages.success(request, 'Updated Successfully')
-        return redirect("goal_input") 
+        if request.FILES.get("image"):
+            hero_area.image = request.FILES.get("image")
 
-    return render(request, "admin/pages/goal_input.html", {"goal": goal})
+        hero_area.save()
 
-@login_required
+        messages.success(request, "Updated Successfully")
+        return redirect("hero_area_input")
+
+    return render(
+        request,
+        "admin/pages/hero_area_input.html",
+        {"hero": hero_area} 
+    )
+
 @login_required
 def about_details(request):
     context = {

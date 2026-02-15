@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PhotoAlbum, Photo
+from .models import PhotoAlbum, Photo, HeroArea
 
 # This allows you to edit Photos directly inside the PhotoAlbum page
 class PhotoInline(admin.TabularInline):
@@ -24,3 +24,5 @@ class PhotoAdmin(admin.ModelAdmin):
     list_display = ('id', 'album', 'created_at')
     list_filter = ('album', 'created_at')
     search_fields = ('album__title',)
+    
+admin.site.register(HeroArea)
