@@ -38,6 +38,11 @@ urlpatterns = [
     path('video_gallery/', video_gallery, name = 'video_gallery' ),
     path('meetings/', meetings, name = 'meetings' ),
     path('contact_submit/', contact_submit, name = 'contact_submit' ),
+    path('career/', career, name = 'career' ),
+    path('meeting_call/', meeting_call, name = 'meeting_call' ),
+
+    #api
+    path('check_email/',check_email, name='check_email'),
 
     
     #home_url end
@@ -61,9 +66,16 @@ urlpatterns = [
     path('about_details/', about_details, name='about_details'),
     path('album_input/', album_input, name='album_input'),
 
+    
     path('update_story/<int:id>/', update_story, name='update_story'),
+
+    path('admin_vission/', admin_vision, name='admin_vision'),
     path('update_vision/<int:id>/', update_vision, name='update_vision'),
+
+    path('admin_mission/', admin_mission, name='admin_mission'),
     path('update_mission/<int:id>/', update_mission, name='update_mission'),
+
+    path('admin_core_values/', admin_core_values, name='admin_core_values'),
     path('update_core_values/<int:id>/', update_core_values, name='update_core_values'),
 
 
@@ -96,6 +108,8 @@ urlpatterns = [
 
 
     path('AdminEvents', AdminEvents, name='AdminEvents'),
+
+    path('admin_video_gallery', admin_video_gallery, name='admin_video_gallery'),
     path('upload_video', upload_video, name='upload_video'),
     path('video_update/<int:id>/', video_update, name='video_update'),
     path('video_delete/<int:id>/', video_delete, name='video_delete'),
@@ -143,13 +157,21 @@ urlpatterns = [
     path('admin_update_album/<int:id>/', admin_update_album, name='admin_update_album'),
     path('delete_album/<int:id>/', delete_album, name='delete_album'),
 
- 
+    path('admin_career/', admin_career, name='admin_career'),
+    path('admin_add_career/', admin_add_career, name='admin_add_career'),
+    path('admin_update_career/<int:id>/', admin_update_career, name='admin_update_career'),
+    path('admin_delete_career/<int:id>/', admin_delete_career, name='admin_delete_career'),
 
-
-    path('AdminNewa/', AdminNewa, name='AdminNewa'),
+    path('AdminNews/', AdminNews, name='AdminNews'),
     path('AdminAddNews/',AdminAddNews, name='AdminAddNews'),
     path('news_update/<int:id>',AdminUpdateNews, name='news_update'),
     path('news_delete/<int:id>',AdminNewswDelete, name='news_delete'),
+
+
+    path('meeting_call_list/<int:id>', meeting_call_list, name = 'meeting_call_list'),
+    path('admin_meeting_call/', admin_meeting_call, name = 'admin_meeting_call'),
+    path('meeting_call_add/', meeting_call_add, name = 'meeting_call_add'),
+    path('meeting_call_update/', meeting_call_update, name = 'meeting_call_update'),
 
     #admin_url end
 ]

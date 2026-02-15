@@ -1,0 +1,115 @@
+{% extends "home/base/base.html" %}
+{% block extra_css %}
+<style>
+    .job-content-box {
+        max-width: 100%;
+        padding-top: 10rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    /* Title */
+    .job-title-modern {
+        font-weight: 700;
+        font-size: 1.6rem;
+        color: #0f172a;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
+        transition: all 0.3s ease;
+    }
+
+    /* Description container */
+    .job-description-modern {
+        font-weight: 400;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #475569;
+    }
+
+    /* ✨ Quill rich text styling */
+    .job-description-modern p {
+        margin-bottom: 12px;
+    }
+
+    .job-description-modern h1,
+    .job-description-modern h2,
+    .job-description-modern h3 {
+        font-weight: 600;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        color: #0f172a;
+    }
+
+    .job-description-modern ul {
+        padding-left: 20px;
+        margin-bottom: 12px;
+    }
+
+    .job-description-modern ul li {
+        margin-bottom: 6px;
+        list-style-type: disc;
+    }
+
+    .job-description-modern strong {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .job-description-modern a {
+        color: #4f46e5;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .job-description-modern a:hover {
+        text-decoration: underline;
+    }
+
+    /* Hover effect */
+    .job-content-box:hover {
+        transform: translateY(-5px);
+    }
+
+    .job-content-box:hover .job-title-modern {
+        color: #4f46e5;
+    }
+
+    /* Optional: spacing between jobs */
+    .job-content-box:not(:last-child) {
+        margin-bottom: 20px;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .job-title-modern {
+            font-size: 1.3rem;
+        }
+        .job-content-box {
+            padding-top: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+
+<section class="pt-5 pb-5"> 
+    <div class="container">
+        {% for career in career %}
+        
+        <div class="job-content-box">
+            <h3 class="job-title-modern">
+                {{ career.title }}
+            </h3>
+            
+            <div class="job-description-modern">
+                {{ career.description|safe }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

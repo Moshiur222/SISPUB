@@ -340,14 +340,11 @@ class News(models.Model):
     
 
 class Career(models.Model):
-    position_name = models.CharField( max_length=50)
-    num_of_vacancy = models.IntegerField(null=True, blank=True)
-    loction_add = models.TextField(null=True)
-    deadline_date = models.DateField(null=True)
-    job_type = models.CharField(max_length=50, null=True)
+    title = models.CharField( max_length=50)
+    description = models.TextField(null=True)
 
     def __str__(self):
-        return self.position_name
+        return self.title
     
 
 
@@ -355,6 +352,7 @@ class Aggregator(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="aggregators")
     name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=50)
+    designation = models.CharField(max_length=50, null=True)
     phone = models.CharField(
         max_length=15,
         validators=[bd_phone_validator],
@@ -385,3 +383,29 @@ class Photo(models.Model):
 
     def __str__(self):
         return f"{self.album.title} - Photo {self.id}"
+
+
+class MeetingTitle(models.Model):
+    title = models.CharField(max_length=255, null=True)
+    def __str__(self):
+        return self.title
+
+class MeetingCall(models.Model):
+    PAYMENT_CHOICES = [
+        ('bkash', 'Bkash'),
+        ('nagad', 'Nagad'),
+        ('rocket', 'Rocket'),
+        ('bank_transfer', 'Bank Transfer'),
+    ]
+    title = models.ForeignKey("MeetingTitle", on_delete=models.CASCADE, null=True)
+    company_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    no_of_person = models.PositiveIntegerField()
+    phone = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(unique=True)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
+    transection_id = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.company_name} - {self.name}"

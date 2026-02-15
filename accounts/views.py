@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from datetime import datetime
 from collections import defaultdict
 from django.db import transaction
+from django.http import JsonResponse
 from .models import *
 from .utils import send_sms
 import random
@@ -147,11 +148,13 @@ def registration_view(request):
 
         if str(user_otp) != str(session_otp):
             messages.error(request, "Invalid OTP. Please try again.")
-            return render(request, "home/layouts/resistation.html", {"otp_sent": True})
+            return render(request, "home/layouts/resistation.html", {
+                "otp_sent": True,
+                "phone": reg_data["phone"]
+            })
 
         try:
             with transaction.atomic():
-
                 user = User.objects.create_user(
                     email=reg_data["email"],
                     password=reg_data["password"],
@@ -161,6 +164,7 @@ def registration_view(request):
                     user=user,
                     name=reg_data["name"],
                     company_name=reg_data["company_name"],
+                    designation=reg_data["designation"],
                     phone=reg_data["phone"],
                     brtc_licence_no=reg_data["brtc_licence_no"],
                     address=reg_data["address"]
@@ -174,11 +178,10 @@ def registration_view(request):
 
         except ValidationError as e:
             messages.error(request, e.messages[0])
-
         except Exception as e:
             messages.error(request, str(e))
 
-        return render(request, "home/layouts/resistation.html", {"otp_sent": True})
+        return render(request, "home/layouts/resistation.html", {"otp_sent": True, "phone": reg_data["phone"]})
 
     elif request.method == "POST":
         reg_data = {
@@ -210,10 +213,49 @@ def registration_view(request):
             messages.error(request, "Failed to send OTP. Please try again.")
             return redirect("registration")
 
-        return render(request, "home/layouts/resistation.html", {"otp_sent": True})
+        return render(request, "home/layouts/resistation.html", {
+            "otp_sent": True,
+            "phone": reg_data["phone"]
+        })
 
-    return render(request, "home/layouts/resistation.html", {"otp_sent": False})
+    # GET request: check if session has reg_data
+    reg_data = request.session.get("reg_data")
+    phone = reg_data["phone"] if reg_data else ""
+    return render(request, "home/layouts/resistation.html", {"otp_sent": False, "phone": phone})
 
+def meeting_call(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company_name')
+        name = request.POST.get('name')
+        no_of_person = request.POST.get('no_of_person')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        payment_method = request.POST.get('payment_method')
+        transection_id = request.POST.get('transection_id')
+
+        if MeetingCall.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists!")
+            return redirect('meeting_call')
+        if MeetingCall.objects.filter(phone=phone).exists():
+            messages.error(request, "Phone number already exists!")
+            return redirect('meeting_call')
+
+        MeetingCall.objects.create(
+            company_name=company_name,
+            name=name,
+            no_of_person=no_of_person,
+            phone=phone,
+            email=email,
+            payment_method=payment_method,
+            transection_id=transection_id
+        )
+        messages.success(request, "submited successful!")
+        return redirect('meeting_call')
+
+    context = {
+        'title': 'Join us today! It only takes a minute.'
+    }
+    return render(request, 'home/layouts/meeting_call.html', context)
 
 def contact_view(request):
     
@@ -334,6 +376,14 @@ def meetings(request):
     }
     return render(request, "home/layouts/meetings.html", context)
 
+
+def career(request):
+    career = Career.objects.all()
+    context  = {
+        'career': career
+    }
+    return render(request, "home/layouts/career.html", context)
+
 #home_view end
 
 
@@ -341,12 +391,16 @@ def meetings(request):
 @login_required
 def dashboard(request):
     return render (request, "admin/pages/dashboard.html")
+
 @login_required
 def home_details(request):
-    return render (request, 'admin/pages/home_details.html', {"all_company_info" : Company_info.objects.all(),
-                                                              "videos": Video.objects.all(), 
-                                                              "hero_areas": HeroArea.objects.all(),
-                                                              })
+    context = {
+        "all_company_info" : Company_info.objects.all(),
+        "videos": Video.objects.all(), 
+        "hero_areas": HeroArea.objects.all(),
+    }
+    return render (request, 'admin/pages/home_details.html', context)
+
 @login_required
 def company_info_input(request):
 
@@ -538,6 +592,14 @@ def update_story(request, id):
     return render(request, "admin/pages/update_story.html", {"story": story})
 
 @login_required
+def admin_vision(request):
+    vision = Vision.objects.all()
+    context = {
+        'vision' : vision
+    }
+    return render(request, "admin/pages/vision.html", context)
+
+@login_required
 def update_vision(request, id):
     vision = get_object_or_404(Vision, id=id)
 
@@ -557,6 +619,13 @@ def update_vision(request, id):
 
     return render(request, "admin/pages/update_vision.html", {"vision": vision})
 
+@login_required
+def admin_mission(request):
+    mission = Mission.objects.all()
+    context = {
+        'mission' : mission
+    }
+    return render(request, "admin/pages/mission.html", context)
 
 @login_required
 def update_mission(request, id):
@@ -577,6 +646,14 @@ def update_mission(request, id):
         return redirect("update_story", id=mission.id)
 
     return render(request, "admin/pages/update_mission.html", {"mission": mission})
+
+@login_required
+def admin_core_values(request):
+    core_values = CoreValues.objects.all()
+    context = {
+        'core_values' : core_values
+    }
+    return render(request, "admin/pages/core_values.html", context)
 
 @login_required
 def update_core_values(request, id):
@@ -880,6 +957,19 @@ def AdminEvents(request):
 
 
 @login_required
+def admin_video_gallery(request):
+    events = Events.objects.all()
+    meetings = Events_Meetings.objects.all()
+    context = {
+        'meetings': meetings,
+        'events': events
+    }
+    return render(request, "admin/pages/admin_video_gallery.html", context)
+
+
+#video gellary start
+
+@login_required
 def upload_video(request):
     if request.method == "POST":
         title_text = request.POST.get("title")
@@ -959,6 +1049,8 @@ def meeting_create(request):
     return render(request, "admin/pages/meeting_create.html", {"action": "Add"})
 
 
+#vedio_gallary end
+
 @login_required
 def meeting_update(request, id):
     meeting = get_object_or_404(Events_Meetings, id=id)
@@ -986,10 +1078,6 @@ def meeting_delete(request, id):
         meeting.delete()
         messages.success(request, "Meeting video deleted successfully!")
         return redirect("AdminEvents")
-
-
-
-
 
 @login_required
 def AdminMedia(request):
@@ -1235,7 +1323,7 @@ def AdminMembersRulesDelete(request, id):
 
 
 @login_required
-def AdminNewa(request):
+def AdminNews(request):
     newses = News.objects.all()
     return render(request, "admin/pages/admin_news.html", {"newses": newses})
 
@@ -1428,10 +1516,95 @@ def delete_album(request, id):
 
 
 
+@login_required
+def admin_career(request):
+    careers = Career.objects.all()
+    context = {
+        'careers': careers
+    }
+    return render(request, 'admin/pages/admin_career.html', context)
+
+
+@login_required
+def admin_add_career(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+
+        if title and description:
+            Career.objects.create(title=title, description=description) 
+            messages.success(request, "Career added successfully!")
+            return redirect('admin_add_career')
+        else:
+            messages.error(request, "Please fill all fields.")
+            
+    return render(request, 'admin/pages/admin_add_career.html')
+
+
+@login_required
+def admin_update_career(request, id):
+    career = get_object_or_404(Career, id=id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+
+        if title and description:
+            career.title = title
+            career.description = description
+            career.save()
+            
+            messages.success(request, "Career updated successfully!")
+            return redirect('admin_career')
+        else:
+            messages.error(request, "Please fill all fields.")
+
+    return render(request, 'admin/pages/admin_update_career.html', {'career': career})
+
+@login_required
+def admin_delete_career(request, id):
+    career = get_object_or_404(Career, id=id)
+    career.delete()
+    messages.success(request, "Career deleted successfully!")
+    return redirect('admin_career')
 
 
 
 
+@login_required
+def meeting_call_list(request, id):
+    meeting_calls = get_object_or_404(MeetingCall, id = id)
+    context = {
+        'meeting_calls': meeting_calls
+    } 
+    return render(request, "admin/pages/meeting_call_list.html", context)
+
+@login_required
+def admin_meeting_call(request):
+    titles = MeetingTitle.objects.all()
+    context = {
+        'titles':titles
+    }
+    return render(request, "admin/pages/admin_meeting_call.html", context)
+
+
+@login_required
+def meeting_call_add(request):
+    if request.method == "POST":
+        title = request.POST.get('title')
+
+        if title:
+            MeetingTitle.objects.create(title=title)
+            messages.success(request, "Meeting call added successfully!")
+            return redirect('meeting_call_add')
+        else:
+            messages.error(request, "Title is required!")
+    return render(request, "admin/pages/meeting_call_add.html")
+
+@login_required
+def meeting_call_update(request):
+
+    return render(request, "admin/pages/meeting_call_update.html")
 
 
 # admin_view end
@@ -1452,3 +1625,9 @@ def contact_submit(request):
         messages.success(request, "Thank you! Your message has been sent successfully.")
         return redirect(request.META.get("HTTP_REFERER", "/"))
    
+def check_email(request):
+    email = request.GET.get('email')
+
+    exists = User.objects.filter(email=email).exists()
+
+    return JsonResponse({'exists': exists})

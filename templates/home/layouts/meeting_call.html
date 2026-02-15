@@ -1,0 +1,241 @@
+{% extends "home/base/base.html" %}
+{% block title %}Register{% endblock title %}
+
+{% block main %}
+<style>
+.reg-wrapper {
+    min-height: 90vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: linear-gradient(140deg, rgba(0, 72, 114, 0.9) 0%, rgba(41, 17, 96, 0.8) 100%);
+    padding: 190px 20px 40px 20px; 
+}
+
+.reg-card {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.reg-card h2 { margin-bottom: 10px; color: #333; text-align: center; font-weight: 700; }
+.reg-card p { text-align: center; color: #777; margin-bottom: 30px; font-size: 0.9rem; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-group { margin-bottom: 18px; position: relative; }
+.form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 0.85rem; font-weight: 600; }
+
+/* Input styling */
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #28a745;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+/* Add dropdown arrow for select */
+.form-group select {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='5' viewBox='0 0 10 5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%23333'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 5px;
+}
+
+/* Button styling */
+.reg-btn { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
+.reg-btn:hover { background-color: #218838; }
+
+.footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; }
+
+.error-text { color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none; }
+.success-text { color: #28a745; font-size: 0.8rem; margin-top: 4px; display: none; }
+</style>
+
+<div class="reg-wrapper">
+    <div class="reg-card">
+        <p style="text-align: left; margin-bottom: 30px; color: #777; font-size: 0.9rem;">{{title}}</p>
+        <form id="regForm" method="POST">
+            {% csrf_token %}
+
+            {% if messages %}
+                {% for message in messages %}
+                    <p style="text-align:center; color:{% if 'error' in message.tags %}#dc3545{% elif 'success' in message.tags %}#28a745{% else %}#333{% endif %}; font-weight:600;">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Company Name & Person Name -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" name="company_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Person Name</label>
+                    <input type="text" name="name" required>
+                </div>
+            </div>
+
+            <!-- No of Person & Phone -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>No of Person</label>
+                    <input type="text" name="no_of_person" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="phone" id="phoneInput" required placeholder="e.g. 01700000000 or +8801700000000">
+                    <div id="phoneError" class="error-text"></div>
+                    <div id="phoneSuccess" class="success-text"> Phone No.</div>
+                </div>
+            </div>
+
+            <!-- Payment Method & Email -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select name="payment_method" required>
+                        <option value="" disabled selected>Select Payment Method</option>
+                        <option value="bkash">Bkash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" id="emailInput" required>
+                    <div id="emailError" class="error-text"></div>
+                    <div id="emailSuccess" class="success-text">Email available</div>
+                </div>
+            </div>
+
+            <!-- Transection ID -->
+            <div class="form-group">
+                <label>Transection ID</label>
+                <input type="text" name="transection_id" required>
+            </div>
+
+            <button type="submit" class="reg-btn">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Email live check
+const emailInput = document.getElementById('emailInput');
+const emailError = document.getElementById('emailError');
+const emailSuccess = document.getElementById('emailSuccess');
+let emailExists = false;
+
+if (emailInput) {
+emailInput.addEventListener('input', function() {
+    const email = this.value.trim();
+    if (email.length > 5) {
+        emailError.innerText = "Checking...";
+        emailError.style.display = 'block';
+        emailSuccess.style.display = 'none';
+
+        fetch('/check_email/?email=' + encodeURIComponent(email))
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    emailInput.style.borderColor = '#dc3545';
+                    emailError.innerText = "Email already exists!";
+                    emailError.style.display = 'block';
+                    emailSuccess.style.display = 'none';
+                    emailExists = true;
+                } else {
+                    emailInput.style.borderColor = '#28a745';
+                    emailError.style.display = 'none';
+                    emailSuccess.style.display = 'block';
+                    emailExists = false;
+                }
+            }).catch(err => {
+                emailError.innerText = "Error checking email";
+                emailError.style.display = 'block';
+                emailExists = true;
+            });
+    } else {
+        emailError.style.display = 'none';
+        emailSuccess.style.display = 'none';
+        emailExists = false;
+    }
+});
+}
+
+// Phone validation
+const phoneInput = document.getElementById('phoneInput');
+const phoneError = document.getElementById('phoneError');
+const phoneSuccess = document.getElementById('phoneSuccess');
+let phoneValid = false;
+
+if (phoneInput) {
+phoneInput.addEventListener('input', function() {
+    const phone = this.value.trim();
+    const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
+
+    if (regex.test(phone)) {
+        phoneInput.style.borderColor = '#28a745';
+        phoneError.style.display = 'none';
+        phoneSuccess.style.display = 'block';
+        phoneValid = true;
+    } else {
+        phoneInput.style.borderColor = '#dc3545';
+        phoneError.innerText = "Invalid BD phone number!";
+        phoneError.style.display = 'block';
+        phoneSuccess.style.display = 'none';
+        phoneValid = false;
+    }
+});
+}
+
+// Form submission validation
+const form = document.getElementById('regForm');
+form.addEventListener('submit', function(e) {
+    const p1 = document.getElementById('pass1');
+    const p2 = document.getElementById('pass2');
+    const matchError = document.getElementById('matchError');
+
+    if (p1 && p2 && p1.value !== p2.value) {
+        e.preventDefault();
+        matchError.style.display = 'block';
+        p2.style.borderColor = '#dc3545';
+    } else if (matchError) {
+        matchError.style.display = 'none';
+    }
+
+    if (emailExists) {
+        e.preventDefault();
+        emailError.innerText = "Email already exists!";
+        emailError.style.display = 'block';
+        emailInput.style.borderColor = '#dc3545';
+    }
+
+    if (phoneInput && !phoneValid) {
+        e.preventDefault();
+        phoneError.innerText = "Invalid BD phone number!";
+        phoneError.style.display = 'block';
+        phoneInput.style.borderColor = '#dc3545';
+    }
+});
+</script>
+{% endblock main %}

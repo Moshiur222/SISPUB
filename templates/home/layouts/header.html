@@ -60,8 +60,8 @@
             <div class="nav-menu">
                 <ul class="nav-list">
                     <li class="nav-item {% active 'home' %}"><a href="{% url 'home' %}" class="nav-link">Home</a></li>
-                    <li class="nav-item dropdown {% active 'about' 'founder' 'vision' 'mission' 'core_values' 'current_executive_commitee' 'previous_committee' 'sisbup_secretariat' %}">
-                        <a href="{% url 'about' %}" class="nav-link">About Us</a>
+                    <li class="nav-item dropdown {% active 'founder' 'vision' 'mission' 'core_values' 'current_executive_commitee' 'previous_committee' 'sisbup_secretariat' %}">
+                        <a href="" class="nav-link">About Us</a>
 
                             <div class="dropdown-menu" style="min-width: 420px;">
                                 <div style="display: flex; padding: 0 10px;">
@@ -163,7 +163,8 @@
 
 
                         <li class="nav-item {% active 'complain' %} "><a href="{% url 'complain' %}" class="nav-link">Complain</a></li>
-                        <li class="nav-item  "><a href="" class="nav-link">Career</a></li>
+                        <li class="nav-item {% active 'career' %} "><a href="{% url 'career' %}" class="nav-link">Career</a></li>
+                        <li class="nav-item {% active 'meeting_call' %} "><a href="{% url 'meeting_call' %}" class="nav-link">Meeting Call</a></li>
                         <li class="nav-item {% active 'contact' %} "><a href="{% url 'contact' %}" class="nav-link">Contacts</a></li>
                 </ul>
             </div>

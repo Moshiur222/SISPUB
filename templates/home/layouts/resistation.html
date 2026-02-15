@@ -3,106 +3,55 @@
 
 {% block main %}
 <style>
-    .reg-wrapper {
-        min-height: 90vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(140deg, rgba(0, 72, 114, 0.9) 0%, rgba(41, 17, 96, 0.8) 100%);
-        padding: 40px 20px;
-    }
+.reg-wrapper {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(140deg, rgba(0, 72, 114, 0.9) 0%, rgba(41, 17, 96, 0.8) 100%);
+    padding: 40px 20px;
+}
 
-    .reg-card {
-        background: #ffffff;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        width: 100%;
-        max-width: 500px; /* Slightly wider to accommodate fields */
-    }
+.reg-card {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
 
-    .reg-card h2 {
-        margin-bottom: 10px;
-        color: #333;
-        text-align: center;
-        font-weight: 700;
-    }
+.reg-card h2 { margin-bottom: 10px; color: #333; text-align: center; font-weight: 700; }
+.reg-card p { text-align: center; color: #777; margin-bottom: 30px; font-size: 0.9rem; }
 
-    .reg-card p {
-        text-align: center;
-        color: #777;
-        margin-bottom: 30px;
-        font-size: 0.9rem;
-    }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 0.85rem; font-weight: 600; }
+.form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; }
+.form-group input:focus { border-color: #28a745; outline: none; }
 
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-    }
+.reg-btn { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
+.reg-btn:hover { background-color: #218838; }
 
-    .form-group {
-        margin-bottom: 18px;
-    }
+.footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; }
 
-    .form-group label {
-        display: block;
-        margin-bottom: 6px;
-        color: #555;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
+.error-text { color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none; }
+.success-text { color: #28a745; font-size: 0.8rem; margin-top: 4px; display: none; }
 
-    .form-group input, .form-group textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 0.95rem;
-    }
-
-    .form-group input:focus {
-        border-color: #28a745;
-        outline: none;
-    }
-
-    .reg-btn {
-        width: 100%;
-        padding: 12px;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.3s;
-        margin-top: 10px;
-    }
-
-    .reg-btn:hover {
-        background-color: #218838;
-    }
-
-    .footer-link {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 0.85rem;
-    }
-
-    .error-text {
-        color: #dc3545;
-        font-size: 0.8rem;
-        margin-top: 4px;
-        display: none;
-    }
+.timer { text-align: center; margin-top: 10px; font-size: 0.85rem; color: #555; }
+.change-phone { color: #007bff; cursor: pointer; font-size: 0.85rem; display: block; margin-top: 5px; }
+.change-phone:hover { text-decoration: underline; }
 </style>
 
-<div class="reg-wrapper"style= "margin-top: 100px">
+<div class="reg-wrapper" style="margin-top: 100px">
     <div class="reg-card">
         <h2>{% if otp_sent %}Verify OTP{% else %}Create Account{% endif %}</h2>
-        <p>{% if otp_sent %}Please enter the code sent to your phone.{% else %}Join us today! It only takes a minute.{% endif %}</p>
-        
+        {% if otp_sent %}
+            <p>Please enter the code sent to your phone <strong id="phoneDisplay">{{phone}}<a class="change-phone" href = "" id="changePhoneBtn">Change Phone Number</a></strong></p>
+        {% else %}
+            <p>Join us today! It only takes a minute.</p>
+        {% endif %}
+
         <form id="regForm" method="POST">
             {% csrf_token %}
 
@@ -117,58 +66,72 @@
             {% endif %}
 
             {% if not otp_sent %}
+            <!-- Registration Fields -->
+            <div class="form-group">
+                <label>BRTC Licence No</label>
+                <input type="text" name="brtc_licence_no" required>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
-                    <label>Full Name</label>
+                    <label>Company Name</label>
+                    <input type="text" name="company_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Person Name</label>
                     <input type="text" name="name" required>
                 </div>
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Company Name</label>
-                        <input type="text" name="company_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="text" name="phone" required placeholder="e.g. 01700000000 or +8801700000000" pattern="(\+8801[3-9][0-9]{8}\d{0,2}|01[3-9][0-9]{8}\d{0,2})" title="Enter a valid Bangladesh phone number (11-15 digits, local or +880)">
-                    </div>
-                    
-                </div>
-
+            <div class="form-row">
                 <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" required>
+                    <label>Designation</label>
+                    <input type="text" name="designation" required>
                 </div>
-
-                <div class="form-group">
-                    <label>BRTC Licence No</label>
-                    <input type="text" name="brtc_licence_no" title="Enter BRTC Licence No" required>
-                </div>
-
                 <div class="form-group">
                     <label>Address</label>
                     <input type="text" name="address" required>
                 </div>
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="pass1" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="pass2" required>
-                        <div id="matchError" class="error-text">Passwords do not match!</div>
-                    </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="phone" id="phoneInput" required placeholder="e.g. 01700000000 or +8801700000000">
+                    <div id="phoneError" class="error-text"></div>
+                    <div id="phoneSuccess" class="success-text">Valid phone</div>
                 </div>
 
-                <button type="submit" class="reg-btn">Send OTP</button>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" id="emailInput" required>
+                    <div id="emailError" class="error-text"></div>
+                    <div id="emailSuccess" class="success-text">Email available</div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="pass1" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="pass2" required>
+                    <div id="matchError" class="error-text">Passwords do not match!</div>
+                </div>
+            </div>
+
+            <button type="submit" class="reg-btn">Send OTP</button>
 
             {% else %}
-                <div class="form-group">
-                    <label>Enter 6-Digit OTP</label>
-                    <input type="text" name="otp_code" maxlength="6" required style="text-align: center; letter-spacing: 5px; font-size: 1.5rem;">
-                </div>
-                <button type="submit" class="reg-btn">Verify & Register</button>
+            <!-- OTP Verification -->
+            <div class="form-group">
+                <label>Enter 6-Digit OTP</label>
+                <input type="text" name="otp_code" maxlength="6" required style="text-align: center; letter-spacing: 5px; font-size: 1.5rem;">
+            </div>
+            <div class="timer" id="otpTimer">Resend OTP in 60s</div>
+            <button type="submit" class="reg-btn" id="resendBtn" disabled>Resend OTP</button>
             {% endif %}
 
             <div class="footer-link">
@@ -179,35 +142,128 @@
 </div>
 
 <script>
-    const form = document.getElementById('regForm');
+// Email live check
+const emailInput = document.getElementById('emailInput');
+const emailError = document.getElementById('emailError');
+const emailSuccess = document.getElementById('emailSuccess');
+let emailExists = false;
+
+if (emailInput) {
+emailInput.addEventListener('input', function() {
+    const email = this.value.trim();
+    if (email.length > 5) {
+        emailError.innerText = "Checking...";
+        emailError.style.display = 'block';
+        emailSuccess.style.display = 'none';
+
+        fetch('/check_email/?email=' + encodeURIComponent(email))
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    emailInput.style.borderColor = '#dc3545';
+                    emailError.innerText = "Email already exists!";
+                    emailError.style.display = 'block';
+                    emailSuccess.style.display = 'none';
+                    emailExists = true;
+                } else {
+                    emailInput.style.borderColor = '#28a745';
+                    emailError.style.display = 'none';
+                    emailSuccess.style.display = 'block';
+                    emailExists = false;
+                }
+            }).catch(err => {
+                emailError.innerText = "Error checking email";
+                emailError.style.display = 'block';
+                emailExists = true;
+            });
+    } else {
+        emailError.style.display = 'none';
+        emailSuccess.style.display = 'none';
+        emailExists = false;
+    }
+});
+}
+
+// Phone live check
+const phoneInput = document.getElementById('phoneInput');
+const phoneError = document.getElementById('phoneError');
+const phoneSuccess = document.getElementById('phoneSuccess');
+let phoneValid = false;
+
+if (phoneInput) {
+phoneInput.addEventListener('input', function() {
+    const phone = this.value.trim();
+    const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
+
+    if (regex.test(phone)) {
+        phoneInput.style.borderColor = '#28a745';
+        phoneError.style.display = 'none';
+        phoneSuccess.style.display = 'block';
+        phoneValid = true;
+    } else {
+        phoneInput.style.borderColor = '#dc3545';
+        phoneError.innerText = "Invalid BD phone number!";
+        phoneError.style.display = 'block';
+        phoneSuccess.style.display = 'none';
+        phoneValid = false;
+    }
+});
+}
+
+// OTP Resend Timer
+const otpTimer = document.getElementById('otpTimer');
+const resendBtn = document.getElementById('resendBtn');
+let timer = 60;
+if (otpTimer) {
+    const countdown = setInterval(() => {
+        if (timer > 0) {
+            otpTimer.innerText = `Resend OTP in ${timer}s`;
+            timer--;
+        } else {
+            otpTimer.innerText = "You can now resend OTP.";
+            resendBtn.disabled = false;
+            clearInterval(countdown);
+        }
+    }, 1000);
+}
+
+// Change phone option
+const changePhoneBtn = document.getElementById('changePhoneBtn');
+if (changePhoneBtn) {
+    changePhoneBtn.addEventListener('click', () => {
+        // Reset OTP session on backend if needed
+        window.location.reload(); // Simple: reload form to change phone
+    });
+}
+
+// Form submission validation
+const form = document.getElementById('regForm');
+form.addEventListener('submit', function(e) {
     const p1 = document.getElementById('pass1');
     const p2 = document.getElementById('pass2');
-    const error = document.getElementById('matchError');
+    const matchError = document.getElementById('matchError');
 
-    if (form && p1 && p2) {
-        form.addEventListener('submit', function(e) {
-            if (p1.value !== p2.value) {
-                e.preventDefault();
-                error.style.display = 'block';
-                p2.style.borderColor = '#dc3545';
-            } else {
-                error.style.display = 'none';
-            }
-        });
-    }
-    const phoneInput = document.querySelector('input[name="phone"]');
-
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function() {
-            const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})\d{0,2}$/;
-            
-            if (!regex.test(this.value)) {
-                this.style.borderColor = '#dc3545';
-            } else {
-                this.style.borderColor = '#28a745';
-            }
-        });
+    if (p1 && p2 && p1.value !== p2.value) {
+        e.preventDefault();
+        matchError.style.display = 'block';
+        p2.style.borderColor = '#dc3545';
+    } else if (matchError) {
+        matchError.style.display = 'none';
     }
 
+    if (emailExists) {
+        e.preventDefault();
+        emailError.innerText = "Email already exists!";
+        emailError.style.display = 'block';
+        emailInput.style.borderColor = '#dc3545';
+    }
+
+    if (phoneInput && !phoneValid) {
+        e.preventDefault();
+        phoneError.innerText = "Invalid BD phone number!";
+        phoneError.style.display = 'block';
+        phoneInput.style.borderColor = '#dc3545';
+    }
+});
 </script>
 {% endblock main %}

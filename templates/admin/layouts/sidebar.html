@@ -3,11 +3,6 @@
 {% load static %}
 {% load admin_active %}
 
-
-
-
-
-
 <div class="sidebar" data-background-color="dark">
   <div class="sidebar-wrapper scrollbar scrollbar-inner">
     <div class="sidebar-content">
@@ -23,23 +18,35 @@
             <p>Home</p>
           </a>
         </li>
-        <li class="nav-item {% admin_active 'about_details' %}">
-          <a href="{% url 'about_details' %}">
-            <p>About</p>
-          </a>
-        </li>
-              <li class="nav-item {% admin_active 'sispab_founders' 'sispab_executive_com' 'previous_executive_committee' %}">
+              <li class="nav-item {% admin_active 'sispab_founders' 'admin_core_values' 'admin_vision' 'admin_mission' 'sispab_executive_com' 'previous_executive_committee' %}">
                 <a data-bs-toggle="collapse" href="#sidebarLayouts">
-                  <p>Commities</p>
+                  <p>About Us</p>
                   <span class="caret"></span>
                 </a>
                 <div class="collapse" id="sidebarLayouts">
                   <ul class="nav nav-collapse">
+                    <p style = "padding-left: 30px; font-size: 14px">About SiSPUB</p>
+                    <li class="{% admin_active 'admin_core_values' %}">
+                      <a href="{% url 'admin_core_values' %}">
+                        <span class="sub-item">Core values</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'admin_vision' %}">
+                      <a href="{% url 'admin_vision' %}">
+                        <span class="sub-item">Vision</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'admin_mission' %}">
+                      <a href="{% url 'admin_mission' %}">
+                        <span class="sub-item">Mission</span>
+                      </a>
+                    </li>
                     <li class="{% admin_active 'sispab_founders' %}">
                       <a href="{% url 'sispab_founders' %}">
                         <span class="sub-item">Sispab Founders</span>
                       </a>
                     </li>
+                    <p  style = "padding-left: 30px; font-size: 14px">Our Team</p>
                     <li class="{% admin_active 'sispab_executive_com' %}">
                       <a href="{% url 'sispab_executive_com' %}">
                         <span class="sub-item">Current Executive Committee</span>
@@ -58,40 +65,10 @@
                   </ul>
                 </div>
               </li>
-              <li class="nav-item {% admin_active 'sispab_founders' 'sispab_executive_com' 'previous_executive_committee' %}">
-                <a data-bs-toggle="collapse" href="#sidebarLayouts">
-                  <p>News & Media</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="sidebarLayouts">
-                  <ul class="nav nav-collapse">
-                    <li class="{% admin_active 'AdminNewa' %}">
-                      <a href="{% url 'AdminNewa' %}">
-                        <span class="sub-item">News</span>
-                      </a>
-                    </li>
-                    <li class="{% admin_active 'admin_add_photo' %}">
-                      <a href="{% url 'admin_Album_list' %}">
-                        <span class="sub-item">Photo Gallery</span>
-                      </a>
-                    </li>
-                    <li class="{% admin_active 'previous_executive_committee' %}">
-                      <a href="{% url 'previous_executive_committee' %}">
-                        <span class="sub-item">Video Gallery</span>
-                      </a>
-                    </li>
-                    {% comment %} <li class="">
-                      <a href="">
-                        <span class="sub-item">Sispab Secretariat</span>
-                      </a>
-                    </li> {% endcomment %}
-                  </ul>
-                </div>
-              </li>
               
               <li class="nav-item {% admin_active 'AdminMembersRules' %}">
                 <a data-bs-toggle="collapse" href="#forms">
-                  <p>Commities</p>
+                  <p>Memberships</p>
                   <span class="caret"></span>
                 </a>
                 <div class="collapse" id="forms">
@@ -124,29 +101,50 @@
                   </ul>
                 </div>
               </li>
-              <li class="nav-item {% admin_active 'AdminEvents' %}">
-                <a href="{% url 'AdminEvents' %}">
-                  <p>Events</p>
+              <!-- News & Media Collapse -->
+              <li class="nav-item {% admin_active 'AdminNews' 'admin_Album_list' 'AdminVideoGallery' %}">
+                <a data-bs-toggle="collapse" href="#newsMenu">
+                  <p>News & Media</p>
+                  <span class="caret"></span>
                 </a>
-              </li>
-              <li class="nav-item {% admin_active 'AdminMedia' %}">
-                <a href="{% url 'AdminMedia' %}">
-                  <p>Media</p>
-                </a>
-              </li>
-              <li class="nav-item {% admin_active 'AdminBlog' %}">
-                <a href="{% url 'AdminBlog' %}">
-                  <p>Blog</p>
-                </a>
+                <div class="collapse {% if request.resolver_match.url_name in 'AdminNews admin_Album_list AdminVideoGallery' %}show{% endif %}" id="newsMenu">
+                  <ul class="nav nav-collapse">
+                    <li class="{% admin_active 'AdminNews' %}">
+                      <a href="{% url 'AdminNews' %}">
+                        <span class="sub-item">News</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'admin_Album_list' %}">
+                      <a href="{% url 'admin_Album_list' %}">
+                        <span class="sub-item">Photo Gallery</span>
+                      </a>
+                    </li>
+                    <li class="{% admin_active 'admin_video_gallery' %}">
+                      <a href="{% url 'admin_video_gallery' %}">
+                        <span class="sub-item">Video Gallery</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </li>
               <li class="nav-item {% admin_active 'AdminCampain' %}">
                 <a href="{% url 'AdminCampain' %}">
                   <p>Campain</p>
                 </a>
               </li>
+              <li class="nav-item {% admin_active 'admin_career' %}">
+                <a href="{% url 'admin_career' %}">
+                  <p>Career</p>
+                </a>
+              </li>
               <li class="nav-item {% admin_active 'AdminContact' %}">
                 <a href="{% url 'AdminContact' %}">
                   <p>Contact</p>
+                </a>
+              </li>
+              <li class="nav-item {% admin_active 'admin_meeting_call' %}">
+                <a href="{% url 'admin_meeting_call' %}">
+                  <p>Meeting Call</p>
                 </a>
               </li>
               </li>
