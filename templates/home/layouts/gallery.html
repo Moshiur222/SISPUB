@@ -35,7 +35,10 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
-
+        .gallery-grid a {
+            text-decoration: none;
+            color: inherit;
+        }
         .gallery-item {
             position: relative;
             overflow: hidden;
@@ -109,9 +112,9 @@
                     {% else %}
                         <img src="{% static 'default_album.jpg' %}" alt="{{ album.title }}">
                     {% endif %}
-                    <div class="overlay">
-                        <span>{{ album.title }}</span>
-                    </div>
+                </div>
+                <div style = "color: #000;  text-align: center; margin-top: 10px; font-size: 1.1rem; font-weight: 500;">
+                    <span>{{ album.title }}({{album.photos.count}})</span>
                 </div>
             </a>
         {% empty %}

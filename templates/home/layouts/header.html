@@ -23,20 +23,6 @@
                     </span>
                 </div>
                 {% endfor %}
-                <div class="social-links">
-                    <a href="#" class="social-link" style="color: #1c8bd4" title="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-link" style="color: #1c8bd4" title="Twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-link" style="color: #1c8bd4" title="LinkedIn">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a href="#" class="social-link" style="color: #1c8bd4" title="YouTube">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                </div>
                 <div class="social-links auth-links">
                     <a href="{% url 'login' %}" class="auth-link {% active 'login' %}">Login</a>
                     <span class="auth-separator">|</span>
@@ -68,33 +54,33 @@
 
                                     <!-- Column 1 -->
                                     <div style="width: 70%; margin-left: 20px;">
-                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px;">About SiSPUB</a>
+                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 30px;">About SiSPUB</a>
                                         <a href="{% url 'core_values' %}"
-                                        class="dropdown-item {% active 'core_values' %}">
+                                        class="dropdown-item {% active 'core_values' %}" style="height: 30px;">
                                             Core Values
                                         </a>
 
                                         <a href="{% url 'vision'%}"
-                                        class="dropdown-item {% active 'vision' %}">
+                                        class="dropdown-item {% active 'vision' %}" style="height: 30px;">
                                             Vision
                                         </a>
                                         <a href="{% url 'mission' %}"
-                                        class="dropdown-item {% active 'mission' %}">
+                                        class="dropdown-item {% active 'mission' %}" style="height: 30px;">
                                             Mission
                                         </a>
-                                        <a href="{% url 'founder' %}" class="dropdown-item {% active 'founder' %}"> SISPAB Founders </a>
+                                        <a href="{% url 'founder' %}" class="dropdown-item {% active 'founder' %}" style="height: 30px;"> SISPAB Founders </a>
                                     </div>
 
                                     <!-- Column 2 -->
                                     <div style="width: 100%;">
-                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px;">Our Team</a>
-                                        <a href="{% url 'current_executive_commitee' %}" class="dropdown-item {% active 'current_executive_commitee' %}">
+                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 30px;">Our Team</a>
+                                        <a href="{% url 'current_executive_commitee' %}" class="dropdown-item {% active 'current_executive_commitee' %}" style="height: 30px;">
                                             Current Executive Committee
                                         </a>
-                                        <a href="{% url 'previous_committee' %}" class="dropdown-item {% active 'previous_committee' %}">
+                                        <a href="{% url 'previous_committee' %}" class="dropdown-item {% active 'previous_committee' %}" style="height: 30px;">
                                             Previous Executive Committee
                                         </a>
-                                        <a href="{% url 'sisbup_secretariat' %}" class="dropdown-item {% active 'sisbup_secretariat' %}">
+                                        <a href="{% url 'sisbup_secretariat' %}" class="dropdown-item {% active 'sisbup_secretariat' %}" style="height: 30px;">
                                             SISPAB Secretariat
                                         </a>
                                     </div>
@@ -107,19 +93,19 @@
                     <li class="nav-item dropdown {% active 'benefit_od_member' 'advisory_council' 'member_resistation' 'membership_rules' 'process_of_members' %}">
                         <a href="#" class="nav-link dropdown-toggle">Membership</a>
                         <div class="dropdown-menu">
-                            <a href="{% url 'benefit_od_member' %}" class="dropdown-item {% active 'benefit_od_member' %}" style="margin-left: 20px;">Benefit of Members</a>
-                            <a href="{% url 'advisory_council' %}" class="dropdown-item {% active 'advisory_council' %}"  style="margin-left: 20px;">Advisory Council</a>
-                            <a href="{% url 'member_resistation' %}" class="dropdown-item {% active 'member_resistation' %}"  style="margin-left: 20px;">Member Registration</a>
-                            <a href="{% url 'membership_rules' %}" class="dropdown-item {% active 'membership_rules' %}"  style="margin-left: 20px;">Membership Rules</a>
-                            <a href="{% url 'process_of_members' %}" class="dropdown-item {% active 'process_of_members' %}"  style="margin-left: 20px;">Process of Membership</a>
+                            <a href="{% url 'benefit_od_member' %}" class="dropdown-item {% active 'benefit_od_member' %}" style="margin-left: 20px; height: 30px">Benefit of Members</a>
+                            <a href="{% url 'advisory_council' %}" class="dropdown-item {% active 'advisory_council' %}"  style="margin-left: 20px; height: 30px">Advisory Council</a>
+                            {% comment %} <a href="{% url 'member_resistation' %}" class="dropdown-item {% active 'member_resistation' %}"  style="margin-left: 20px; height: 30px">Member Registration</a> {% endcomment %}
+                            <a href="{% url 'membership_rules' %}" class="dropdown-item {% active 'membership_rules' %}"  style="margin-left: 20px; height: 30px">Membership Rules</a>
+                            {% comment %} <a href="{% url 'process_of_members' %}" class="dropdown-item {% active 'process_of_members' %}"  style="margin-left: 20px; height: 30px;">Process of Membership</a> {% endcomment %}
                         </div>
                     </li>
-                    <li class="nav-item dropdown {% active  'news' 'media' 'video_gallery' %}">
+                    <li class="nav-item dropdown {% active  'news' 'photo' 'photos' 'video_gallery' 'news_detail_view' %}">
                         <a href="#" class="nav-link dropdown-toggle">News & Media</a>
                         <div class="dropdown-menu">
-                            <a href="{% url 'news' %}" class="dropdown-item {% active 'news' %}"  style="margin-left: 20px;">News</a>
-                            <a href="{% url 'photo' %}" class="dropdown-item {% active 'photo' %}"  style="margin-left: 20px;">Photo Gallery</a>
-                            <a href="{% url 'video_gallery' %}" class="dropdown-item {% active 'video_gallery' %}"  style="margin-left: 20px;">Video Gallery</a>
+                            <a href="{% url 'news' %}" class="dropdown-item {% active 'news' 'news_detail_view' %}"  style="margin-left: 20px; height: 30px">News</a>
+                            <a href="{% url 'photo' %}" class="dropdown-item {% active 'photo' 'photos' %}"  style="margin-left: 20px; height: 30px">Photo Gallery</a>
+                            <a href="{% url 'video_gallery' %}" class="dropdown-item {% active 'video_gallery' %}"  style="margin-left: 20px; height: 30px">Video Gallery</a>
                         </div>
                     </li>
                     {% comment %} <li class="nav-item dropdown {% active  'publication' 'career' 'blog' %}">
@@ -164,7 +150,7 @@
 
                         <li class="nav-item {% active 'complain' %} "><a href="{% url 'complain' %}" class="nav-link">Complain</a></li>
                         <li class="nav-item {% active 'career' %} "><a href="{% url 'career' %}" class="nav-link">Career</a></li>
-                        <li class="nav-item {% active 'meeting_call' %} "><a href="{% url 'meeting_call' %}" class="nav-link">Meeting Call</a></li>
+                        <li class="nav-item {% active 'meeting_calls' 'meeting_call' %} "><a href="{% url 'meeting_calls' %}" class="nav-link">Meeting Call</a></li>
                         <li class="nav-item {% active 'contact' %} "><a href="{% url 'contact' %}" class="nav-link">Contacts</a></li>
                 </ul>
             </div>

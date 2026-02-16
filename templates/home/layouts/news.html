@@ -49,11 +49,15 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .news-card:hover {
+    text-decoration: none;
     transform: translateY(-7px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    cursor: pointer;
 }
 
 /* --- Image --- */
@@ -178,7 +182,7 @@
 
 <div class="news-grid">
     {% for news in newses %}
-    <div class="news-card">
+    <a href="{% url 'news_detail_view' news.id %}" class="news-card">
         {% if news.image %}
         <img data-src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
         {% else %}
@@ -192,13 +196,7 @@
         {% if news.date %}
         <span class="news-date">{{ news.date|date:"F d, Y" }}</span>
         {% endif %}
-
-        <a href="#" class="news-read-more" data-id="{{ news.id }}"
-           data-title="{{ news.title|escapejs }}"
-           data-date="{{ news.date|date:'F d, Y' }}"
-           data-image="{% if news.image %}{{ news.image.url }}{% endif %}"
-           data-description="{{ news.description|escapejs }}">Read Full Story</a>
-    </div>
+    </a>
     {% empty %}
     <div class="no-news">
         <h3>No News Available</h3>

@@ -39,7 +39,8 @@ urlpatterns = [
     path('meetings/', meetings, name = 'meetings' ),
     path('contact_submit/', contact_submit, name = 'contact_submit' ),
     path('career/', career, name = 'career' ),
-    path('meeting_call/', meeting_call, name = 'meeting_call' ),
+    path('meeting_call/<int:id>/', meeting_call, name = 'meeting_call' ),
+    path('meeting_calls/', meeting_calls, name = 'meeting_calls' ),
 
     #api
     path('check_email/',check_email, name='check_email'),

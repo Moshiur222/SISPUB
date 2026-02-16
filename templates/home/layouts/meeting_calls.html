@@ -1,0 +1,144 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <style>
+        :root {
+            --primary-color: #2874a7;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            --card-shadow-hover: 0 15px 30px rgba(0,0,0,0.12);
+        }
+
+        .gallery-section {
+            padding: 190px 20px 80px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .gallery-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+            margin-bottom: 15px;
+        }
+
+        .gallery-subtitle {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            /* Reduced min-width for smaller, more professional thumbnails */
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+        }
+
+        .gallery-card {
+            text-decoration: none;
+            display: block;
+            group: hover;
+        }
+
+        .image-wrapper {
+            position: relative;
+            /* Professional 4:3 Aspect Ratio */
+            aspect-ratio: 4 / 3; 
+            overflow: hidden;
+            border-radius: 16px;
+            background-color: #f8f9fa;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        /* Hover Effects */
+        .gallery-card:hover .image-wrapper {
+            transform: translateY(-8px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .gallery-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .meeting-info {
+            padding: 15px 5px;
+            text-align: left;
+        }
+
+        .meeting-title {
+            display: block;
+            color: var(--text-dark);
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .gallery-card:hover .meeting-title {
+            color: var(--primary-color);
+        }
+
+        .meeting-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+{% endblock extra_css %}
+
+{% block main %}
+<div class="gallery-section">
+    <div class="gallery-header">
+        <h2 class="gallery-title">All Meetings</h2>
+    </div>
+
+    <div class="gallery-grid">
+        {% for meeting_title in meeting_titles %}
+            <a href="{% url 'meeting_call' meeting_title.id %}" class="gallery-card">
+                <div class="image-wrapper">
+                    {% if meeting_title.image %}
+                        <img src="{{ meeting_title.image.url }}" alt="{{ meeting_title.title }}" loading="lazy">
+                    {% else %}
+                        <img src="{% static 'default_album.jpg' %}" alt="{{ meeting_title.title }}">
+                    {% endif %}
+                </div>
+                <div class="meeting-info">
+                    <span class="meeting-title">{{ meeting_title.title }}</span>
+                    {% if meeting_title.created_at %}
+                    <span class="meeting-date">{{ meeting_title.created_at|date:"M d, Y" }}</span>
+                    {% endif %}
+                </div>
+            </a>
+        {% empty %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <p class="text-muted">No meetings are available at this time.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock main %}

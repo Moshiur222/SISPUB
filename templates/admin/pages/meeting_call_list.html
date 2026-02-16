@@ -1,6 +1,77 @@
 {% extends "admin/base/base.html" %}
 {% block content %}
+
+<style>
+/* Global font */
+body, .card, .table, .btn, input, select {
+    font-size: 13px !important;
+}
+
+/* Compact table */
+table {
+    font-size: 12px;
+    width: 100%;          /* full width */
+    table-layout: auto;   /* prevent scroll */
+}
+
+table th, 
+table td {
+    padding: 4px 6px !important;
+    line-height: 1.2;
+    word-wrap: break-word; /* prevent overflow text */
+}
+
+table th {
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+/* 🔥 Action buttons inline */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+}
+
+.action-buttons .btn {
+    font-size: 11px;
+    padding: 3px 6px;
+    line-height: 1;
+    border-radius: 4px;
+}
+
+/* Title */
+.title-heading {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Alerts */
+.alert {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+/* DataTables controls */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    font-size: 11px;
+}
+
+/* Inputs */
+.dataTables_wrapper input,
+.dataTables_wrapper select {
+    height: 26px;
+    font-size: 12px;
+}
+</style>
+
 <div class="card mt-4">
+
     {% if messages %}
         {% for message in messages %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -13,60 +84,83 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
             <a href="{% url 'admin_meeting_call' %}" class="btn btn-sm btn-outline-secondary">← Back</a>
-            <h5 class="mb-0" style="margin-left: 35rem;">Meeting Call List</h5>
+            
+            <h5 class="mb-0 title-heading" style="margin-left: 35rem;">
+                Meeting Call List
+            </h5>
         </div>
     </div>
 
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="example" class="table table-striped table-bordered table-hover align-middle">
-                <thead class="table-light">
+    <div class="card-body p-2">
+
+        <!-- Removed table-responsive to remove horizontal scroll -->
+        <table id="example" class="table table-striped table-bordered table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Company Name</th>
+                    <th>Person Name</th>
+                    <th>No of Person</th>
+                    <th>Phone</th>
+                    <th>Email Address</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Transection ID</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if meeting_calls %}
+                    {% for call in meeting_calls %}
                     <tr>
-                        <th>#</th>
-                        <th>Company Name</th>
-                        <th>Person Name</th>
-                        <th>No of Person</th>
-                        <th>Phone</th>
-                        <th>Email Address</th>
-                        <th>Payment Method</th>
-                        <th>Transection ID</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if meeting_calls %}
-                        {% for call in meeting_calls %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ call.company_name }}</td>
-                            <td>{{ call.name }}</td>
-                            <td>{{ call.no_of_person }}</td>
-                            <td>{{ call.phone }}</td>
-                            <td>{{ call.email }}</td>
-                            <td>{{ call.payment_method }}</td>
-                            <td>{{ call.transection_id }}</td>
-                            <td class="text-center">
-                                <a href="{% url 'call_update' id=call.id %}" class="btn btn-sm btn-warning">Update</a>
-                                <form action="{% url 'call_delete' id=call.id %}" method="post" style="display:inline;">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ call.company_name }}</td>
+                        <td>{{ call.name }}</td>
+                        <td>{{ call.no_of_person }}</td>
+                        <td>{{ call.phone }}</td>
+                        <td>{{ call.email }}</td>
+                        <td>{{ call.amount }}</td>
+                        <td>{{ call.payment_method }}</td>
+                        <td>{{ call.transection_id }}</td>
+
+                        <!-- ICON BUTTONS -->
+                        <td class="text-center">
+                            <div class="action-buttons">
+                                <!-- Update -->
+                                <a href="{% url 'call_update' id=call.id %}" 
+                                   class="btn btn-warning btn-sm" 
+                                   title="Update">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+
+                                <!-- Delete -->
+                                <form action="{% url 'call_delete' id=call.id %}" method="post" style="margin:0;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger"
+                                    <button type="submit" 
+                                        class="btn btn-danger btn-sm" 
+                                        title="Delete"
                                         onclick="return confirm('Are you sure you want to delete this contact?')">
-                                        Delete
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="9" class="text-center text-muted">No contacts found</td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted">No contacts found</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
     </div>
 </div>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
@@ -74,11 +168,14 @@
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<!-- Export dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -86,7 +183,7 @@
 <script>
 $(document).ready(function() {
     $('#example').DataTable({
-        dom: 'Bfrtip', // Show Buttons at top
+        dom: 'Bfrtip',
         buttons: [
             { extend: 'copyHtml5', text: 'Copy' },
             { extend: 'excelHtml5', text: 'Excel' },
@@ -98,4 +195,5 @@ $(document).ready(function() {
     });
 });
 </script>
+
 {% endblock content %}

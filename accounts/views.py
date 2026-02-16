@@ -313,16 +313,16 @@ def resend_otp(request):
 
         return JsonResponse({"status": "ok"})
 
+def meeting_calls(request):
+    meeting_titles = MeetingTitle.objects.all()
+    return render(request, "home/layouts/meeting_calls.html", {"meeting_titles": meeting_titles})
 
-def meeting_call(request):
-    # Get the last created MeetingTitle
-    last_title = MeetingTitle.objects.order_by('-id').first()
 
-    if not last_title:
-        messages.error(request, "No Meeting Title available!")
-        return redirect('home')  # Or another page
+def meeting_call(request, id):
+    # Get the specific MeetingTitle
+    last_title = get_object_or_404(MeetingTitle, id=id)
 
-    # Default form values (to retain after errors)
+    # Default form values for GET request or re-rendering after error
     form_data = {
         'company_name': '',
         'name': '',
@@ -334,7 +334,7 @@ def meeting_call(request):
     }
 
     if request.method == 'POST':
-        # Get form data
+        # Capture data from POST
         form_data.update({
             'company_name': request.POST.get('company_name', '').strip(),
             'name': request.POST.get('name', '').strip(),
@@ -345,12 +345,12 @@ def meeting_call(request):
             'transection_id': request.POST.get('transection_id', '').strip(),
         })
 
-        # Validate required fields
+        # 1. Validate required fields
         if not all(form_data.values()):
             messages.error(request, "All fields are required!")
             return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
 
-        # Validate number of persons
+        # 2. Validate and convert number of persons
         try:
             no_of_person = int(form_data['no_of_person'])
             if no_of_person <= 0:
@@ -359,33 +359,38 @@ def meeting_call(request):
             messages.error(request, "Number of persons must be a positive number.")
             return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
 
-        # Calculate total amount safely
-        amount = (last_title.amount or 0) * no_of_person
+        # 3. Calculate total amount
+        # Multiplies MeetingTitle price by number of people
+        total_price = (last_title.amount or 0) * no_of_person
 
-        # Check for duplicate phone or email
+        # 4. Check for duplicates
         if MeetingCall.objects.filter(phone=form_data['phone']).exists():
             messages.error(request, "Phone number already registered!")
             return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
+        
         if MeetingCall.objects.filter(email=form_data['email']).exists():
             messages.error(request, "Email already registered!")
             return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
 
-        # Save MeetingCall
-        MeetingCall.objects.create(
-            title=last_title,
-            company_name=form_data['company_name'],
-            name=form_data['name'],
-            no_of_person=no_of_person,
-            phone=form_data['phone'],
-            email=form_data['email'],
-            payment_method=form_data['payment_method'],
-            transection_id=form_data['transection_id'],
-            amount=amount
-        )
+        # 5. Save the MeetingCall
+        try:
+            MeetingCall.objects.create(
+                title=last_title,
+                company_name=form_data['company_name'],
+                name=form_data['name'],
+                no_of_person=no_of_person,
+                phone=form_data['phone'],
+                email=form_data['email'],
+                payment_method=form_data['payment_method'],
+                transection_id=form_data['transection_id'],
+                amount=total_price  # Now works because field exists in model
+            )
+            messages.success(request, f"Submitted successfully! Total: {total_price}")
+            return redirect('meeting_call', id=last_title.id)
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
 
-        messages.success(request, "Submitted successfully!")
-        return redirect('meeting_call')
-
+    # For GET requests
     context = {
         'title': last_title,
         **form_data
@@ -1835,12 +1840,11 @@ def call_update(request, id):
 @login_required
 def call_delete(request, id):
     call = get_object_or_404(MeetingCall, id=id)
-    call_id = call.id
 
     call.delete()
     messages.success(request, "Deleted successfully!")
 
-    return redirect('meeting_call_list', id=call_id)
+    return redirect('meeting_call_list', call.title.id)
 
 # admin_view end
 

@@ -3,64 +3,144 @@
 
 {% block extra_css %}
 <style>
-.news-detail-header {
-    text-align: center;
-    padding: 60px 20px 40px;
-    background: linear-gradient(140deg, rgba(0,72,114,0.9) 0%, rgba(41,17,96,0.8) 100%);
-    color: white;
-    margin-bottom: 40px;
-}
+    /* Professional Typography */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
 
-.news-detail-header h1 {
-    font-size: 2.8rem;
-    font-weight: 400;
-    margin-bottom: 15px;
-}
+    .article-wrapper {
+        
+        background-color: #fff;
+        color: #1a1a1a;
+        font-family: 'Inter', sans-serif;
+    }
 
-.news-detail-header span {
-    font-size: 1rem;
-    opacity: 0.8;
-}
+    /* Header Section */
+    .article-header {
+        max-width: 800px;
+        margin: 60px auto 40px;
+        text-align: center;
+        padding: 100px 0;
+    }
 
-.news-detail-container {
-    max-width: 900px;
-    margin: 0 auto 60px;
-    padding: 0 20px;
-}
+    .article-category {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #004872;
+        margin-bottom: 15px;
+        display: block;
+    }
 
-.news-detail-image {
-    width: 100%;
-    max-height: 450px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 30px;
-}
+    .article-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        color: #111;
+    }
 
-.news-detail-description {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: #333;
-}
+    .article-meta {
+        font-size: 0.95rem;
+        color: #666;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    /* Featured Image */
+    .article-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .image-frame {
+        margin-bottom: 50px;
+    }
+
+    .article-featured-image {
+        width: 100%;
+        height: auto;
+        max-height: 600px;
+        object-fit: cover;
+        border-radius: 4px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    /* Content Styling */
+    .article-content {
+        max-width: 740px; /* Golden standard for readability */
+        margin: 0 auto 80px;
+        font-family: 'Lora', serif; /* Serif for the actual news reading */
+        font-size: 1.25rem;
+        line-height: 1.8;
+        color: #292929;
+    }
+
+    .article-content p {
+        margin-bottom: 1.5rem;
+    }
+
+    /* First Letter Dropcap */
+    .article-content > p:first-of-type::first-letter {
+        float: left;
+        font-size: 5rem;
+        line-height: 4rem;
+        padding-top: 4px;
+        padding-right: 12px;
+        padding-left: 3px;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: #111;
+    }
+
+    .sticky{
+        position: sticky;
+        top: 200px;
+        z-index: 100;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+        .article-title { font-size: 2.2rem; }
+        .article-content { font-size: 1.1rem; }
+    }
 </style>
 {% endblock extra_css %}
 
 {% block main %}
-<div class="news-detail-header">
-    <h1>{{ news.title }}</h1>
-    {% if news.date %}
-    <span>{{ news.date|date:"F d, Y" }}</span>
-    {% endif %}
-</div>
+<article class="article-wrapper">
+    <header class="article-header">
+        <a class= "sticky" href="{% url 'news' %}" style="position: absolute; left: 20px;  font-size: 0.9rem; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Back 
+        </a>
+        <span class="article-category">News & Updates</span>
+        <h1 class="article-title">{{ news.title }}</h1>
+        
+        <div class="article-meta">
+            {% if news.date %}
+            <span><i class="far fa-calendar"></i> {{ news.date|date:"F d, Y" }}</span>
+            {% endif %}
+            <span><i class="far fa-clock"></i> 5 min read</span>
+        </div>
+    </header>
 
-<div class="news-detail-container">
-    {% if news.image %}
-    <img src="{{ news.image.url }}" alt="{{ news.title }}" class="news-detail-image">
-    {% endif %}
+    <div class="article-container">
+        {% if news.image %}
+        <div class="image-frame">
+            <img src="{{ news.image.url }}" alt="{{ news.title }}" class="article-featured-image">
+        </div>
+        {% endif %}
 
-    {% if news.description %}
-    <div class="news-detail-description">
-        {{ news.description|safe }}
+        {% if news.description %}
+        <div class="article-content">
+            {{ news.description|safe }}
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-</div>
+</article>
 {% endblock main %}
