@@ -254,6 +254,7 @@ def meeting_call(request):
             messages.error(request, "No Meeting Title available!")
             return redirect('meeting_call')
 
+        # Get form data
         company_name = request.POST.get('company_name')
         name = request.POST.get('name')
         no_of_person = request.POST.get('no_of_person')
@@ -262,7 +263,29 @@ def meeting_call(request):
         payment_method = request.POST.get('payment_method')
         transection_id = request.POST.get('transection_id')
 
+        # Validate required fields
+        if not all([company_name, name, no_of_person, phone, email, payment_method, transection_id]):
+            messages.error(request, "All fields are required!")
+            return redirect('meeting_call')
 
+        try:
+            no_of_person = int(no_of_person)
+        except ValueError:
+            messages.error(request, "Number of persons must be a valid number.")
+            return redirect('meeting_call')
+
+        # Calculate total amount
+        amount = last_title.amount * no_of_person
+
+        # Check if phone or email already exists
+        if MeetingCall.objects.filter(phone=phone).exists():
+            messages.error(request, "Phone number already registered!")
+            return redirect('meeting_call')
+        if MeetingCall.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered!")
+            return redirect('meeting_call')
+
+        # Save MeetingCall
         MeetingCall.objects.create(
             title=last_title,
             company_name=company_name,
@@ -271,8 +294,10 @@ def meeting_call(request):
             phone=phone,
             email=email,
             payment_method=payment_method,
-            transection_id=transection_id
+            transection_id=transection_id,
+            amount=amount
         )
+
         messages.success(request, "Submitted successfully!")
         return redirect('meeting_call')
 

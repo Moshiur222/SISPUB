@@ -2,6 +2,9 @@
 {% block title %}Register{% endblock title %}
 
 {% block main %}
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <style>
 .reg-wrapper {
     min-height: 90vh;
@@ -28,7 +31,6 @@
 .form-group { margin-bottom: 18px; position: relative; }
 .form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 0.85rem; font-weight: 600; }
 
-/* Input styling */
 .form-group input,
 .form-group select {
     width: 100%;
@@ -50,7 +52,6 @@
     box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
 }
 
-/* Add dropdown arrow for select */
 .form-group select {
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='5' viewBox='0 0 10 5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%23333'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -58,7 +59,6 @@
     background-size: 10px 5px;
 }
 
-/* Button styling */
 .reg-btn { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
 .reg-btn:hover { background-color: #218838; }
 
@@ -66,11 +66,26 @@
 
 .error-text { color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none; }
 .success-text { color: #28a745; font-size: 0.8rem; margin-top: 4px; display: none; }
+
+/* Quill editor display inside card */
+.ql-editor {
+    padding: 0;
+    border: none;
+    min-height: auto;
+    font-size: 0.9rem;
+    color: #777;
+}
 </style>
 
 <div class="reg-wrapper">
     <div class="reg-card">
-        <p style="text-align: left; margin-bottom: 30px; color: #777; font-size: 0.9rem;">{{title}}</p>
+        <p style="text-align: center; margin-bottom: 30px; color: #000; font-size: 0.9rem; font-weight: 600">{{title.title}}</p>
+        
+        <!-- Quill content -->
+        <div class="ql-editor">
+            {{ title.description|safe }}
+        </div>
+
         <form id="regForm" method="POST">
             {% csrf_token %}
 
@@ -85,31 +100,35 @@
             <!-- Company Name & Person Name -->
             <div class="form-row">
                 <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="phone" id="phoneInput" required placeholder="e.g. 01700000000 or +8801700000000">
+                    <div id="phoneError" class="error-text"></div>
+                    <div id="phoneSuccess" class="success-text">Phone No. valid</div>
+                </div>
+                <div class="form-group">
                     <label>Company Name</label>
                     <input type="text" name="company_name" required>
                 </div>
+            </div>
+
+            <!-- Person Name & No of Person -->
+            <div class="form-row">
                 <div class="form-group">
                     <label>Person Name</label>
                     <input type="text" name="name" required>
                 </div>
-            </div>
-
-            <!-- No of Person & Phone -->
-            <div class="form-row">
                 <div class="form-group">
                     <label>No of Person</label>
-                    <input type="text" name="no_of_person" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" name="phone" id="phoneInput" required placeholder="e.g. 01700000000 or +8801700000000">
-                    <div id="phoneError" class="error-text"></div>
-                    <div id="phoneSuccess" class="success-text"> Phone No.</div>
+                    <input type="number" name="no_of_person" id="noOfPersonInput" required min="1">
                 </div>
             </div>
 
-            <!-- Payment Method & Email -->
+            <!-- Amount & Payment Method -->
             <div class="form-row">
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="text" name="amount"  id="amountInput" readonly>
+                </div>
                 <div class="form-group">
                     <label>Payment Method</label>
                     <select name="payment_method" required>
@@ -120,6 +139,14 @@
                         <option value="bank_transfer">Bank Transfer</option>
                     </select>
                 </div>
+            </div>
+
+            <!-- Transection ID & Email -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Transection ID</label>
+                    <input type="text" name="transection_id" required>
+                </div>
                 <div class="form-group">
                     <label>Email Address</label>
                     <input type="email" name="email" id="emailInput" required>
@@ -128,16 +155,13 @@
                 </div>
             </div>
 
-            <!-- Transection ID -->
-            <div class="form-group">
-                <label>Transection ID</label>
-                <input type="text" name="transection_id" required>
-            </div>
-
             <button type="submit" class="reg-btn">Submit</button>
         </form>
     </div>
 </div>
+
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <script>
 // Email live check
@@ -147,39 +171,39 @@ const emailSuccess = document.getElementById('emailSuccess');
 let emailExists = false;
 
 if (emailInput) {
-emailInput.addEventListener('input', function() {
-    const email = this.value.trim();
-    if (email.length > 5) {
-        emailError.innerText = "Checking...";
-        emailError.style.display = 'block';
-        emailSuccess.style.display = 'none';
+    emailInput.addEventListener('input', function() {
+        const email = this.value.trim();
+        if (email.length > 5) {
+            emailError.innerText = "Checking...";
+            emailError.style.display = 'block';
+            emailSuccess.style.display = 'none';
 
-        fetch('/check_email/?email=' + encodeURIComponent(email))
-            .then(res => res.json())
-            .then(data => {
-                if (data.exists) {
-                    emailInput.style.borderColor = '#dc3545';
-                    emailError.innerText = "Email already exists!";
+            fetch('/check_email/?email=' + encodeURIComponent(email))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists) {
+                        emailInput.style.borderColor = '#dc3545';
+                        emailError.innerText = "Email already exists!";
+                        emailError.style.display = 'block';
+                        emailSuccess.style.display = 'none';
+                        emailExists = true;
+                    } else {
+                        emailInput.style.borderColor = '#28a745';
+                        emailError.style.display = 'none';
+                        emailSuccess.style.display = 'block';
+                        emailExists = false;
+                    }
+                }).catch(err => {
+                    emailError.innerText = "Error checking email";
                     emailError.style.display = 'block';
-                    emailSuccess.style.display = 'none';
                     emailExists = true;
-                } else {
-                    emailInput.style.borderColor = '#28a745';
-                    emailError.style.display = 'none';
-                    emailSuccess.style.display = 'block';
-                    emailExists = false;
-                }
-            }).catch(err => {
-                emailError.innerText = "Error checking email";
-                emailError.style.display = 'block';
-                emailExists = true;
-            });
-    } else {
-        emailError.style.display = 'none';
-        emailSuccess.style.display = 'none';
-        emailExists = false;
-    }
-});
+                });
+        } else {
+            emailError.style.display = 'none';
+            emailSuccess.style.display = 'none';
+            emailExists = false;
+        }
+    });
 }
 
 // Phone validation
@@ -189,40 +213,41 @@ const phoneSuccess = document.getElementById('phoneSuccess');
 let phoneValid = false;
 
 if (phoneInput) {
-phoneInput.addEventListener('input', function() {
-    const phone = this.value.trim();
-    const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
+    phoneInput.addEventListener('input', function() {
+        const phone = this.value.trim();
+        const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
 
-    if (regex.test(phone)) {
-        phoneInput.style.borderColor = '#28a745';
-        phoneError.style.display = 'none';
-        phoneSuccess.style.display = 'block';
-        phoneValid = true;
-    } else {
-        phoneInput.style.borderColor = '#dc3545';
-        phoneError.innerText = "Invalid BD phone number!";
-        phoneError.style.display = 'block';
-        phoneSuccess.style.display = 'none';
-        phoneValid = false;
-    }
-});
+        if (regex.test(phone)) {
+            phoneInput.style.borderColor = '#28a745';
+            phoneError.style.display = 'none';
+            phoneSuccess.style.display = 'block';
+            phoneValid = true;
+        } else {
+            phoneInput.style.borderColor = '#dc3545';
+            phoneError.innerText = "Invalid BD phone number!";
+            phoneError.style.display = 'block';
+            phoneSuccess.style.display = 'none';
+            phoneValid = false;
+        }
+    });
+}
+
+// Dynamic amount calculation
+const noOfPersonInput = document.getElementById('noOfPersonInput');
+const amountInput = document.getElementById('amountInput');
+const perPersonAmount = {{ title.amount|default:0 }};
+
+if (noOfPersonInput && amountInput) {
+    noOfPersonInput.addEventListener('input', function() {
+        const num = parseInt(this.value) || 0;
+        const total = num * perPersonAmount;
+        amountInput.value = total;
+    });
 }
 
 // Form submission validation
 const form = document.getElementById('regForm');
 form.addEventListener('submit', function(e) {
-    const p1 = document.getElementById('pass1');
-    const p2 = document.getElementById('pass2');
-    const matchError = document.getElementById('matchError');
-
-    if (p1 && p2 && p1.value !== p2.value) {
-        e.preventDefault();
-        matchError.style.display = 'block';
-        p2.style.borderColor = '#dc3545';
-    } else if (matchError) {
-        matchError.style.display = 'none';
-    }
-
     if (emailExists) {
         e.preventDefault();
         emailError.innerText = "Email already exists!";

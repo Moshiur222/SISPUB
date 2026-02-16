@@ -386,16 +386,21 @@ class Photo(models.Model):
 
 class MeetingTitle(models.Model):
     title = models.CharField(max_length=255, null=True)
+    amount = models.IntegerField(null=True)
+    description = models.TextField(null=True)
+
     def __str__(self):
         return self.title
 
 class MeetingCall(models.Model):
+    
     PAYMENT_CHOICES = [
         ('bkash', 'Bkash'),
         ('nagad', 'Nagad'),
         ('rocket', 'Rocket'),
         ('bank_transfer', 'Bank Transfer'),
     ]
+
     title = models.ForeignKey("MeetingTitle", on_delete=models.CASCADE, null=True)
     company_name = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
