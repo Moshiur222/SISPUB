@@ -22,17 +22,49 @@
         {% endif %}
 
         <!-- Form -->
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
+            <!-- Title -->
             <div class="mb-3">
                 <label class="form-label">Title</label>
-                <!-- ✅ Pre-fill existing value -->
                 <input type="text" name="title" class="form-control"
                        value="{{ meeting_title.title }}"
                        placeholder="Enter meeting title..." required>
             </div>
+            <div class="mb-3">
+                <label class="form-label">Amount</label>
+                <input type="text" name="amount" class="form-control"
+                       value="{{ meeting_title.amount }}"
+                       placeholder="Enter meeting amount..." required>
+            </div>
 
+            <!-- Description with Quill -->
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <div id="quill-editor"
+                     style="height:200px; border:1px solid #ced4da; border-radius:.25rem; padding:.375rem .75rem; background:#fff;">
+                </div>
+                <input type="hidden" name="description" id="description-input"
+                       value="{{ meeting_title.description|safe }}">
+            </div>
+
+            <!-- Image upload -->
+            <div class="mb-3">
+                <label class="form-label">Image</label>
+                <input type="file" name="image" class="form-control" accept="image/*" id="image-input">
+
+                <!-- Show current image if exists -->
+                {% if meeting_title.image %}
+                    <img id="image-preview" src="{{ meeting_title.image.url }}" alt="Current Image"
+                         style="max-width:200px; margin-top:10px;">
+                {% else %}
+                    <img id="image-preview" src="" alt="Preview"
+                         style="max-width:200px; margin-top:10px; display:none;">
+                {% endif %}
+            </div>
+
+            <!-- Buttons -->
             <div class="d-flex justify-content-end gap-2">
                 <a href="{% url 'admin_meeting_call' %}" class="btn btn-sm btn-secondary">Cancel</a>
                 <button type="submit" class="btn btn-success">Update</button>
@@ -41,5 +73,60 @@
         </form>
     </div>
 </div>
+
+<!-- Quill CSS & JS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<style>
+    /* Make Quill editor match Bootstrap form-control look */
+    #quill-editor .ql-editor {
+        min-height: 150px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Initialize Quill
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline'],
+                ['link', 'image'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['clean']
+            ]
+        }
+    });
+
+    // Pre-fill Quill with existing description
+    quill.root.innerHTML = document.getElementById('description-input').value;
+
+    // On form submit, copy HTML to hidden input
+    var form = document.querySelector('form');
+    form.onsubmit = function() {
+        document.getElementById('description-input').value = quill.root.innerHTML;
+    };
+
+    // Preview selected image before submit
+    const imageInput = document.getElementById('image-input');
+    const imagePreview = document.getElementById('image-preview');
+    imageInput.addEventListener('change', function(event){
+        const file = event.target.files[0];
+        if(file){
+            const reader = new FileReader();
+            reader.onload = function(e){
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+});
+</script>
 
 {% endblock content %}

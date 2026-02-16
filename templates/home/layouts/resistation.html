@@ -3,7 +3,7 @@
 
 {% block main %}
 <style>
-/* --- your existing styles unchanged --- */
+/* --- Your existing styles --- */
 .reg-wrapper {
     min-height: 90vh;
     display: flex;
@@ -32,11 +32,43 @@
 #resendBtn:disabled { display: none; }
 .change-number-btn { padding: 6px 12px; margin-top: 8px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 0.85rem; }
 .change-number-btn:hover { background-color: #0056b3; }
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+  margin-left: 10px;
+}
+.switch input { display: none; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 25px;
+  top: 0; left: 0; right: 0; bottom: 0;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 19px;
+  width: 19px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+input:checked + .slider { background-color: #28a745; }
+input:checked + .slider:before { transform: translateX(25px); }
 </style>
 
 <div class="reg-wrapper" style="margin-top: 100px">
     <div class="reg-card">
         <h2>{% if otp_sent %}Verify OTP{% else %}Create Account{% endif %}</h2>
+
         {% if otp_sent %}
             <p>
                 Code sent to your phone 
@@ -46,6 +78,15 @@
         {% else %}
             <p>Join us today! It only takes a minute.</p>
         {% endif %}
+
+        <!-- Aggregator Toggle -->
+        <div class="form-group">
+            <label>Will you be an aggregator?</label>
+            <label class="switch">
+                <input type="checkbox" id="aggregatorToggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
 
         <form id="regForm" method="POST">
             {% csrf_token %}
@@ -64,7 +105,7 @@
             <!-- Registration Fields -->
             <div class="form-group">
                 <label>BRTC Licence No</label>
-                <input type="text" name="brtc_licence_no" required>
+                <input type="text" name="brtc_licence_no" id="brtcLicenceInput" required>
             </div>
             <div class="form-row">
                 <div class="form-group">
@@ -219,7 +260,6 @@ if (changePhoneBtn) {
     const phoneDisplay = document.getElementById('phoneDisplay');
     const parent = phoneDisplay.parentNode;
 
-    // Create input and error/success divs once
     const input = document.createElement('input');
     input.type = 'text';
     input.name = 'phone';
@@ -231,7 +271,7 @@ if (changePhoneBtn) {
     input.style.borderRadius = '6px';
     input.style.border = '1px solid #ddd';
     input.style.fontSize = '0.95rem';
-    input.style.display = 'none'; // hidden initially
+    input.style.display = 'none';
 
     const errorDiv = document.createElement('div');
     errorDiv.id = 'phoneError';
@@ -242,19 +282,17 @@ if (changePhoneBtn) {
     successDiv.className = 'success-text';
     successDiv.innerText = 'Valid phone';
 
-    // Create the Update Number button
     const updateBtn = document.createElement('button');
     updateBtn.type = 'button';
     updateBtn.className = 'change-number-btn';
     updateBtn.innerText = 'Update Number';
-    updateBtn.style.display = 'none'; // hidden initially
+    updateBtn.style.display = 'none';
 
     parent.appendChild(input);
     parent.appendChild(errorDiv);
     parent.appendChild(successDiv);
     parent.appendChild(updateBtn);
 
-    // Phone validation
     function validatePhoneField() {
         const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
         if (regex.test(input.value)) {
@@ -273,9 +311,8 @@ if (changePhoneBtn) {
 
     input.addEventListener('input', validatePhoneField);
 
-    // Click "Change" link
     changePhoneBtn.addEventListener('click', () => {
-        input.value = phoneDisplay.innerText; // prefill
+        input.value = phoneDisplay.innerText;
         input.style.display = 'inline';
         phoneDisplay.style.display = 'none';
         updateBtn.style.display = 'inline';
@@ -289,7 +326,6 @@ if (changePhoneBtn) {
         if (submitOtpBtn) submitOtpBtn.style.display = 'none';
     });
 
-    // Click "Update Number" button
     updateBtn.addEventListener('click', () => {
         if (!validatePhoneField()) {
             alert('Enter a valid Bangladeshi phone number!');
@@ -312,5 +348,73 @@ if (changePhoneBtn) {
         alert('Phone number updated. Please click "Send OTP" to receive a new OTP.');
     });
 }
+
+// --- Aggregator Toggle JS ---
+const aggregatorToggle = document.getElementById('aggregatorToggle');
+const brtcInput = document.getElementById('brtcLicenceInput');
+
+if (aggregatorToggle && brtcInput) {
+    aggregatorToggle.addEventListener('change', () => {
+        if (aggregatorToggle.checked) {
+            brtcInput.removeAttribute('disabled');
+        } else {
+            brtcInput.value = '';
+            brtcInput.setAttribute('disabled', 'true');
+        }
+    });
+    // Initialize as disabled
+    brtcInput.setAttribute('disabled', 'true');
+}
+
+// --- Live Email Uniqueness Check ---
+const emailInput = document.getElementById('emailInput');
+const emailError = document.getElementById('emailError');
+const emailSuccess = document.getElementById('emailSuccess');
+
+if (emailInput) {
+    emailInput.addEventListener('input', () => {
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        fetch(`/check_email/?email=${encodeURIComponent(email)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.exists) {
+                    emailInput.style.borderColor = '#dc3545';
+                    emailError.innerText = 'Email already exists!';
+                    emailError.style.display = 'block';
+                    emailSuccess.style.display = 'none';
+                } else {
+                    emailInput.style.borderColor = '#28a745';
+                    emailError.style.display = 'none';
+                    emailSuccess.style.display = 'block';
+                }
+            });
+    });
+}
+
+// --- Live Phone Uniqueness Check ---
+if (phoneInput) {
+    phoneInput.addEventListener('input', () => {
+        const phone = phoneInput.value.trim();
+        if (!phone) return;
+
+        fetch(`/check_phone/?phone=${encodeURIComponent(phone)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.phone_exists) {
+                    phoneInput.style.borderColor = '#dc3545';
+                    phoneError.innerText = 'Phone number already exists!';
+                    phoneError.style.display = 'block';
+                    phoneSuccess.style.display = 'none';
+                } else {
+                    phoneInput.style.borderColor = '#28a745';
+                    phoneError.style.display = 'none';
+                    phoneSuccess.style.display = 'block';
+                }
+            });
+    });
+}
+
 </script>
 {% endblock main %}

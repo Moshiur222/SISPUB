@@ -1,4 +1,6 @@
 import re
+import hashlib
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -24,6 +26,15 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
+def bd_phone_validator(value):
+    """Valid Bangladeshi phone number: 01XXXXXXXXX"""
+    pattern = r'^01[3-9]\d{8}$'
+    if not re.match(pattern, value):
+        raise ValidationError("Please enter a valid mobile number (example: 017XXXXXXXX)")
+
+def hash_otp(otp):
+    return hashlib.sha256(otp.encode()).hexdigest()
 
 class User(AbstractUser):
     username = None
@@ -355,7 +366,8 @@ class Aggregator(models.Model):
     phone = models.CharField(
         max_length=15,
         validators=[bd_phone_validator],
-        blank=True
+        blank=True,
+        unique=True
     )
     brtc_licence_no = models.CharField(
         max_length=50,
@@ -388,6 +400,7 @@ class MeetingTitle(models.Model):
     title = models.CharField(max_length=255, null=True)
     amount = models.IntegerField(null=True)
     description = models.TextField(null=True)
+    image = models.ImageField(upload_to="image/", null=True)
 
     def __str__(self):
         return self.title

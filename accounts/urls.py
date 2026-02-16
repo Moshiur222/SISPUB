@@ -43,7 +43,9 @@ urlpatterns = [
 
     #api
     path('check_email/',check_email, name='check_email'),
+    path('check_phone/',check_phone, name='check_phone'),
     path("resend-otp/", resend_otp, name="resend_otp"),
+    path("get_aggregator_info/", get_aggregator_info, name="get_aggregator_info"),
 
     
     #home_url end

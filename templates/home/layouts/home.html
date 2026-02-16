@@ -3,6 +3,10 @@
 {% load embed_video_tags %}
 {% block title %}home{% endblock title %}
 {% block extra_css %}
+
+
+<!-- Include Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
 
 	.responsive-video-wrapper {
@@ -114,15 +118,10 @@
 													<div class="et_pb_blurb_content">
 
 														<div class="et_pb_blurb_container">
-
 															<div class="et_pb_blurb_description">
-																<p style="text-align: justify;">
-																</p>
-																<p style="text-align: justify;">
-																</p>
 																{% for hero_area in hero_areas %}
-																<p style="text-align: justify;">{{ hero_area.descriptions }}</p>
-																	{% endfor %}
+																<p style="text-align: justify;" class="quill-content" id="quill-{{ forloop.counter }}">{{ hero_area.descriptions|safe }}</p>
+																{% endfor %}
 															</div>
 														</div>
 													</div>
@@ -177,5 +176,17 @@
             }
         });
     });
+</script>
+<!-- Include Quill JS -->
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		{% for hero_area in hero_areas %}
+		var quill{{ forloop.counter }} = new Quill('#quill-{{ forloop.counter }}', {
+			theme: 'bubble',   // Keeps it simple and inline, no extra UI
+			readOnly: true
+		});
+		quill{{ forloop.counter }}.root.innerHTML = `{{ hero_area.descriptions|safe }}`;
+		{% endfor %}
+	});
 </script>
 {% endblock custom_js %}

@@ -28,6 +28,9 @@
                     <tr>
                         <th>#</th>
                         <th>Title</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Image</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -36,6 +39,15 @@
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ title.title }}</td>
+                        <td>{{ title.description| truncatewords:20 |safe }}</td>
+                        <td>{{ title.amount }}</td>
+                        <td>
+                            {% if title.image %}
+                                <img src="{{ title.image.url }}" alt="Title Image" style="width:100px; height:auto;">
+                            {% else %}
+                                No image
+                            {% endif %}
+                        </td>
                         <td class="text-center">
                             <!-- View -->
                              <a href="{% url 'meeting_call_list' title.id %}" 
@@ -54,11 +66,7 @@
                                 method="post" 
                                 style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" 
-                                        class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Are you sure you want to delete this item?')">
-                                    Delete
-                                </button>
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this item?')"> Delete</button>
                             </form>
 
                         </td>
