@@ -23,8 +23,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Address</th>
-                        <th>Business Name</th>
-                        <th>Message</th>
+                        <th>Feadback Message</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -35,7 +34,6 @@
                         <td>{{ contact.name }}</td>
                         <td>{{ contact.email }}</td>
                         <td>{{ contact.address|default:"-" }}</td>
-                        <td>{{ contact.business_name }}</td>
                         <td>{{ contact.message|default:"-" }}</td>
                         <td class="text-center">
                             <a href="{% url 'contact_update' contact.id %}" class="btn btn-sm btn-warning">Update</a>

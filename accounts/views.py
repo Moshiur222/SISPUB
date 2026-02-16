@@ -1629,6 +1629,7 @@ def meeting_call_add(request):
             messages.error(request, "Title is required!")
     return render(request, "admin/pages/meeting_call_add.html")
 
+
 @login_required
 def meeting_call_update(request, id):
     meeting_title = get_object_or_404(MeetingTitle, id=id)
@@ -1672,15 +1673,12 @@ def call_update(request, id):
         payment_method = request.POST.get('payment_method')
         transection_id = request.POST.get('transection_id')
 
-        # Validation
-        if not title_id:
-            messages.error(request, "Title is required!")
-            return redirect('call_update', id=id)
+        # Get the title object (ForeignKey)
+        if title_id:
+            title = get_object_or_404(MeetingTitle, id=title_id)
+            meeting_call.title = title
 
-        # Get title (ForeignKey)
-        title = get_object_or_404(MeetingTitle, id=title_id)
-
-        # Update all fields
+        # Update all other fields
         meeting_call.company_name = company_name
         meeting_call.name = name
         meeting_call.no_of_person = no_of_person
@@ -1690,13 +1688,12 @@ def call_update(request, id):
         meeting_call.transection_id = transection_id
 
         meeting_call.save()
-
         messages.success(request, "Meeting call updated successfully!")
 
-        # ✅ IMPORTANT FIX
-        return redirect('meeting_call_list', id=title.id)
+        # ✅ Correct redirect
+        return redirect('call_update', id=meeting_call.id)
 
-    # Get titles (latest first 🔥)
+    # Get all titles for dropdown in template
     titles = MeetingTitle.objects.all().order_by('-id')
 
     context = {
@@ -1704,7 +1701,6 @@ def call_update(request, id):
         'titles': titles
     }
     return render(request, "admin/pages/call_update.html", context)
-
 
 @login_required
 def call_delete(request, id):
@@ -1726,7 +1722,6 @@ def contact_submit(request):
             name=request.POST.get("name"),
             email=request.POST.get("email"),
             address=request.POST.get("address"),
-            business_name=request.POST.get("residential_business"),
             message=request.POST.get("message"),
         )
 

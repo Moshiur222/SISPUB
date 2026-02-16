@@ -312,7 +312,6 @@ class Contact_list(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254)
     address = models.TextField(null=True)
-    business_name = models.CharField(max_length=50)
     message = models.TextField(null=True)
     
     def __str__(self):

@@ -1,80 +1,228 @@
 {% load static %}
 
-<div class="et_pb_section et_pb_section_7 et_pb_with_background et_section_regular">
-	<div class="et_pb_row et_pb_row_10 et_pb_gutters3">
-		<div class="et_pb_column et_pb_column_2_3 et_pb_column_24 et_pb_css_mix_blend_mode_passthrough">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700&display=swap" rel="stylesheet">
 
-			<div id="et_pb_contact_form_0"
-				class="et_pb_with_border et_pb_module et_pb_contact_form_0 et_pb_contact_form_container clearfix"
-				data-form_unique_num="0"
-				data-form_unique_id="">
+<section class="premium-contact">
+  <div class="mesh-gradient-bg"></div>
+  
+  <div class="glass-container">
+    <div class="brand-panel">
+      <div class="content-wrapper">
+        <div class="status-pill">
+          <span class="dot"></span> Support Active
+        </div>
+		{% for info in all_company_info %}
+        <div class="contact-cards">
+          <div class="mini-card">
+            <div class="icon-circle">📍</div>
+            <div class="card-info">
+              <label>Office Address</label>
+              <span>{{info.house_no}}, {{info.block}}-{{info.district}}</span>
+            </div>
+          </div>
+          
+          <div class="mini-card">
+            <div class="icon-circle">📞</div>
+            <div class="card-info">
+              <label>Contact Information</label>
+              <span> {{info.phone}} • {{info.email}}</span>
+            </div>
+          </div>
 
-				<h2 class="et_pb_contact_main_title">We're Here To Help!</h2>
-				{% if messages %}
-					<div class="et-pb-contact-message">
-						{% for message in messages %}
-						<div class="alert alert-success alert-dismissible fade show" role="alert">
-							<strong>{{ message }}
-							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-							</div>
-							<p></p>
-						{% endfor %}
-					</div>
-				{% else %}
-					<div class="et-pb-contact-message"></div>
-				{% endif %}
-				<div class="et_pb_contact">
-					<form class="et_pb_contact_form clearfix" method="post"  action="{% url 'contact_submit' %}" style= "color: #fff">
-						{% csrf_token %}
+          <div class="mini-card">
+            <div class="icon-circle">🕒</div>
+            <div class="card-info">
+              <label>Business Hours</label>
+              <span>Sat – Thu: {{info.office_hours}}<br><small style="color: #ef4444;">Friday: {{info.friday}}</small></span>
+            </div>
+          </div>
+        </div>
 
-						<p class="et_pb_contact_field et_pb_contact_field_0 et_pb_contact_field_half"
-						   data-id="name" data-type="input">
-							<label for="et_pb_contact_name_0" class="et_pb_contact_form_label">Name</label>
-							<input type="text" id="et_pb_contact_name_0" class="input"
-								   name="name" placeholder="Name" required>
-						</p>
+        <div class="brand-footer">
+          <p>Connect with us</p>
+          <div class="social-icons">
+            <a href="#" class="social-btn">Facebook</a>
+            <a href="#" class="social-btn">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </div>
+	{% endfor %}
+    <div class="form-panel">
+      <div class="form-intro">
+        <h3>Submit Feadback</h3>
+        <p>Please fill out the form below and we'll get back to you shortly.</p>
+      </div>
 
-						<p class="et_pb_contact_field et_pb_contact_field_1 et_pb_contact_field_half et_pb_contact_field_last"
-						   data-id="email" data-type="email">
-							<label for="et_pb_contact_email_0" class="et_pb_contact_form_label">Email Address</label>
-							<input type="email" id="et_pb_contact_email_0" class="input"
-								   name="email" placeholder="Email Address" required>
-						</p>
+      {% if messages %}
+        {% for message in messages %}
+          <div class="success-banner">
+            <span class="icon">✦</span> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      <form method="post" action="{% url 'contact_submit' %}" class="glass-form">
+        {% csrf_token %}
+        
+        <div class="split-row">
+          <div class="input-box">
+            <input type="text" name="name" placeholder="Full Name" required>
+          </div>
+          <div class="input-box">
+            <input type="email" name="email" placeholder="Email Address" required>
+          </div>
+        </div>
 
-						<p class="et_pb_contact_field et_pb_contact_field_2 et_pb_contact_field_half"
-						   data-id="address" data-type="text">
-							<label for="et_pb_con tact_address_0" class="et_pb_contact_form_label">Address</label>
-							<input type="text" id="et_pb_contact_address_0" class="input"
-								   name="address" placeholder="Address">
-						</p>
+        <div class="split-row">
+          <div class="input-box">
+            <input type="text" name="phone" placeholder="Phone Number" required>
+          </div>
+          <div class="input-box">
+            <input type="text" name="address" placeholder="Address" required>
+          </div>
+        </div>
 
-						<p class="et_pb_contact_field et_pb_contact_field_3 et_pb_contact_field_half et_pb_contact_field_last"
-						   data-id="residential_business" data-type="text">
-							<label for="et_pb_contact_residential_business_0" class="et_pb_contact_form_label">
-								Residential/Business
-							</label>
-							<input type="text" id="et_pb_contact_residential_business_0" class="input"
-								   name="residential_business" placeholder="Residential/Business" required>
-						</p>
+        <div class="input-box">
+          <textarea name="message" rows="3" placeholder="Your feadback..." required></textarea>
+        </div>
 
-						<p class="et_pb_contact_field et_pb_contact_field_4 et_pb_contact_field_last"
-						   data-id="message" data-type="textarea">
-							<label for="et_pb_contact_message_0" class="et_pb_contact_form_label">Message</label>
-							<textarea name="message" id="et_pb_contact_message_0"
-									  class="et_pb_contact_message input"
-									  placeholder="Message" required></textarea>
-						</p>
-						
-						<div class="et_contact_bottom_container">
-							<button type="submit" style="cursor: pointer; font-size: 14px; color: #fff; background-color: #ffa727; border: none; width: 200px ; height: 55px; border: 20px solid #ffa727; border-radius: 50px;">
-								SEND MESSAGE
-							</button>
-						</div>
+        <button type="submit" class="glow-button">
+          Send Message 
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 10px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
 
-					</form>
-				</div>
+<style>
+/* Retained the previous beautiful CSS but adjusted 
+   card heights for the new business hours info. 
+*/
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --dark-bg: #0b1120;
+}
 
-			</div>
-		</div>
-	</div>
-</div>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.premium-contact {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+    background-color: #f8fafc;
+}
+
+.mesh-gradient-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    background: 
+        radial-gradient(at 0% 0%, hsla(161, 84%, 84%, 1) 0, transparent 50%), 
+        radial-gradient(at 50% 100%, hsla(225, 39%, 30%, 1) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(161, 84%, 84%, 1) 0, transparent 50%);
+    filter: blur(80px);
+}
+
+.glass-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1150px;
+    display: flex;
+    background: var(--glass-bg);
+    backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.brand-panel {
+    flex: 0 0 40%;
+    background: var(--dark-bg);
+    color: white;
+    padding: 60px 50px;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+.hero-text { font-family: 'Syne', sans-serif; font-size: 42px; line-height: 1.1; margin-bottom: 25px; }
+.gradient-text { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.sub-text { color: #94a3b8; line-height: 1.6; margin-bottom: 40px; font-size: 15px; }
+
+.mini-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.04);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.icon-circle { font-size: 20px; min-width: 40px; height: 40px; background: #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.card-info label { display: block; font-size: 11px; text-transform: uppercase; color: #10b981; font-weight: 700; margin-bottom: 4px; }
+.card-info span { font-size: 14px; color: #f1f5f9; line-height: 1.5; }
+
+.brand-footer { margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; }
+.social-icons { display: flex; gap: 12px; margin-top: 15px; }
+.social-btn { 
+    font-size: 13px; 
+    text-decoration: none; 
+    color: #94a3b8; 
+    border: 1px solid #334155; 
+    padding: 8px 16px; 
+    border-radius: 8px;
+    transition: 0.3s;
+}
+.social-btn:hover { color: white; border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+
+.form-panel { flex: 1; padding: 60px; background: white; }
+.form-intro h3 { font-family: 'Syne', sans-serif; font-size: 30px; margin-bottom: 8px; }
+.form-intro p { color: #64748b; margin-bottom: 40px; }
+
+.split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.input-box { margin-bottom: 20px; }
+.input-box input, .input-box textarea {
+    width: 100%; padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; background: #f8fafc; transition: 0.3s;
+}
+.input-box input:focus, .input-box textarea:focus {
+    outline: none; border-color: #10b981; background: white; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.glow-button {
+    width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 20px; border-radius: 12px;
+    font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 15px 30px -10px rgba(16, 185, 129, 0.4); transition: 0.3s;
+}
+.glow-button:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.5); }
+
+@media (max-width: 950px) {
+    .glass-container { flex-direction: column; }
+    .brand-panel { padding: 40px; }
+    .form-panel { padding: 40px; }
+}
+</style>
