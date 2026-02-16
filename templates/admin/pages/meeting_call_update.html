@@ -1,0 +1,45 @@
+{% extends "admin/base/base.html" %}
+{% block content %}
+
+<div class="card mt-4" style="max-width: 600px; margin:auto;">
+
+    <!-- Header -->
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Update Meeting Call Title</h5>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Form -->
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <!-- ✅ Pre-fill existing value -->
+                <input type="text" name="title" class="form-control"
+                       value="{{ meeting_title.title }}"
+                       placeholder="Enter meeting title..." required>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'admin_meeting_call' %}" class="btn btn-sm btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-success">Update</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

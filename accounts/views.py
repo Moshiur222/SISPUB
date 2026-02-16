@@ -8,8 +8,12 @@ from collections import defaultdict
 from django.db import transaction
 from django.http import JsonResponse
 from .models import *
+import random, time, hashlib
+from django.views.decorators.csrf import csrf_exempt
 from .utils import send_sms
 import random
+
+
 
 
 # home_view start
@@ -135,24 +139,44 @@ def bd_phone_validator(value):
             "Please enter a valid mobile number (example: 017XXXXXXXX)"
         )
 
+def hash_otp(otp):
+    return hashlib.sha256(otp.encode()).hexdigest()
 
 def registration_view(request):
+
+    # ================= OTP VERIFY =================
     if request.method == "POST" and "otp_code" in request.POST:
         user_otp = request.POST.get("otp_code")
+
         session_otp = request.session.get("otp")
+        otp_time = request.session.get("otp_time")
         reg_data = request.session.get("reg_data")
 
         if not reg_data:
-            messages.error(request, "Session has expired. Please try again.")
+            messages.error(request, "Session expired. Try again.")
             return redirect("registration")
 
-        if str(user_otp) != str(session_otp):
-            messages.error(request, "Invalid OTP. Please try again.")
+        # Expiry check (5 min)
+        if time.time() - otp_time > 300:
+            messages.error(request, "OTP expired.")
+            return redirect("registration")
+
+        # Match check
+        if hash_otp(user_otp) != session_otp:
+            attempts = request.session.get("otp_attempts", 0) + 1
+            request.session["otp_attempts"] = attempts
+
+            if attempts >= 5:
+                messages.error(request, "Too many attempts.")
+                return redirect("registration")
+
+            messages.error(request, "Invalid OTP.")
             return render(request, "home/layouts/resistation.html", {
                 "otp_sent": True,
                 "phone": reg_data["phone"]
             })
 
+        # Create user
         try:
             with transaction.atomic():
                 user = User.objects.create_user(
@@ -160,7 +184,8 @@ def registration_view(request):
                     password=reg_data["password"],
                     user_type=2
                 )
-                aggregator = Aggregator(
+
+                aggregator = Aggregator.objects.create(
                     user=user,
                     name=reg_data["name"],
                     company_name=reg_data["company_name"],
@@ -169,62 +194,66 @@ def registration_view(request):
                     brtc_licence_no=reg_data["brtc_licence_no"],
                     address=reg_data["address"]
                 )
-                aggregator.full_clean()
-                aggregator.save()
 
             request.session.flush()
-            messages.success(request, "Account created successfully! Please log in.")
-            return redirect("registration")
+            messages.success(request, "Account created successfully!")
+            return redirect("login")
 
-        except ValidationError as e:
-            messages.error(request, e.messages[0])
         except Exception as e:
             messages.error(request, str(e))
+            return redirect("registration")
 
-        return render(request, "home/layouts/resistation.html", {"otp_sent": True, "phone": reg_data["phone"]})
-
+    # ================= REGISTER =================
     elif request.method == "POST":
+
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match")
+            return redirect("registration")
+
         reg_data = {
             "name": request.POST.get("name"),
             "company_name": request.POST.get("company_name"),
+            "designation": request.POST.get("designation"),
             "email": request.POST.get("email"),
-            "password": request.POST.get("password"),
+            "password": password,
             "phone": request.POST.get("phone"),
             "brtc_licence_no": request.POST.get("brtc_licence_no"),
             "address": request.POST.get("address"),
         }
 
         if User.objects.filter(email=reg_data["email"]).exists():
-            messages.error(request, "An account with this email already exists.")
+            messages.error(request, "Email already exists")
             return redirect("registration")
 
         otp = str(random.randint(100000, 999999))
 
         request.session["reg_data"] = reg_data
-        request.session["otp"] = otp
-        request.session.modified = True
+        request.session["otp"] = hash_otp(otp)
+        request.session["otp_time"] = time.time()
+        request.session["otp_attempts"] = 0
 
-        sms_text = f"Your OTP code is {otp}. Do not share this code with anyone."
-        sms_response = send_sms(reg_data["phone"], sms_text)
-
-        print("SMS RESPONSE:", sms_response)
-
-        if sms_response.get("code") != "445000":
-            messages.error(request, "Failed to send OTP. Please try again.")
-            return redirect("registration")
+        # send SMS
+        send_sms(reg_data["phone"], f"Your OTP is {otp}")
 
         return render(request, "home/layouts/resistation.html", {
             "otp_sent": True,
             "phone": reg_data["phone"]
         })
 
-    # GET request: check if session has reg_data
-    reg_data = request.session.get("reg_data")
-    phone = reg_data["phone"] if reg_data else ""
-    return render(request, "home/layouts/resistation.html", {"otp_sent": False, "phone": phone})
+    return render(request, "home/layouts/resistation.html", {"otp_sent": False})
 
 def meeting_call(request):
+    # Get the last created MeetingTitle
+    last_title = MeetingTitle.objects.order_by('-id').first()
+
     if request.method == 'POST':
+        if not last_title:
+            messages.error(request, "No Meeting Title available!")
+            return redirect('meeting_call')
+
         company_name = request.POST.get('company_name')
         name = request.POST.get('name')
         no_of_person = request.POST.get('no_of_person')
@@ -233,14 +262,9 @@ def meeting_call(request):
         payment_method = request.POST.get('payment_method')
         transection_id = request.POST.get('transection_id')
 
-        if MeetingCall.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists!")
-            return redirect('meeting_call')
-        if MeetingCall.objects.filter(phone=phone).exists():
-            messages.error(request, "Phone number already exists!")
-            return redirect('meeting_call')
 
         MeetingCall.objects.create(
+            title=last_title,
             company_name=company_name,
             name=name,
             no_of_person=no_of_person,
@@ -249,11 +273,11 @@ def meeting_call(request):
             payment_method=payment_method,
             transection_id=transection_id
         )
-        messages.success(request, "submited successful!")
+        messages.success(request, "Submitted successfully!")
         return redirect('meeting_call')
 
     context = {
-        'title': 'Join us today! It only takes a minute.'
+        'title': last_title
     }
     return render(request, 'home/layouts/meeting_call.html', context)
 
@@ -1573,10 +1597,14 @@ def admin_delete_career(request, id):
 
 @login_required
 def meeting_call_list(request, id):
-    meeting_calls = get_object_or_404(MeetingCall, id = id)
+
+    title = get_object_or_404(MeetingTitle, id=id)
+    calls = MeetingCall.objects.filter(title=title).order_by('-created_at')
+
     context = {
-        'meeting_calls': meeting_calls
-    } 
+        'title': title,
+        'meeting_calls': calls
+    }
     return render(request, "admin/pages/meeting_call_list.html", context)
 
 @login_required
@@ -1602,10 +1630,91 @@ def meeting_call_add(request):
     return render(request, "admin/pages/meeting_call_add.html")
 
 @login_required
-def meeting_call_update(request):
+def meeting_call_update(request, id):
+    meeting_title = get_object_or_404(MeetingTitle, id=id)
 
-    return render(request, "admin/pages/meeting_call_update.html")
+    if request.method == "POST":
+        title = request.POST.get('title')
 
+        if title:
+            meeting_title.title = title
+            meeting_title.save()
+            messages.success(request, "Meeting title updated successfully!")
+            return redirect('admin_meeting_call')
+        else:
+            messages.error(request, "Title is required!")
+
+    context = {
+        'meeting_title': meeting_title
+    }
+    return render(request, "admin/pages/meeting_call_update.html", context)
+
+@login_required
+def meeting_call_delete(request, id):
+    meeting_call = get_object_or_404(MeetingTitle, id=id)
+    meeting_call.delete()
+    messages.success(request, "Meeting title deleted successfully!")
+    return redirect('admin_meeting_call')
+
+
+
+@login_required
+def call_update(request, id):
+    meeting_call = get_object_or_404(MeetingCall, id=id)
+
+    if request.method == "POST":
+        title_id = request.POST.get('title_id')
+        company_name = request.POST.get('company_name')
+        name = request.POST.get('name')
+        no_of_person = request.POST.get('no_of_person')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        payment_method = request.POST.get('payment_method')
+        transection_id = request.POST.get('transection_id')
+
+        # Validation
+        if not title_id:
+            messages.error(request, "Title is required!")
+            return redirect('call_update', id=id)
+
+        # Get title (ForeignKey)
+        title = get_object_or_404(MeetingTitle, id=title_id)
+
+        # Update all fields
+        meeting_call.company_name = company_name
+        meeting_call.name = name
+        meeting_call.no_of_person = no_of_person
+        meeting_call.phone = phone
+        meeting_call.email = email
+        meeting_call.payment_method = payment_method
+        meeting_call.transection_id = transection_id
+
+        meeting_call.save()
+
+        messages.success(request, "Meeting call updated successfully!")
+
+        # ✅ IMPORTANT FIX
+        return redirect('meeting_call_list', id=title.id)
+
+    # Get titles (latest first 🔥)
+    titles = MeetingTitle.objects.all().order_by('-id')
+
+    context = {
+        'meeting_call': meeting_call,
+        'titles': titles
+    }
+    return render(request, "admin/pages/call_update.html", context)
+
+
+@login_required
+def call_delete(request, id):
+    call = get_object_or_404(MeetingCall, id=id)
+    call_id = call.id
+
+    call.delete()
+    messages.success(request, "Deleted successfully!")
+
+    return redirect('meeting_call_list', id=call_id)
 
 # admin_view end
 
@@ -1625,9 +1734,29 @@ def contact_submit(request):
         messages.success(request, "Thank you! Your message has been sent successfully.")
         return redirect(request.META.get("HTTP_REFERER", "/"))
    
+   
+   
 def check_email(request):
     email = request.GET.get('email')
 
     exists = User.objects.filter(email=email).exists()
 
     return JsonResponse({'exists': exists})
+
+
+@csrf_exempt
+def resend_otp(request):
+    if request.method == "POST":
+        reg_data = request.session.get("reg_data")
+
+        if not reg_data:
+            return JsonResponse({"status": "expired"})
+
+        otp = str(random.randint(100000, 999999))
+
+        request.session["otp"] = hash_otp(otp)
+        request.session["otp_time"] = time.time()
+
+        send_sms(reg_data["phone"], f"Your OTP is {otp}")
+
+        return JsonResponse({"status": "ok"})

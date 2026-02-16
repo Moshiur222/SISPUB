@@ -1,0 +1,91 @@
+{% extends "admin/base/base.html" %}
+{% block content %}
+
+<div class="card mt-4" style="max-width: 700px; margin:auto;">
+
+    <!-- Header -->
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Update Meeting Call</h5>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Form -->
+        <form method="POST">
+            {% csrf_token %}
+            <!-- Company Name -->
+            <div class="mb-3">
+                <label class="form-label">Company Name</label>
+                <input type="text" name="company_name" class="form-control"
+                       value="{{ meeting_call.company_name }}" required>
+            </div>
+
+            <!-- Person Name -->
+            <div class="mb-3">
+                <label class="form-label">Person Name</label>
+                <input type="text" name="name" class="form-control"
+                       value="{{ meeting_call.name }}" required>
+            </div>
+
+            <!-- No of Person -->
+            <div class="mb-3">
+                <label class="form-label">No of Person</label>
+                <input type="number" name="no_of_person" class="form-control"
+                       value="{{ meeting_call.no_of_person }}" required>
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control"
+                       value="{{ meeting_call.phone }}" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control"
+                       value="{{ meeting_call.email }}" required>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="mb-3">
+                <label class="form-label">Payment Method</label>
+                <select name="payment_method" class="form-control" required>
+                    <option value="bkash" {% if meeting_call.payment_method == "bkash" %}selected{% endif %}>Bkash</option>
+                    <option value="nagad" {% if meeting_call.payment_method == "nagad" %}selected{% endif %}>Nagad</option>
+                    <option value="rocket" {% if meeting_call.payment_method == "rocket" %}selected{% endif %}>Rocket</option>
+                    <option value="bank_transfer" {% if meeting_call.payment_method == "bank_transfer" %}selected{% endif %}>Bank Transfer</option>
+                </select>
+            </div>
+
+            <!-- Transaction ID -->
+            <div class="mb-3">
+                <label class="form-label">Transaction ID</label>
+                <input type="text" name="transection_id" class="form-control"
+                       value="{{ meeting_call.transection_id }}" required>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'meeting_call_list' id=meeting_call.title.id %}" 
+                   class="btn btn-sm btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-success">Update</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

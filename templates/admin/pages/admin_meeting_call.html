@@ -44,13 +44,13 @@
                             </a>
 
                             <!-- Edit -->
-                            {% comment %} <a href="{% url 'meeting_call_update' title.id %}" 
+                            <a href="{% url 'meeting_call_update' title.id %}" 
                             class="btn btn-sm btn-warning">
                                 Edit
-                            </a> {% endcomment %}
+                            </a> 
 
                             <!-- Delete -->
-                            {% comment %} <form action="{% url 'meeting_call_delete' title.id %}" 
+                            <form action="{% url 'meeting_call_delete' title.id %}" 
                                 method="post" 
                                 style="display:inline;">
                                 {% csrf_token %}
@@ -59,7 +59,7 @@
                                         onclick="return confirm('Are you sure you want to delete this item?')">
                                     Delete
                                 </button>
-                            </form> {% endcomment %}
+                            </form>
 
                         </td>
                     </tr>

@@ -11,7 +11,10 @@
     {% endif %}
 
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Meeting Call List</h5>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'admin_meeting_call' %}" class="btn btn-sm btn-outline-secondary">← Back</a>
+            <h5 class="mb-0" style="margin-left: 35rem;">Meeting Call List</h5>
+        </div>
     </div>
 
     <div class="card-body">
@@ -31,29 +34,34 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for meeting_call in meeting_calls %}
-                    <tr>
-                        <td>{{ meeting_call.counter }}</td>
-                        <td>{{ meeting_call.company_name }}</td>
-                        <td>{{ meeting_call.name }}</td>
-                        <td>{{ meeting_call.no_of_person }}</td>
-                        <td>{{ meeting_call.phone }}</td>
-                        <td>{{ meeting_call.email }}</td>
-                        <td>{{ meeting_call.payment_method }}</td>
-                        <td>{{ meeting_call.transection_id }}</td>
-                        <td class="text-center">
-                            <a href="{% url 'contact_update' contact.id %}" class="btn btn-sm btn-warning">Update</a>
-                            <form action="{% url 'contact_delete' contact.id %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this contact?')">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">No contacts found</td>
-                    </tr>
-                    {% endfor %}
+                    {% if meeting_calls %}
+                        {% for call in meeting_calls %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ call.company_name }}</td>
+                            <td>{{ call.name }}</td>
+                            <td>{{ call.no_of_person }}</td>
+                            <td>{{ call.phone }}</td>
+                            <td>{{ call.email }}</td>
+                            <td>{{ call.payment_method }}</td>
+                            <td>{{ call.transection_id }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'call_update' id=call.id %}" class="btn btn-sm btn-warning">Update</a>
+                                <form action="{% url 'call_delete' id=call.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this contact?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted">No contacts found</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>

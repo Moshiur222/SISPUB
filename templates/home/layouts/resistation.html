@@ -21,6 +21,18 @@
     max-width: 500px;
 }
 
+.change-phone {
+    color: #007bff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-left: 5px;  /* space from phone number */
+    display: inline;    
+    text-decoration: none;
+}
+.change-phone:hover {
+    text-decoration: underline;
+}
+
 .reg-card h2 { margin-bottom: 10px; color: #333; text-align: center; font-weight: 700; }
 .reg-card p { text-align: center; color: #777; margin-bottom: 30px; font-size: 0.9rem; }
 
@@ -39,15 +51,31 @@
 .success-text { color: #28a745; font-size: 0.8rem; margin-top: 4px; display: none; }
 
 .timer { text-align: center; margin-top: 10px; font-size: 0.85rem; color: #555; }
-.change-phone { color: #007bff; cursor: pointer; font-size: 0.85rem; display: block; margin-top: 5px; }
-.change-phone:hover { text-decoration: underline; }
+
+#resendBtn {
+    padding: 5px 10px;
+    margin-left: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+}
+#resendBtn:disabled {
+    display: none;
+}
 </style>
 
 <div class="reg-wrapper" style="margin-top: 100px">
     <div class="reg-card">
         <h2>{% if otp_sent %}Verify OTP{% else %}Create Account{% endif %}</h2>
         {% if otp_sent %}
-            <p>Please enter the code sent to your phone <strong id="phoneDisplay">{{phone}}<a class="change-phone" href = "" id="changePhoneBtn">Change Phone Number</a></strong></p>
+            <p>
+                Code sent to your phone 
+                <strong id="phoneDisplay">{{phone}}</strong>
+                <a class="change-phone" id="changePhoneBtn">Change</a>
+            </p>
         {% else %}
             <p>Join us today! It only takes a minute.</p>
         {% endif %}
@@ -117,7 +145,7 @@
                 </div>
                 <div class="form-group">
                     <label>Confirm Password</label>
-                    <input type="password" id="pass2" required>
+                    <input type="password" id="pass2" name="confirm_password" required>
                     <div id="matchError" class="error-text">Passwords do not match!</div>
                 </div>
             </div>
@@ -126,12 +154,14 @@
 
             {% else %}
             <!-- OTP Verification -->
-            <div class="form-group">
-                <label>Enter 6-Digit OTP</label>
-                <input type="text" name="otp_code" maxlength="6" required style="text-align: center; letter-spacing: 5px; font-size: 1.5rem;">
+            <input type="text" name="otp_code" maxlength="6" required style="text-align:center; font-size:1.5rem; letter-spacing:5px; width:100%; margin-bottom:10px;">
+
+            <div class="timer">
+                <span id="timerText">Resend OTP in 60s</span>
+                <button type="button" id="resendBtn" disabled>Resend OTP</button>
             </div>
-            <div class="timer" id="otpTimer">Resend OTP in 60s</div>
-            <button type="submit" class="reg-btn" id="resendBtn" disabled>Resend OTP</button>
+
+            <button type="submit" class="reg-btn">Submit OTP</button>
             {% endif %}
 
             <div class="footer-link">
@@ -142,128 +172,95 @@
 </div>
 
 <script>
-// Email live check
-const emailInput = document.getElementById('emailInput');
-const emailError = document.getElementById('emailError');
-const emailSuccess = document.getElementById('emailSuccess');
-let emailExists = false;
+// Password match
+const form = document.getElementById('regForm');
+const p1 = document.getElementById('pass1');
+const p2 = document.getElementById('pass2');
+const matchError = document.getElementById('matchError');
 
-if (emailInput) {
-emailInput.addEventListener('input', function() {
-    const email = this.value.trim();
-    if (email.length > 5) {
-        emailError.innerText = "Checking...";
-        emailError.style.display = 'block';
-        emailSuccess.style.display = 'none';
-
-        fetch('/check_email/?email=' + encodeURIComponent(email))
-            .then(res => res.json())
-            .then(data => {
-                if (data.exists) {
-                    emailInput.style.borderColor = '#dc3545';
-                    emailError.innerText = "Email already exists!";
-                    emailError.style.display = 'block';
-                    emailSuccess.style.display = 'none';
-                    emailExists = true;
-                } else {
-                    emailInput.style.borderColor = '#28a745';
-                    emailError.style.display = 'none';
-                    emailSuccess.style.display = 'block';
-                    emailExists = false;
-                }
-            }).catch(err => {
-                emailError.innerText = "Error checking email";
-                emailError.style.display = 'block';
-                emailExists = true;
-            });
-    } else {
-        emailError.style.display = 'none';
-        emailSuccess.style.display = 'none';
-        emailExists = false;
-    }
-});
-}
-
-// Phone live check
-const phoneInput = document.getElementById('phoneInput');
-const phoneError = document.getElementById('phoneError');
-const phoneSuccess = document.getElementById('phoneSuccess');
-let phoneValid = false;
-
-if (phoneInput) {
-phoneInput.addEventListener('input', function() {
-    const phone = this.value.trim();
-    const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
-
-    if (regex.test(phone)) {
-        phoneInput.style.borderColor = '#28a745';
-        phoneError.style.display = 'none';
-        phoneSuccess.style.display = 'block';
-        phoneValid = true;
-    } else {
-        phoneInput.style.borderColor = '#dc3545';
-        phoneError.innerText = "Invalid BD phone number!";
-        phoneError.style.display = 'block';
-        phoneSuccess.style.display = 'none';
-        phoneValid = false;
-    }
-});
-}
-
-// OTP Resend Timer
-const otpTimer = document.getElementById('otpTimer');
-const resendBtn = document.getElementById('resendBtn');
-let timer = 60;
-if (otpTimer) {
-    const countdown = setInterval(() => {
-        if (timer > 0) {
-            otpTimer.innerText = `Resend OTP in ${timer}s`;
-            timer--;
-        } else {
-            otpTimer.innerText = "You can now resend OTP.";
-            resendBtn.disabled = false;
-            clearInterval(countdown);
+if (form) {
+    form.addEventListener('submit', function(e) {
+        if (p1 && p2 && p1.value !== p2.value) {
+            e.preventDefault();
+            matchError.style.display = 'block';
+            p2.style.borderColor = '#dc3545';
+        } else if (matchError) {
+            matchError.style.display = 'none';
         }
-    }, 1000);
-}
-
-// Change phone option
-const changePhoneBtn = document.getElementById('changePhoneBtn');
-if (changePhoneBtn) {
-    changePhoneBtn.addEventListener('click', () => {
-        // Reset OTP session on backend if needed
-        window.location.reload(); // Simple: reload form to change phone
     });
 }
 
-// Form submission validation
-const form = document.getElementById('regForm');
-form.addEventListener('submit', function(e) {
-    const p1 = document.getElementById('pass1');
-    const p2 = document.getElementById('pass2');
-    const matchError = document.getElementById('matchError');
+// Phone validation
+const phoneInput = document.getElementById('phoneInput');
+const phoneError = document.getElementById('phoneError');
+const phoneSuccess = document.getElementById('phoneSuccess');
 
-    if (p1 && p2 && p1.value !== p2.value) {
-        e.preventDefault();
-        matchError.style.display = 'block';
-        p2.style.borderColor = '#dc3545';
-    } else if (matchError) {
-        matchError.style.display = 'none';
-    }
+if (phoneInput) {
+    phoneInput.addEventListener('input', function() {
+        const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
+        if (regex.test(this.value)) {
+            this.style.borderColor = '#28a745';
+            phoneError.style.display = 'none';
+            phoneSuccess.style.display = 'block';
+        } else {
+            this.style.borderColor = '#dc3545';
+            phoneError.innerText = "Invalid BD phone number!";
+            phoneError.style.display = 'block';
+            phoneSuccess.style.display = 'none';
+        }
+    });
+}
 
-    if (emailExists) {
-        e.preventDefault();
-        emailError.innerText = "Email already exists!";
-        emailError.style.display = 'block';
-        emailInput.style.borderColor = '#dc3545';
-    }
+// OTP Timer & Resend
+const timerText = document.getElementById('timerText');
+const resendBtn = document.getElementById('resendBtn');
 
-    if (phoneInput && !phoneValid) {
+if (timerText && resendBtn) {
+    let time = 60;
+    const interval = setInterval(() => {
+        if (time > 0) {
+            timerText.innerText = `Resend OTP in ${time}s`;
+            time--;
+        } else {
+            resendBtn.disabled = false;
+            timerText.innerText = "You can resend OTP now";
+            clearInterval(interval);
+        }
+    }, 1000);
+
+    resendBtn.addEventListener('click', () => {
+        fetch('/resend-otp/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("OTP Resent!");
+            resendBtn.disabled = true;
+            time = 60; // restart timer
+            const restartInterval = setInterval(() => {
+                if (time > 0) {
+                    timerText.innerText = `Resend OTP in ${time}s`;
+                    time--;
+                } else {
+                    resendBtn.disabled = false;
+                    timerText.innerText = "You can resend OTP now";
+                    clearInterval(restartInterval);
+                }
+            }, 1000);
+        });
+    });
+}
+
+// Change phone
+const changePhoneBtn = document.getElementById('changePhoneBtn');
+if (changePhoneBtn) {
+    changePhoneBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        phoneError.innerText = "Invalid BD phone number!";
-        phoneError.style.display = 'block';
-        phoneInput.style.borderColor = '#dc3545';
-    }
-});
+        window.location.reload();
+    });
+}
 </script>
 {% endblock main %}

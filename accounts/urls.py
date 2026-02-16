@@ -43,6 +43,7 @@ urlpatterns = [
 
     #api
     path('check_email/',check_email, name='check_email'),
+    path("resend-otp/", resend_otp, name="resend_otp"),
 
     
     #home_url end
@@ -171,7 +172,11 @@ urlpatterns = [
     path('meeting_call_list/<int:id>', meeting_call_list, name = 'meeting_call_list'),
     path('admin_meeting_call/', admin_meeting_call, name = 'admin_meeting_call'),
     path('meeting_call_add/', meeting_call_add, name = 'meeting_call_add'),
-    path('meeting_call_update/', meeting_call_update, name = 'meeting_call_update'),
+    path('meeting_call_update/<int:id>/', meeting_call_update, name = 'meeting_call_update'),
+    path('meeting_call_delete/<int:id>/', meeting_call_delete, name = 'meeting_call_delete'),
+    
+    path('call_delete/<int:id>/', call_delete, name = 'call_delete'),
+    path('call_update/<int:id>/', call_update, name = 'call_update'),
 
     #admin_url end
 ]
