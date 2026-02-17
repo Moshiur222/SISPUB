@@ -1,5 +1,5 @@
 {% extends "home/base/base.html" %}
-
+{% load static %}
 {% block main %}
 <style id="divi-dynamic-critical-inline-css" type="text/css">
 @font-face{font-family:ETmodules;font-display:block;src:url(//www.sispab.org/wp-content/themes/Divi/core/admin/fonts/modules/base/modules.eot);src:url(//www.sispab.org/wp-content/themes/Divi/core/admin/fonts/modules/base/modules.eot?#iefix) format("embedded-opentype"),url(//www.sispab.org/wp-content/themes/Divi/core/admin/fonts/modules/base/modules.woff) format("woff"),url(//www.sispab.org/wp-content/themes/Divi/core/admin/fonts/modules/base/modules.ttf) format("truetype"),url(//www.sispab.org/wp-content/themes/Divi/core/admin/fonts/modules/base/modules.svg#ETmodules) format("svg");font-weight:400;font-style:normal}
@@ -131,7 +131,9 @@ textarea {
 			<div class="et_builder_inner_content et_pb_gutters3">
 		<div class="et_pb_section et_pb_section_0 et_pb_section_parallax et_pb_with_background et_pb_fullwidth_section et_section_regular">
 				
-				<span class="et_parallax_bg_wrap"><span class="et_parallax_bg" style="background-image: url(&quot;https://www.sispab.org/wp-content/uploads/2023/07/IMG-20220529-WA0032.jpg&quot;); height: 678.194px; transform: translate(0px, 180.6px);"></span></span>
+				<span class="et_parallax_bg_wrap">
+					<span class="et_parallax_bg" style="background-image: url('{% static 'home/images/banner2.png' %}'); background-size: cover; background-position: center; background-repeat: no-repeat; height:100%; width: 100%; display: block;"></span>
+				</span>
 				
 				
 				

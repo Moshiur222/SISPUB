@@ -3,11 +3,19 @@
 
 {% block extra_css %}
 <style>
-/* --- Header Section --- */
+
+/* --- Header Section (UPDATED WITH BACKGROUND IMAGE) --- */
 .news-header {
     text-align: center;
-    padding: 70px 20px 50px;
-    background: linear-gradient(140deg, rgba(0,72,114,0.9) 0%, rgba(41,17,96,0.85) 100%);
+    padding: 250px 20px 50px;
+
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("{% static 'home/images/banner4.png' %}");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
     color: white;
     margin-bottom: 50px;
     border-radius: 10px;
@@ -18,8 +26,7 @@
     font-size: 3rem;
     font-weight: 400;
     margin-bottom: 15px;
-    letter-spacing: 1px;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    color: #ffff
 }
 
 .news-header p {
@@ -27,7 +34,6 @@
     opacity: 0.9;
     max-width: 650px;
     margin: 0 auto;
-    line-height: 1.6;
 }
 
 /* --- Grid Layout --- */
@@ -46,18 +52,15 @@
     border-radius: 10px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: 0.3s;
     display: flex;
     flex-direction: column;
     text-decoration: none;
-    cursor: pointer;
 }
 
 .news-card:hover {
-    text-decoration: none;
     transform: translateY(-7px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-    cursor: pointer;
 }
 
 /* --- Image --- */
@@ -66,216 +69,157 @@
     height: 220px;
     object-fit: cover;
     border-bottom: 3px solid #3498db;
-    transition: transform 0.4s ease;
-}
-
-.news-card:hover .news-image {
-    transform: scale(1.05);
 }
 
 /* --- Content --- */
 .news-title {
     font-size: 1.4rem;
     margin: 15px 20px 8px;
-    color: #fff;
+    color: #000;
     font-weight: 600;
-    line-height: 1.4;
 }
 
 .news-date {
-    display: block;
     font-size: 0.9rem;
     color: #7f8c8d;
     margin: 0 20px 15px;
 }
 
-.news-description {
-    color: #555;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin: 0 20px 20px;
-    flex-grow: 1;
+/* --- No News (BACKGROUND IMAGE FIXED) --- */
+.no-news {
+    grid-column: 1 / -1;
+    border-radius: 8px;
+    overflow: hidden;
+
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                url("{% static 'home/images/banner2.png' %}");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: #fff;
+    text-align: center;
+    padding: 80px 20px;
 }
 
-/* --- Read More --- */
-.news-read-more {
-    display: inline-block;
-    color: #3498db;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin: 0 20px 20px;
-    position: relative;
-    transition: all 0.3s ease;
+.no-news h3 {
+    color: #fff;
 }
 
-.news-read-more:hover {
-    color: #2980b9;
-    padding-right: 15px;
-}
-
-.news-read-more:hover::after {
-    content: " →";
-    position: absolute;
-    right: 0;
-}
-
-/* --- Modal Popup --- */
+/* --- Modal --- */
 .modal {
     display: none;
     position: fixed;
     z-index: 9999;
     left: 0; top: 0;
     width: 100%; height: 100%;
-    overflow-y: auto;
     background: rgba(0,0,0,0.6);
-    padding: 40px 20px;
 }
 
 .modal-content {
     background: #fff;
     border-radius: 10px;
     max-width: 800px;
-    margin: 50px auto;
+    margin: 80px auto;
     padding: 30px;
     position: relative;
-    animation: fadeInUp 0.5s ease-out;
 }
 
 .modal-close {
     position: absolute;
     top: 15px; right: 20px;
     font-size: 1.5rem;
-    font-weight: 700;
-    color: #888;
     cursor: pointer;
 }
 
-.modal-close:hover {
-    color: #333;
-}
-
-.modal img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-    border-radius: 6px;
-}
-
-/* --- No News --- */
-.no-news {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    color: #666;
-}
 </style>
-{% endblock extra_css %}
+{% endblock %}
 
 {% block main %}
+
 <div class="news-header">
-    <h1 style = " color: #fff">What's New</h1>
+    <h1>What's New</h1>
     <p>Stay updated with the latest news, announcements, and events</p>
 </div>
 
 <div class="news-grid">
+
     {% for news in newses %}
     <a href="{% url 'news_detail_view' news.id %}" class="news-card">
+
         {% if news.image %}
-        <img data-src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
+        <!-- FIXED (lazy safe) -->
+        <img src="{{ news.image.url }}" data-src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
         {% else %}
-        <div class="news-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;">
-            <span>No Image</span>
+        <div class="news-image" style="background:#eee;display:flex;align-items:center;justify-content:center;">
+            No Image
         </div>
         {% endif %}
 
-        <h3 class="news-title" style = "color : #000">{{ news.title }}</h3>
+        <h3 class="news-title">{{ news.title }}</h3>
 
         {% if news.date %}
         <span class="news-date">{{ news.date|date:"F d, Y" }}</span>
         {% endif %}
+
     </a>
+
     {% empty %}
+    <!-- ✅ BACKGROUND IMAGE WORKING -->
     <div class="no-news">
         <h3>No News Available</h3>
         <p>Check back later for updates</p>
     </div>
     {% endfor %}
+
 </div>
 
-<!-- Modal Structure -->
+<!-- Modal -->
 <div id="news-modal" class="modal">
     <div class="modal-content">
         <span class="modal-close">&times;</span>
-        <img id="modal-image" src="" alt="">
+        <img id="modal-image" src="" style="width:100%;margin-bottom:15px;">
         <h2 id="modal-title"></h2>
-        <p id="modal-date" style="color: #7f8c8d;"></p>
-        <div id="modal-description" style="margin-top: 15px;"></div>
+        <p id="modal-date"></p>
+        <div id="modal-description"></div>
     </div>
 </div>
-{% endblock main %}
+
+{% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Lazy load images
+
+    // Lazy load
     const images = document.querySelectorAll('.news-image');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
-                if (img.tagName === 'IMG' && img.dataset.src) {
+                if (img.dataset.src) {
                     img.src = img.dataset.src;
-                    img.onload = () => { img.style.opacity = '1'; }
                 }
-                observer.unobserve(img);
+                obs.unobserve(img);
             }
         });
-    }, { rootMargin: '50px' });
-    images.forEach(img => {
-        if (img.tagName === 'IMG') {
-            img.style.opacity = '0';
-            img.style.transition = 'opacity 0.3s';
-            imageObserver.observe(img);
-        }
     });
 
-    // Modal popup
+    images.forEach(img => observer.observe(img));
+
+    // Modal close
     const modal = document.getElementById('news-modal');
-    const modalImage = document.getElementById('modal-image');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDate = document.getElementById('modal-date');
-    const modalDesc = document.getElementById('modal-description');
     const closeBtn = document.querySelector('.modal-close');
 
-    const readMoreLinks = document.querySelectorAll('.news-read-more');
-    readMoreLinks.forEach(link => {
-        link.addEventListener('click', function(e){
-            e.preventDefault();
-            modal.style.display = 'block';
-            modalTitle.textContent = this.dataset.title;
-            modalDate.textContent = this.dataset.date;
-            modalDesc.innerHTML = this.dataset.description;
-            if(this.dataset.image){
-                modalImage.src = this.dataset.image;
-                modalImage.style.display = 'block';
-            } else {
-                modalImage.style.display = 'none';
-            }
-        });
-    });
+    closeBtn.onclick = () => modal.style.display = "none";
 
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (e) => {
+    window.onclick = (e) => {
         if(e.target === modal){
-            modal.style.display = 'none';
+            modal.style.display = "none";
         }
-    });
+    };
+
 });
 </script>
-{% endblock extra_js %}
+{% endblock %}

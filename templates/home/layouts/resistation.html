@@ -1,70 +1,92 @@
 {% extends "home/base/base.html" %}
+{% load static %}
 {% block title %}Register{% endblock title %}
 
 {% block main %}
 <style>
-/* --- Your existing styles --- */
+/* Registration page wrapper with background image */
 .reg-wrapper {
     min-height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(140deg, rgba(0, 72, 114, 0.9) 0%, rgba(41, 17, 96, 0.8) 100%);
     padding: 40px 20px;
+
+    /* Background image */
+    background: url("{% static 'home/images/banner4.png' %}") no-repeat center center;
+    background-size: cover;
+    position: relative;
 }
-.reg-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-.change-phone { color: #007bff; cursor: pointer; font-size: 0.85rem; margin-left: 5px; display: inline; text-decoration: none; }
-.change-phone:hover { text-decoration: underline; }
-.reg-card h2 { margin-bottom: 10px; color: #333; text-align: center; font-weight: 700; }
-.reg-card p { text-align: center; color: #777; margin-bottom: 30px; font-size: 0.9rem; }
+
+/* Dark overlay for contrast */
+.reg-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+
+/* Registration card */
+.reg-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 500px;
+    position: relative; /* Keep card above overlay */
+    z-index: 1;
+}
+
+/* Card text */
+.reg-card h2 {
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
+    font-weight: 700;
+}
+.reg-card p {
+    text-align: center;
+    color: #777;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+/* Form styles */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .form-group { margin-bottom: 18px; }
 .form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 0.85rem; font-weight: 600; }
 .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; }
 .form-group input:focus { border-color: #28a745; outline: none; }
+
 .reg-btn { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
 .reg-btn:hover { background-color: #218838; }
+
 .footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; }
 .error-text { color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none; }
 .success-text { color: #28a745; font-size: 0.8rem; margin-top: 4px; display: none; }
+
 .timer { text-align: center; margin-top: 10px; font-size: 0.85rem; color: #555; }
 #resendBtn { padding: 5px 10px; margin-left: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; display: inline-block; }
 #resendBtn:disabled { display: none; }
 .change-number-btn { padding: 6px 12px; margin-top: 8px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 0.85rem; }
 .change-number-btn:hover { background-color: #0056b3; }
 
-/* Toggle Switch */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 25px;
-  margin-left: 10px;
-}
+/* Aggregator toggle switch */
+.switch { position: relative; display: inline-block; width: 50px; height: 25px; margin-left: 10px; }
 .switch input { display: none; }
-.slider {
-  position: absolute;
-  cursor: pointer;
-  background-color: #ccc;
-  border-radius: 25px;
-  top: 0; left: 0; right: 0; bottom: 0;
-  transition: .4s;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 19px;
-  width: 19px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  border-radius: 50%;
-  transition: .4s;
-}
+.slider { position: absolute; cursor: pointer; background-color: #ccc; border-radius: 25px; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 19px; width: 19px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
 input:checked + .slider { background-color: #28a745; }
 input:checked + .slider:before { transform: translateX(25px); }
-</style>
 
+/* Responsive */
+@media (max-width: 768px) {
+    .reg-wrapper { padding: 20px; }
+    .form-row { grid-template-columns: 1fr; }
+}
+</style>
 <div class="reg-wrapper" style="margin-top: 100px">
     <div class="reg-card">
         <h2>{% if otp_sent %}Verify OTP{% else %}Create Account{% endif %}</h2>
