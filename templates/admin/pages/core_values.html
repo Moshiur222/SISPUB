@@ -1,13 +1,11 @@
 {% extends "admin/base/base.html" %}
 
 {% block content %}
-
 <div class="card mt-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Core Values</h5>
         {% if core_values %}
-            <a href="{% url 'update_core_values' core_values.first.id %}"
-               class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'update_core_values' core_values.first.id %}" class="btn btn-sm btn-warning">Edit</a>
         {% endif %}
     </div>
 
@@ -17,6 +15,7 @@
                 <tr>
                     <th>#</th>
                     <th>Title</th>
+                    <th>Image</th>
                     <th>Description</th>
                 </tr>
             </thead>
@@ -25,16 +24,22 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ c.title }}</td>
-                    <td>{{ c.descriptions|safe }}</td>
+                    <td>
+                        {% if c.image %}
+                            <img src="{{ c.image.url }}" width="80" alt="{{ c.title }}">
+                        {% else %}
+                            No Image
+                        {% endif %}
+                    </td>
+                    <td>{{ c.descriptions|truncatewords:20|safe }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3" class="text-center text-muted">No core values</td>
+                    <td colspan="4" class="text-center text-muted">No core values</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
-
 {% endblock %}

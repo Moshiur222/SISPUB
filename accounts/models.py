@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.utils import timezone
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -128,6 +130,7 @@ class AboutParagraph(models.Model):
     
 class Vision(models.Model):
     title = models.CharField(max_length=50)
+    image = models.ImageField(upload_to= "media/", null=True)
     descriptions = models.TextField(null=True, blank=True)
     
     def __str__(self):
@@ -135,6 +138,7 @@ class Vision(models.Model):
     
 class Mission(models.Model):
     title = models.CharField(max_length=50)
+    image = models.ImageField(upload_to= "media/", null=True)
     descriptions = models.TextField(null=True, blank=True)
     
     def __str__(self):
@@ -142,6 +146,7 @@ class Mission(models.Model):
     
 class CoreValues(models.Model):
     title = models.CharField(max_length=50)
+    image = models.ImageField(upload_to= "media/", null=True)
     descriptions = models.TextField(null=True, blank=True)
     
     def __str__(self):
@@ -401,12 +406,15 @@ class MeetingTitle(models.Model):
     amount = models.IntegerField(null=True)
     description = models.TextField(null=True)
     image = models.ImageField(upload_to="image/", null=True)
+    expire_date = models.DateField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
+
 class MeetingCall(models.Model):
-    
+
     PAYMENT_CHOICES = [
         ('bkash', 'Bkash'),
         ('nagad', 'Nagad'),
@@ -418,12 +426,12 @@ class MeetingCall(models.Model):
     company_name = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     no_of_person = models.PositiveIntegerField()
-    phone = models.CharField(max_length=20, unique=True)
-    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
     transection_id = models.CharField(max_length=255)
-    amount = models.IntegerField(null=True)
+    amount = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.company_name} - {self.name}"
+        return f"{self.title.title} - {self.name}"

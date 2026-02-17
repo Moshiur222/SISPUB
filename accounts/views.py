@@ -720,6 +720,7 @@ def admin_vision(request):
 
 @login_required
 def update_vision(request, id):
+     # Fetch the CoreValues object
     vision = get_object_or_404(Vision, id=id)
 
     if request.method == "POST":
@@ -728,13 +729,21 @@ def update_vision(request, id):
 
         if not title:
             messages.error(request, "Title cannot be empty")
-            return render(request, "admin/pages/update_story.html", {"vision": vision})
+            return render(request, "admin/pages/update_vision.html", {"vision": vision})
 
+        # Update fields
         vision.title = title
         vision.descriptions = descriptions
+
+        # Handle image upload
+        if request.FILES.get("image"):
+            vision.image = request.FILES.get("image")
+
         vision.save()
-        messages.success(request,'Vision has been Updated')
-        return redirect("update_story", id=vision.id)
+        messages.success(request, "Vision has been updated successfully!")
+
+        # Redirect to the list page after update
+        return redirect("update_vision", id=vision.id)
 
     return render(request, "admin/pages/update_vision.html", {"vision": vision})
 
@@ -748,6 +757,7 @@ def admin_mission(request):
 
 @login_required
 def update_mission(request, id):
+     # Fetch the CoreValues object
     mission = get_object_or_404(Mission, id=id)
 
     if request.method == "POST":
@@ -756,13 +766,21 @@ def update_mission(request, id):
 
         if not title:
             messages.error(request, "Title cannot be empty")
-            return render(request, "admin/pages/update_mission.html", {"mission": mission})
+            return render(request, "admin/pages/update_vision.html", {"mission": mission})
 
+        # Update fields
         mission.title = title
         mission.descriptions = descriptions
+
+        # Handle image upload
+        if request.FILES.get("image"):
+            mission.image = request.FILES.get("image")
+
         mission.save()
-        messages.success(request,'Mission has been Updated')
-        return redirect("update_story", id=mission.id)
+        messages.success(request, "Vision has been updated successfully!")
+
+        # Redirect to the list page after update
+        return redirect("update_mission", id=mission.id)
 
     return render(request, "admin/pages/update_mission.html", {"mission": mission})
 
@@ -770,13 +788,14 @@ def update_mission(request, id):
 def admin_core_values(request):
     core_values = CoreValues.objects.all()
     context = {
-        'core_values' : core_values
+        'core_values': core_values
     }
     return render(request, "admin/pages/core_values.html", context)
 
 @login_required
 def update_core_values(request, id):
-    core_values = get_object_or_404(CoreValues, id=id)
+    # Fetch the CoreValues object
+    core_value = get_object_or_404(CoreValues, id=id)
 
     if request.method == "POST":
         title = request.POST.get("title")
@@ -784,15 +803,24 @@ def update_core_values(request, id):
 
         if not title:
             messages.error(request, "Title cannot be empty")
-            return render(request, "admin/pages/update_core_values.html", {"mission": mission})
+            return render(request, "admin/pages/update_core_values.html", {"core_value": core_value})
 
-        core_values.title = title
-        core_values.descriptions = descriptions
-        core_values.save()
-        messages.success(request,'Core Values has been Updated')
-        return redirect("update_story", id=core_values.id)
+        # Update fields
+        core_value.title = title
+        core_value.descriptions = descriptions
 
-    return render(request, "admin/pages/update_core_values.html", {"core_values": core_values})
+        # Handle image upload
+        if request.FILES.get("image"):
+            core_value.image = request.FILES.get("image")
+
+        core_value.save()
+        messages.success(request, "Core Value has been updated successfully!")
+
+        # Redirect to the list page after update
+        return redirect("admin_core_values")
+
+    # Render the update form
+    return render(request, "admin/pages/update_core_values.html", {"core_value": core_value})
 
 @login_required
 def album_input(request):

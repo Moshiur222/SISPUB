@@ -2,10 +2,9 @@
 
 {% block content %}
 
-<!-- ✅ QUILL CSS (ADDED) -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
-<form method="post" class="mt-5">
+<form method="post" enctype="multipart/form-data" class="mt-5">
     {% csrf_token %}
 
     <div class="card shadow-sm mx-auto" style="max-width: 700px;">
@@ -19,12 +18,10 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Card Header -->
         <div class="card-header bg-warning text-dark text-center">
-            <h5 class="mb-0">Mission</h5>
+            <h5 class="mb-0">Update Mission</h5>
         </div>
 
-        <!-- Card Body -->
         <div class="card-body">
             <div class="row g-3">
 
@@ -37,23 +34,31 @@
                         class="form-control rounded"
                         placeholder="Enter Title"
                         value="{{ mission.title }}"
+                        required
                     />
                 </div>
 
                 <!-- Description -->
                 <div class="col-md-12">
                     <label class="form-label fw-bold">Description</label>
-
-                    <!-- 🔹 ORIGINAL TEXTAREA (UNCHANGED) -->
                     <textarea
                         id="description"
                         name="descriptions"
                         class="form-control rounded"
                         rows="7"
-                        style="min-height:160px;"
-                    >{{ mission.descriptions }}</textarea>
+                        style="min-height:160px; display:none;"
+                    >{{ mission.descriptions|safe }}</textarea>
 
                     <div id="quill-editor" style="height: 220px;"></div>
+                </div>
+
+                <!-- Image -->
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Image</label><br>
+                    {% if mission.image %}
+                        <img src="{{ mission.image.url }}" width="150" class="mb-2" alt="{{ mission.title }}"><br>
+                    {% endif %}
+                    <input type="file" name="image" class="form-control">
                 </div>
 
             </div>
@@ -65,11 +70,11 @@
         </div>
     </div>
 </form>
+
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>
     const textarea = document.getElementById("description");
-    textarea.style.display = "none";
 
     const quill = new Quill("#quill-editor", {
         theme: "snow",
@@ -85,8 +90,10 @@
         }
     });
 
+    // Load existing description into Quill
     quill.root.innerHTML = textarea.value;
 
+    // Copy Quill content back to textarea on form submit
     textarea.closest("form").addEventListener("submit", function () {
         textarea.value = quill.root.innerHTML;
     });

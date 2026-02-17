@@ -1,13 +1,11 @@
 {% extends "admin/base/base.html" %}
 
 {% block content %}
-
 <div class="card mt-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Mission</h5>
         {% if mission %}
-            <a href="{% url 'update_mission' mission.first.id %}"
-               class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'update_mission' mission.first.id %}" class="btn btn-sm btn-warning">Edit</a>
         {% endif %}
     </div>
 
@@ -17,25 +15,31 @@
                 <tr>
                     <th>#</th>
                     <th>Title</th>
+                    <th>Image</th>
                     <th>Description</th>
                 </tr>
             </thead>
             <tbody>
-                {% for m in mission %}
+                {% for c in mission %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ m.title }}</td>
-                    <td>{{ m.descriptions|safe }}</td>
+                    <td>{{ c.title }}</td>
+                    <td>
+                        {% if c.image %}
+                            <img src="{{ c.image.url }}" width="80" alt="{{ c.title }}">
+                        {% else %}
+                            No Image
+                        {% endif %}
+                    </td>
+                    <td>{{ c.descriptions|truncatewords:20|safe }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3" class="text-center text-muted">No Mission</td>
+                    <td colspan="4" class="text-center text-muted">No core values</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
-
-
 {% endblock %}
