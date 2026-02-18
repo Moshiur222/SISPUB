@@ -2,123 +2,141 @@
 {% load static %}
 
 {% block extra_css %}
-    <style>
-        :root {
-            --primary-color: #2874a7;
-            --text-dark: #2d3436;
-            --text-light: #636e72;
-            --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            --card-shadow-hover: 0 15px 30px rgba(0,0,0,0.12);
-        }
+<style>
+    :root {
+        --primary-color: #2874a7;
+        --text-dark: #2d3436;
+        --text-light: #636e72;
+        --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        --card-shadow-hover: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    
+    .news-header {
+        text-align: center;
+        padding: 310px 20px 50px;
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                    url("{% static 'home/images/banner4.png' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: white;
+        margin-bottom: 50px;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
 
-        .gallery-section {
-            padding: 190px 20px 80px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+    .news-header h1 {
+        font-size: 3rem;
+        font-weight: 400;
+        margin-bottom: 15px;
+        color: #ffff;
+    }
 
-        .gallery-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
+    .gallery-section {
+        padding: 5px 20px 80px;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
 
-        .gallery-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--text-dark);
-            letter-spacing: -0.5px;
-            margin-bottom: 15px;
-        }
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 30px;
+    }
 
-        .gallery-subtitle {
-            color: var(--text-light);
-            font-size: 1rem;
-        }
+    .gallery-card {
+        text-decoration: none;
+        display: block;
+        transition: all 0.3s ease;
+    }
 
+    /* Logic for disabled cards */
+    .gallery-card.disabled-link {
+        pointer-events: none;
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    .gallery-card.disabled-link:hover .image-wrapper {
+        transform: none;
+        box-shadow: var(--card-shadow);
+    }
+
+    .image-wrapper {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        border-radius: 16px;
+        background-color: #f8f9fa;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .gallery-card:not(.disabled-link):hover .image-wrapper {
+        transform: translateY(-8px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .gallery-card:not(.disabled-link):hover img {
+        transform: scale(1.08);
+    }
+
+    .meeting-info {
+        padding: 15px 5px;
+        text-align: center;
+    }
+
+    .meeting-title {
+        display: block;
+        color: var(--text-dark);
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        transition: color 0.3s ease;
+    }
+
+    .gallery-card:not(.disabled-link):hover .meeting-title {
+        color: var(--primary-color);
+    }
+
+    .meeting-date {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+    }
+
+    .live-countdown {
+        color: #e67e22;
+        font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
         .gallery-grid {
-            display: grid;
-            /* Reduced min-width for smaller, more professional thumbnails */
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 30px;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
-
-        .gallery-card {
-            text-decoration: none;
-            display: block;
-            group: hover;
-        }
-
-        .image-wrapper {
-            position: relative;
-            /* Professional 4:3 Aspect Ratio */
-            aspect-ratio: 4 / 3; 
-            overflow: hidden;
-            border-radius: 16px;
-            background-color: #f8f9fa;
-            box-shadow: var(--card-shadow);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-
-        .image-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-
-        /* Hover Effects */
-        .gallery-card:hover .image-wrapper {
-            transform: translateY(-8px);
-            box-shadow: var(--card-shadow-hover);
-        }
-
-        .gallery-card:hover img {
-            transform: scale(1.08);
-        }
-
-        .meeting-info {
-            padding: 15px 5px;
-            text-align: left;
-        }
-
-        .meeting-title {
-            display: block;
-            color: var(--text-dark);
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            transition: color 0.3s ease;
-        }
-
-        .gallery-card:hover .meeting-title {
-            color: var(--primary-color);
-        }
-
-        .meeting-date {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        @media (max-width: 600px) {
-            .gallery-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
-    </style>
+    }
+</style>
 {% endblock extra_css %}
 
 {% block main %}
-<div class="gallery-section">
-    <div class="gallery-header">
-        <h2 class="gallery-title">All Meetings</h2>
-    </div>
+<div class="news-header">
+    <h1>All Meetings</h1>
+</div>
 
+<div class="gallery-section">
     <div class="gallery-grid">
         {% for meeting_title in meeting_titles %}
-            <a href="{% url 'meeting_call' meeting_title.id %}" class="gallery-card">
+            <a href="{% url 'meeting_call' meeting_title.id %}" class="gallery-card" id="card-{{ forloop.counter }}">
                 <div class="image-wrapper">
                     {% if meeting_title.image %}
                         <img src="{{ meeting_title.image.url }}" alt="{{ meeting_title.title }}" loading="lazy">
@@ -128,9 +146,10 @@
                 </div>
                 <div class="meeting-info">
                     <span class="meeting-title">{{ meeting_title.title }}</span>
-                    {% if meeting_title.created_at %}
-                    <span class="meeting-date">{{ meeting_title.created_at|date:"M d, Y" }}</span>
-                    {% endif %}
+                    <span class="meeting-date expiry-timer" 
+                          data-expire="{{ meeting_title.expire_date|date:'Y-m-d H:i:s' }}">
+                        Calculating...
+                    </span>
                 </div>
             </a>
         {% empty %}
@@ -141,4 +160,38 @@
     </div>
 </div>
 
+<script>
+function updateTimers() {
+    const timers = document.querySelectorAll('.expiry-timer');
+    const now = new Date();
+
+    timers.forEach(timer => {
+        const expiryDate = new Date(timer.getAttribute('data-expire'));
+        const diffMs = expiryDate - now;
+        const card = timer.closest('.gallery-card');
+
+        if (diffMs <= 0) {
+            timer.innerHTML = '<span style="color: #e74c3c; font-weight:bold;">Expired</span>';
+            card.classList.add('disabled-link');
+            card.setAttribute('onclick', 'return false;');
+            return;
+        }
+
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        if (days > 0) {
+            timer.innerHTML = `<span class="live-countdown">${days}d ${hours}h ${minutes}m ${seconds}s left</span>`;
+        } else {
+            timer.innerHTML = `<span class="live-countdown">${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')} left</span>`;
+        }
+    });
+}
+
+setInterval(updateTimers, 1000);
+updateTimers();
+</script>
 {% endblock main %}

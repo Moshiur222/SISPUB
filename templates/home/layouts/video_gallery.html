@@ -1,129 +1,113 @@
 {% extends "home/base/base.html" %}
+{% load static %}
 
 {% block extra_css %}
 <style>
-    /* --- Original Styles --- */
-    .et_pb_video .et_pb_video_overlay_hover:hover {
-        background-color: rgba(0,0,0,.6);
-    }
-    
-    .et_pb_text h1 {
-        letter-spacing: 14px;
-        line-height: 2.3em;
-    }
-    
-    body.safari .et_pb_text h1,
-    body.uiwebview .et_pb_text h1,
-    body.iphone .et_pb_text h1 {
-        font-variant-ligatures: no-common-ligatures;
-    }
-    
-    .et_pb_text {
-        text-shadow: 0.08em 0.08em 0.08em rgba(0,0,0,0.4);
-        background-color: rgba(0,3,61,0.05);
-        box-shadow: -3px 6px 33px 0px rgba(0,0,0,0.3);
-    }
 
-    /* --- Spacing & Size Adjustments --- */
-    .et_pb_section {
-        padding: 5px 0 !important;
-    }
+/* --- Header Section --- */
+.news-header {
+    text-align: center;
+    padding: 250px 20px 50px;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("{% static 'home/images/banner4.png' %}");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    margin-bottom: 50px;
+    border-radius: 10px;
+}
 
-    /* Target the very first section to give it even more breathing room from the top */
-    .et_builder_inner_content .et_pb_section:first-child {
-        margin-top: 40px !important;
-    }
+.news-header h1 {
+    color: #fff;
+    font-size: 35px;
+}
 
-    .et_pb_row {
-        padding: 5px 0 !important;
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-        width: 45% !important; 
-        max-width: 800px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-    }
+/* --- Single Card --- */
+.video-card {
+    max-width: 1400px;
+    margin: 0 auto 60px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
 
-    .et_pb_gutters2 .et_pb_column_1_2 {
-        width: 49.6% !important;
-        margin-right: 0.8% !important;
-    }
+/* --- Video Grid inside ONE card --- */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
 
-    .et_pb_gutters2 .et_pb_column_1_2.et-last-child {
-        margin-right: 0 !important;
-    }
+/* --- Video Wrapper --- */
+.video-wrapper {
+    position: relative;
+    padding-top: 56.25%;
+}
 
-    .et_pb_video {
-        margin-bottom: 0 !important;
-    }
+.video-wrapper iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border: none;
+}
 
-    /* Responsive handling */
-    @media (max-width: 980px) {
-        .et_pb_row { width: 70% !important; }
-    }
+/* --- Title --- */
+.main-title {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
 
-    @media (max-width: 767px) {
-        .et_pb_row { width: 90% !important; }
-        .et_pb_column_1_2 {
-            width: 100% !important;
-            margin-right: 0 !important;
-            margin-bottom: 15px !important;
-        }
-    }
 </style>
-{% endblock extra_css %}
+{% endblock %}
 
 {% block main %}
-<article id="post-77" class="post-77 page type-page status-publish hentry" style="padding-top: 150px">
-    <div class="entry-content">
-        <div class="et-l et-l--post">
-            <div class="et_builder_inner_content et_pb_gutters3">
-                {% if events %}
-                    {% for event in events %}
-                    <div class="et_pb_section et_section_regular">
-                        
-                        {% if event.title.title %}
-                        <div class="et_pb_row">
-                            <div class="et_pb_column et_pb_column_4_4 et-last-child">
-                                <div class="et_pb_module et_pb_text et_pb_text_align_left">
-                                    <div class="et_pb_text_inner">
-                                        <h1 style="text-align: center; margin-bottom: 0;">{{ event.title.title }}</h1>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                    
-                        <div class="et_pb_row et_pb_gutters2">
-                            {% if event.embed_url_1 %}
-                            <div class="et_pb_column et_pb_column_1_2">
-                                <div class="et_pb_module et_pb_video">
-                                    <div class="et_pb_video_box">
-                                        <div class="fluid-width-video-wrapper" style="padding-top: 56.25%;">
-                                            <iframe title="{{ event.title }}" src="{{ event.embed_url_1 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        
-                            {% if event.embed_url_2 %}
-                            <div class="et_pb_column et_pb_column_1_2 et-last-child">
-                                <div class="et_pb_module et_pb_video">
-                                    <div class="et_pb_video_box">
-                                        <div class="fluid-width-video-wrapper" style="padding-top: 56.25%;">
-                                            <iframe title="{{ event.title }}" src="{{ event.embed_url_2 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
+
+<!-- Header -->
+<div class="news-header ">
+    <h1>Video Gallery</h1>
+</div>
+
+<div class="container">
+
+    {% if events %}
+
+        <!-- ONE SINGLE CARD -->
+        <div class="video-card">
+            <div class="video-grid">
+
+                {% for event in events %}
+
+                    {% if event.embed_url_1 %}
+                    <div class="video-wrapper">
+                        <iframe title="{{ event.title }}" src="{{ event.embed_url_1 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                     </div>
-                    {% endfor %}
-                {% endif %}
+                    {% endif %}
+
+                    {% if event.embed_url_2 %}
+                    <div class="video-wrapper">
+                        <iframe title="{{ event.title }}" src="{{ event.embed_url_2 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    {% endif %}
+
+                {% endfor %}
+
             </div>
+
         </div>
-    </div>
-</article>
-{% endblock main %}
+
+    {% else %}
+
+        <div style="text-align:center; padding: 80px;">
+            <h3>No videos available</h3>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

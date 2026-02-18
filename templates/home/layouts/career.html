@@ -1,9 +1,30 @@
 {% extends "home/base/base.html" %}
+
+{% load static %}
 {% block extra_css %}
 <style>
+
+    .news-header {
+            text-align: center;
+            padding: 350px 20px 50px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                        url("{% static 'home/images/banner4.png' %}");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            margin-bottom: 50px;
+            border-radius: 10px;
+        }
+
+        .news-header h1 {
+            color: #fff;
+            font-size: 35px;
+        }
+
+
     .job-content-box {
         max-width: 100%;
-        padding-top: 10rem;
+        padding-top: 0.5rem;
         padding-bottom: 2rem;
         border-bottom: 1px solid #e5e7eb;
         transition: all 0.3s ease;
@@ -90,25 +111,88 @@
             padding-top: 3rem;
         }
     }
+
+    /* Card Container */
+.job-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    height: 100%; /* Keeps all cards same height in a row */
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.job-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: #007bff; /* Optional accent color */
+}
+
+/* Content Area */
+.job-card-body {
+    padding: 25px;
+    flex-grow: 1;
+}
+
+.job-title-modern {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.job-description-modern {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Action Area */
+.job-card-footer {
+    padding: 15px 25px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.btn-apply {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.btn-apply:hover {
+    text-decoration: underline;
+}
 </style>
 {% endblock %}
 
 {% block main %}
 
-<section class="pt-5 pb-5"> 
+<!-- Header -->
+ {% for career in career %}
+<div class="news-header ">
+    <h1>Career</h1>
+</div>
+
+<section class="career-section pt-5 pb-5"> 
     <div class="container">
-        {% for career in career %}
-        
-        <div class="job-content-box">
-            <h3 class="job-title-modern">
-                {{ career.title }}
-            </h3>
-            
-            <div class="job-description-modern">
-                {{ career.description|safe }}
+        <div class="row"> 
+            <div class="col-md-6 col-lg-4 mb-4"> <div class="job-card">
+                    <div class="job-card-body">
+                        <h3 class="job-title-modern">
+                            {{ career.title }}
+                        </h3>
+                        <div class="job-description-modern">
+                            {{ career.description|safe }}
+                        </div>
+                    </div>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </section>
 

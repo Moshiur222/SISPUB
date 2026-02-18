@@ -1,6 +1,7 @@
 {% extends "admin/base/base.html" %}
 {% block content %}
 <div class="card mt-4">
+
     {% if messages %}
         {% for message in messages %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -11,16 +12,12 @@
     {% endif %}
 
     <div class="card-header d-flex justify-content-between align-items-center">
-    
-    <!-- Left: Title -->
-    <h5 class="mb-0">Meeting Call List</h5>
+        <h5 class="mb-0">Meeting Call List</h5>
+        <a href="{% url 'meeting_call_add' %}" class="btn btn-sm btn-success">
+            + Add Title
+        </a>
+    </div>
 
-    <!-- Right: Add Button -->
-    <a href="{% url 'meeting_call_add' %}" class="btn btn-sm btn-success">
-        + Add Title
-    </a>
-
-</div>
     <div class="card-body">
         <div class="table-responsive">
             <table id="example" class="table table-striped table-bordered table-hover align-middle">
@@ -28,71 +25,82 @@
                     <tr>
                         <th>#</th>
                         <th>Title</th>
+                        <th>Create Date</th>
+                        <th>Expiry Date</th>
+                        <th>Time</th>
+                        <th>Total Count</th>
                         <th>Description</th>
                         <th>Amount</th>
                         <th>Image</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for title in titles %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ title.title }}</td>
-                        <td>{{ title.description| truncatewords:20 |safe }}</td>
+                        <td>{{ title.created_at|date:"F d, Y" }}</td>
+                        <td>{{ title.expire_date|date:"F d, Y" }}</td>
+                       <td>{{ title.expire_date|date:"H:i:s" }}</td>
+                        <td>{{ title.calls.count }}</td>
+                        <td>{{ title.description|truncatewords:10|safe }}</td>
                         <td>{{ title.amount }}</td>
+
                         <td>
                             {% if title.image %}
-                                <img src="{{ title.image.url }}" alt="Title Image" style="width:100px; height:auto;">
+                                <img src="{{ title.image.url }}" 
+                                     style="max-width:100px; height:auto; border-radius: 4px;">
                             {% else %}
-                                No image
+                                <span class="text-muted">No image</span>
                             {% endif %}
                         </td>
+
                         <td class="text-center">
-                            <!-- View -->
-                             <a href="{% url 'meeting_call_list' title.id %}" 
-                            class="btn btn-sm btn-info">
-                                View
-                            </a>
+                            <div class="btn-group">
+                                <a href="{% url 'meeting_call_list' title.id %}" class="btn btn-sm btn-info">View</a>
+                                <a href="{% url 'meeting_call_update' title.id %}" class="btn btn-sm btn-warning">Edit</a>
 
-                            <!-- Edit -->
-                            <a href="{% url 'meeting_call_update' title.id %}" 
-                            class="btn btn-sm btn-warning">
-                                Edit
-                            </a> 
-
-                            <!-- Delete -->
-                            <form action="{% url 'meeting_call_delete' title.id %}" 
-                                method="post" 
-                                style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this item?')"> Delete</button>
-                            </form>
-
+                                <form action="{% url 'meeting_call_delete' title.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
+
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center text-muted">No contacts found</td>
+                        <td colspan="9" class="text-center text-muted">No records found</td> <!-- FIXED -->
                     </tr>
                     {% endfor %}
                 </tbody>
+
             </table>
         </div>
     </div>
 </div>
 
-<!-- DataTables CSS -->
+<!-- ✅ DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
 
-<!-- jQuery -->
+<!-- ✅ jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<!-- DataTables JS -->
+
+<!-- ✅ DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- ✅ Buttons -->
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<!-- ✅ Required for export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -100,16 +108,12 @@
 <script>
 $(document).ready(function() {
     $('#example').DataTable({
-        dom: 'Bfrtip', // Show Buttons at top
-        buttons: [
-            { extend: 'copyHtml5', text: 'Copy' },
-            { extend: 'excelHtml5', text: 'Excel' },
-            { extend: 'pdfHtml5', text: 'PDF' },
-            { extend: 'print', text: 'Print' }
-        ],
+        dom: 'Bfrtip',
+        buttons: ['copy', 'excel', 'pdf', 'print'],
         pageLength: 10,
-        lengthMenu: [5, 10, 25, 50, 100],
+        responsive: true
     });
 });
 </script>
+
 {% endblock content %}

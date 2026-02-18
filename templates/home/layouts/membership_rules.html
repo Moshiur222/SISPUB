@@ -64,6 +64,51 @@
 .ql-container.ql-snow {
     border: none !important;
 }
+
+/* --- Rules Card --- */
+.rules-card {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.rules-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+/* Title */
+.rules-title {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Description */
+.rules-description {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: #555;
+    text-align: center;
+}
+
+/* List */
+.rules-list {
+    margin-top: 15px;
+    padding-left: 0;
+    List-style: none;
+}
+
+.rules-list li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
 </style>
 
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -146,14 +191,14 @@ a,abbr,acronym,address,applet,b,big,blockquote,body,center,cite,code,dd,del,dfn,
 				
 				
 				
-				<section class="et_pb_module et_pb_fullwidth_header et_pb_fullwidth_header_0 et_hover_enabled et_pb_text_align_center et_pb_bg_layout_dark">
+				<section class="et_pb_module et_pb_fullwidth_header et_pb_fullwidth_header_0  et_pb_text_align_center et_pb_bg_layout_dark">
 				
-				
+				 {% for rules_titles in rules_titles %}
 					<div class="et_pb_fullwidth_header_container center">
 						<div class="header-content-container center">
 							<div class="header-content">
 								
-								<h1 class="et_pb_module_header">Membership Rules</h1>
+								<h1 class="et_pb_module_header"> {{ rules_titles.title }}</h1>
 								
 								
 							</div>
@@ -176,24 +221,22 @@ a,abbr,acronym,address,applet,b,big,blockquote,body,center,cite,code,dd,del,dfn,
 
 <div class="et_pb_column et_pb_column_4_4 et_pb_column_0 et_pb_css_mix_blend_mode_passthrough et-last-child">
     
-    {% for rules_titles in rules_titles %}           
-    <section class="membership-rules">
-        <div class="container">
-            <h2>{{ rules_titles.title }}</h2>
-            <div class="description">
-                {{ rules_titles.description|safe }}
-            </div>
-        </div>
-    </section>
-    <div class="container">   
-            <li>
-                {{ rules_titles.rules|safe }}
-            </li>
-            {% endfor %}
-        </ul>
+
+
+<div class="rules-card">
+    <div class="rules-description">
+        {{ rules_titles.description|safe }}
     </div>
+
+    <ul style="list-style: none;" class="rules-list">
+        <li>
+            {{ rules_titles.rules|safe }}
+        </li>
+    </ul>
+
 </div>
 
+{% endfor %}
 				
 				
 				</div>

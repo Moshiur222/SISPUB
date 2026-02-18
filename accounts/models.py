@@ -44,7 +44,7 @@ class User(AbstractUser):
 
     USER_TYPES = (
         (1, "admin"),
-        (2, "member")
+        (2, "member"),
     )
     user_type = models.IntegerField(choices=USER_TYPES)
 
@@ -406,7 +406,7 @@ class MeetingTitle(models.Model):
     amount = models.IntegerField(null=True)
     description = models.TextField(null=True)
     image = models.ImageField(upload_to="image/", null=True)
-    expire_date = models.DateField(null=True)
+    expire_date = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -422,7 +422,7 @@ class MeetingCall(models.Model):
         ('bank_transfer', 'Bank Transfer'),
     ]
 
-    title = models.ForeignKey("MeetingTitle", on_delete=models.CASCADE, null=True)
+    title = models.ForeignKey("MeetingTitle", on_delete=models.CASCADE, null=True, related_name="calls")
     company_name = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     no_of_person = models.PositiveIntegerField()

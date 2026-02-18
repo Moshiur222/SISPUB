@@ -3,8 +3,25 @@
 
 {% block extra_css %}
     <style>
+        .news-header {
+            text-align: center;
+            padding: 350px 20px 50px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                        url("{% static 'home/images/banner4.png' %}");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            margin-bottom: 50px;
+            border-radius: 10px;
+        }
+
+        .news-header h1 {
+            color: #fff;
+            font-size: 35px;
+        }
+
         .gallery-section {
-            padding: 150px 20px 60px;
+            padding: 5px 20px 60px;
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -99,9 +116,13 @@
 
 {% block main %}
 
-<div class="gallery-section">
-    <h2 class="gallery-title">Photo Gallery</h2>
+<!-- Header -->
+<div class="news-header ">
+    <h1>Photo Gallery</h1>
+</div>
 
+
+<div class="gallery-section">
     <!-- Single grid container for all albums -->
     <div class="gallery-grid">
         {% for album in albums %}

@@ -1,17 +1,33 @@
 {% extends "admin/base/base.html" %}
+
+{% block custom_css %}
+<style>
+    /* Hides the increment/decrement arrows in Chrome, Safari, Edge, and Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Hides them in Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+{% endblock custom_css %}
+
 {% block content %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <div class="card mt-4" style="max-width: 600px; margin:auto;">
 
-    <!-- Header -->
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Add Meeting Call Title</h5>
     </div>
 
-    <!-- Body -->
     <div class="card-body">
 
-        <!-- Messages -->
         {% if messages %}
             {% for message in messages %}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -21,29 +37,30 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Form -->
-        <form method="POST" enctype="multipart/form-data"> <!-- needed for image upload -->
+        <form method="POST" enctype="multipart/form-data"> 
             {% csrf_token %}
 
             <div class="mb-3">
                 <label class="form-label">Title</label>
                 <input type="text" name="title" class="form-control" placeholder="Enter meeting title..." required>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">Amount</label>
-                <input type="text" name="amount" class="form-control" placeholder="Enter meeting amount..." required>
+                <input type="number" name="amount" class="form-control" placeholder="Enter meeting amount..." required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Expiry Date & Time</label>
+                <input type="text" name="expire_date" id="expiry-datetime" class="form-control bg-white" placeholder="Select Date & Time" required>
             </div>
 
-            <!-- Description with Quill -->
             <div class="mb-3">
                 <label class="form-label">Description</label>
-                <!-- Quill editor container -->
                 <div id="quill-editor" style="height: 200px; background: #fff;"></div>
-                <!-- Hidden input to submit content -->
                 <input type="hidden" name="description" id="description-input">
             </div>
 
-            <!-- Image input -->
             <div class="mb-3">
                 <label class="form-label">Image</label>
                 <input type="file" name="image" class="form-control" accept="image/*" id="image-input">
@@ -59,10 +76,25 @@
     </div>
 </div>
 
-<!-- Quill CSS and JS -->
+<!-- Quill JS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
+// Initialize Flatpickr for Date & Time
+flatpickr("#expiry-datetime", {
+    enableTime: true,        // Enable time picker
+    dateFormat: "Y-m-d H:i", // Backend format: "2026-02-18 14:30"
+    altInput: true,
+    altFormat: "F j, Y H:i K",  // User sees: "February 18, 2026 02:30 PM"
+    minDate: "today",        // Prevent past date/time
+    time_24hr: false         // 12hr format with AM/PM
+});
+
+// Image Preview Logic
 document.getElementById('image-input').addEventListener('change', function(event){
     const file = event.target.files[0];
     if(file){
@@ -75,25 +107,22 @@ document.getElementById('image-input').addEventListener('change', function(event
         reader.readAsDataURL(file);
     }
 });
-</script>
 
-<script>
+// Quill Initialization
 document.addEventListener("DOMContentLoaded", function() {
-    // Initialize Quill
     var quill = new Quill('#quill-editor', {
         theme: 'snow',
         modules: {
             toolbar: [
                 [{ 'header': [1, 2, 3, false] }],
                 ['bold', 'italic', 'underline'],
-                ['link', 'image'],  // image upload button
+                ['link', 'image'],
                 [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                 ['clean']
             ]
         }
     });
 
-    // On form submit, copy HTML content to hidden input
     var form = document.querySelector('form');
     form.onsubmit = function() {
         document.getElementById('description-input').value = quill.root.innerHTML;

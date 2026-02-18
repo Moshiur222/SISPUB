@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from .models import *
 import random, time, hashlib
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
 from .utils import send_sms
 import random
 import requests
@@ -175,7 +176,7 @@ def send_sms(phone_1, message):
 def hash_otp(otp):
     return hashlib.sha256(otp.encode()).hexdigest()
 
-# ===================== Registration View =====================
+
 def registration_view(request):
 
     # ----- OTP Verification -----
@@ -189,7 +190,7 @@ def registration_view(request):
             messages.error(request, "Session expired. Try again.")
             return redirect("registration")
 
-        if time.time() - otp_time > 300:  # 5 min expiry
+        if time.time() - otp_time > 300:
             messages.error(request, "OTP expired.")
             return redirect("registration")
 
@@ -202,13 +203,16 @@ def registration_view(request):
             messages.error(request, "Invalid OTP.")
             return render(request, "home/layouts/resistation.html", {"otp_sent": True, "phone": reg_data["phone"]})
 
-        # Create user and aggregator
+        # Create user and profile
         try:
             with transaction.atomic():
+                # Logic: If it's an aggregator, user_type is 3, else 2
+                u_type = 3 if reg_data.get("is_aggregator_flag") else 2
+                
                 user = User.objects.create_user(
                     email=reg_data["email"],
                     password=reg_data["password"],
-                    user_type=2
+                    user_type=u_type
                 )
 
                 Aggregator.objects.create(
@@ -229,16 +233,23 @@ def registration_view(request):
             messages.error(request, str(e))
             return redirect("registration")
 
-    # ----- Registration Form Submission -----
+    # ----- Registration Form Submission (Phase 1: Send OTP) -----
     elif request.method == "POST":
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
+        
         if password != confirm_password:
             messages.error(request, "Passwords do not match")
             return redirect("registration")
 
-        is_aggregator = request.POST.get("aggregatorToggle") == "on"
-        brtc_no = request.POST.get("brtc_licence_no") if is_aggregator else ""
+        # Check hidden input value "1" from HTML
+        is_aggregator = request.POST.get("is_aggregator") == "1"
+        brtc_no = request.POST.get("brtc_licence_no", "").strip()
+
+        # Mandatory check for Type 3 (Aggregator)
+        if is_aggregator and not brtc_no:
+            messages.error(request, "BRTC License is mandatory for Aggregators.")
+            return redirect("registration")
 
         reg_data = {
             "name": request.POST.get("name"),
@@ -247,7 +258,8 @@ def registration_view(request):
             "email": request.POST.get("email"),
             "password": password,
             "phone": request.POST.get("phone"),
-            "brtc_licence_no": brtc_no,
+            "brtc_licence_no": brtc_no if is_aggregator else "",
+            "is_aggregator_flag": is_aggregator, # Store the choice for user_type logic
             "address": request.POST.get("address"),
         }
 
@@ -259,6 +271,7 @@ def registration_view(request):
             messages.error(request, "Phone number already exists")
             return redirect("registration")
 
+        # OTP Logic
         otp = str(random.randint(100000, 999999))
         request.session["reg_data"] = reg_data
         request.session["otp"] = hash_otp(otp)
@@ -267,7 +280,7 @@ def registration_view(request):
 
         sms_sent = send_sms(reg_data["phone"], f"Your OTP is {otp}")
         if not sms_sent:
-            messages.error(request, "Failed to send OTP. Check phone number or SMS settings.")
+            messages.error(request, "Failed to send OTP. Please try again.")
             return redirect("registration")
 
         return render(request, "home/layouts/resistation.html", {"otp_sent": True, "phone": reg_data["phone"]})
@@ -302,79 +315,76 @@ def meeting_calls(request):
     return render(request, "home/layouts/meeting_calls.html", {"meeting_titles": meeting_titles})
 
 
+User = get_user_model()
 
-# Meeting call view
+def get_aggregator_info(request):
+    phone = request.GET.get('phone', '').strip()
+
+    if phone.startswith("+880"):
+        phone = phone[3:]
+    elif phone.startswith("880"):
+        phone = phone[2:]
+
+    try:
+        aggregator = Aggregator.objects.select_related('user').filter(phone=phone).first()
+
+        if aggregator:
+            data = {
+                'company_name': aggregator.company_name,
+                'name': aggregator.name,
+                'no_of_person': getattr(aggregator, 'no_of_person', 1),
+                'email': aggregator.user.email if aggregator.user else "",
+            }
+            return JsonResponse({'exists': True, 'data': data})
+        
+        return JsonResponse({'exists': False, 'data': {}})
+
+    except Exception as e:
+        return JsonResponse({'exists': False, 'error': str(e)}, status=500)
+    
+
 def meeting_call(request, id):
     last_title = get_object_or_404(MeetingTitle, id=id)
 
-    form_data = {
-        'company_name': '',
-        'name': '',
-        'no_of_person': '',
-        'phone': '',
-        'email': '',
-        'payment_method': '',
-        'transection_id': '',
+    # Initialize empty form data
+    context_data = {
+        'company_name': '', 'name': '', 'no_of_person': '',
+        'phone': '', 'email': '', 'payment_method': '', 'transection_id': '',
     }
 
     if request.method == 'POST':
-        form_data.update({
-            'company_name': request.POST.get('company_name', '').strip(),
-            'name': request.POST.get('name', '').strip(),
-            'no_of_person': request.POST.get('no_of_person', '').strip(),
-            'phone': request.POST.get('phone', '').strip(),
-            'email': request.POST.get('email', '').strip(),
-            'payment_method': request.POST.get('payment_method', '').strip(),
-            'transection_id': request.POST.get('transection_id', '').strip(),
-        })
+        # Update context with submitted data to repopulate on error
+        for field in context_data:
+            context_data[field] = request.POST.get(field, '').strip()
 
-        # 1. Validate required fields
-        if not all(form_data.values()):
-            messages.error(request, "All fields are required!")
-            return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
+        # 1. Server-side Membership Check (Security)
+        phone = context_data['phone']
+        if not Aggregator.objects.filter(phone__icontains=phone[-10:]).exists():
+            messages.error(request, "Registration failed: Phone number not found in member list.")
+            return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **context_data})
 
-        # 2. Validate number of persons
+        # 2. Save logic
         try:
-            no_of_person = int(form_data['no_of_person'])
-            if no_of_person <= 0:
-                raise ValueError
-        except ValueError:
-            messages.error(request, "Number of persons must be a positive number.")
-            return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
+            no_of_person = int(context_data['no_of_person'])
+            total_price = (last_title.amount or 0) * no_of_person
 
-        # 3. Calculate total amount
-        total_price = (last_title.amount or 0) * no_of_person
-
-        # 4. Check duplicates
-        if MeetingCall.objects.filter(phone=form_data['phone']).exists():
-            messages.error(request, "Phone number already registered!")
-            return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
-        
-        if MeetingCall.objects.filter(email=form_data['email']).exists():
-            messages.error(request, "Email already registered!")
-            return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **form_data})
-
-        # 5. Save
-        try:
             MeetingCall.objects.create(
                 title=last_title,
-                company_name=form_data['company_name'],
-                name=form_data['name'],
+                company_name=context_data['company_name'],
+                name=context_data['name'],
                 no_of_person=no_of_person,
-                phone=form_data['phone'],
-                email=form_data['email'],
-                payment_method=form_data['payment_method'],
-                transection_id=form_data['transection_id'],
+                phone=context_data['phone'],
+                email=context_data['email'],
+                payment_method=context_data['payment_method'],
+                transection_id=context_data['transection_id'],
                 amount=total_price
             )
-            messages.success(request, f"Submitted successfully! Total: {total_price}")
+            messages.success(request, "Submitted successfully!")
             return redirect('meeting_call', id=last_title.id)
         except Exception as e:
-            messages.error(request, f"An error occurred: {e}")
+            messages.error(request, f"Error: {e}")
 
-    # GET request
-    context = {'title': last_title, **form_data}
-    return render(request, 'home/layouts/meeting_call.html', context)
+    return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **context_data})
 
 def contact_view(request):
     
@@ -1744,20 +1754,34 @@ def meeting_call_add(request):
     if request.method == "POST":
         title_text = request.POST.get('title')
         amount = request.POST.get('amount')
+        expire_date = request.POST.get('expire_date')
         description = request.POST.get('description')
         image = request.FILES.get('image')
 
-        if title_text:
+        # 1. Basic Validation to prevent the "Invalid Date" Crash
+        if not title_text:
+            messages.error(request, "Title is required!")
+            return render(request, "admin/pages/meeting_call_add.html")
+
+        if not expire_date or expire_date == "":
+            messages.error(request, "Please select a valid expiry date.")
+            return render(request, "admin/pages/meeting_call_add.html")
+
+        # 2. Attempt to create the object
+        try:
             MeetingTitle.objects.create(
                 title=title_text,
                 amount=amount,
+                expire_date=expire_date,
                 description=description,
                 image=image
             )
             messages.success(request, "Meeting call added successfully!")
             return redirect('meeting_call_add')
-        else:
-            messages.error(request, "Title is required!")
+            
+        except Exception as e:
+            # This catches database-level format errors and shows them as a message
+            messages.error(request, f"Error saving meeting: {e}")
 
     return render(request, "admin/pages/meeting_call_add.html")
 
@@ -1885,26 +1909,3 @@ def check_phone(request):
     phone_exists = Aggregator.objects.filter(phone=phone).exists()
 
     return JsonResponse({'phone_exists': phone_exists})
-
-
-
-def get_aggregator_info(request):
-    phone = request.GET.get('phone', '').strip()
-
-    # ---- Normalize phone to match DB ----
-    if phone.startswith("0"):
-        phone = "880" + phone[1:]
-    elif phone.startswith("+880"):
-        phone = phone[1:]
-
-    try:
-        aggregator = Aggregator.objects.get(phone=phone)
-        data = {
-            'company_name': aggregator.company_name,
-            'name': aggregator.name,
-            'no_of_person': getattr(aggregator, 'no_of_person', ''),
-            'email': getattr(aggregator, 'email', ''),
-        }
-        return JsonResponse({'exists': True, 'data': data})
-    except Aggregator.DoesNotExist:
-        return JsonResponse({'exists': False, 'data': {}})

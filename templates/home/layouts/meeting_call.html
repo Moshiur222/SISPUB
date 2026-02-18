@@ -2,30 +2,95 @@
 {% block title %}Register{% endblock title %}
 
 {% block main %}
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-/* --- Existing CSS --- */
-.reg-wrapper { min-height: 90vh; display: flex; align-items: flex-start; justify-content: center; background: linear-gradient(140deg, rgba(0,72,114,0.9) 0%, rgba(41,17,96,0.8) 100%); padding: 190px 20px 40px 20px; }
-.reg-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-.reg-card h2 { margin-bottom: 10px; color: #333; text-align: center; font-weight: 700; }
-.reg-card .description { text-align: center; color: #777; margin-bottom: 30px; font-size: 0.95rem; }
-.back-btn-custom { display: inline-flex; align-items: center; text-decoration: none; color: #888; font-size: 0.85rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease; }
-.back-btn-custom:hover { color: #28a745; transform: translateX(-3px); }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.form-group { margin-bottom: 18px; position: relative; }
-.form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 0.85rem; font-weight: 600; }
-.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; background-color: #fff; }
-.form-group input:focus, .form-group select:focus { border-color: #28a745; outline: none; box-shadow: 0 0 0 2px rgba(40,167,69,0.2); }
-.reg-btn { width: 100%; padding: 12px; background-color: #28a745; color: #fff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
-.reg-btn:hover { background-color: #218838; }
-.error-text { color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none; }
-.success-text { color: #28a745; font-size: 0.8rem; margin-top: 4px; display: none; }
+    /* --- Modern Professional Styling --- */
+    :root {
+        --primary-green: #28a745;
+        --dark-navy: #004872;
+        --slate-500: #64748b;
+        --slate-900: #0f172a;
+        --border-color: #e2e8f0;
+    }
+
+    body { font-family: 'Inter', sans-serif; }
+
+    .reg-wrapper { 
+        min-height: 90vh; 
+        display: flex; 
+        align-items: flex-start; 
+        justify-content: center; 
+        background: linear-gradient(140deg, rgba(0,72,114,0.9) 0%, rgba(41,17,96,0.8) 100%); 
+        padding: 190px 20px 40px 20px; 
+    }
+
+    .reg-card { 
+        background: #fff; 
+        padding: 40px; 
+        border-radius: 16px; 
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
+        width: 100%; 
+        max-width: 550px; 
+    }
+
+    .reg-card h2 { margin-bottom: 8px; color: var(--slate-900); text-align: center; font-weight: 700; font-size: 1.75rem; }
+    .reg-card .description { text-align: center; color: var(--slate-500); margin-bottom: 30px; font-size: 0.95rem; line-height: 1.5; }
+
+    .back-btn-custom { 
+        display: inline-flex; 
+        align-items: center; 
+        text-decoration: none; 
+        color: #94a3b8; 
+        font-size: 0.75rem; 
+        font-weight: 700; 
+        margin-bottom: 20px; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-group { margin-bottom: 20px; position: relative; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--slate-900); font-size: 0.85rem; font-weight: 600; }
+    
+    .form-group input, .form-group select { 
+        width: 100%; 
+        padding: 12px; 
+        border: 1px solid var(--border-color); 
+        border-radius: 8px; 
+        font-size: 0.95rem; 
+        background-color: #f8fafc; 
+        transition: all 0.2s ease; 
+    }
+    
+    .form-group input:focus, .form-group select:focus { border-color: var(--primary-green); outline: none; box-shadow: 0 0 0 3px rgba(40,167,69,0.1); background-color: #fff; }
+    .form-group input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; }
+
+    .reg-btn { 
+        width: 100%; padding: 14px; background-color: var(--primary-green); color: #fff; 
+        border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; 
+    }
+
+    .success-badge { color: var(--primary-green); font-size: 0.75rem; margin-top: 6px; display: none; font-weight: 600; align-items: center; gap: 4px; }
+
+    /* --- Compact Professional SweetAlert --- */
+    .compact-swal-popup { width: 340px !important; padding: 1.5rem !important; border-radius: 12px !important; }
+    .compact-swal-title { font-size: 1.05rem !important; color: var(--slate-900) !important; font-weight: 700 !important; text-align: left !important; margin-bottom: 8px !important; }
+    .compact-swal-html { font-size: 0.85rem !important; color: var(--slate-500) !important; text-align: left !important; line-height: 1.4 !important; }
+    .compact-confirm-btn { background-color: var(--primary-green) !important; font-size: 0.8rem !important; padding: 8px 20px !important; border-radius: 6px !important; font-weight: 600 !important; }
+    .compact-cancel-btn { font-size: 0.8rem !important; color: #94a3b8 !important; font-weight: 600 !important; }
+    .swal2-icon { display: none !important; } /* Removing Icons per request */
+    .swal2-actions { justify-content: flex-start !important; margin-top: 1.5rem !important; }
+
+    /* Shake animation */
+    .input-error-shake { animation: shake 0.3s both; border-color: #ef4444 !important; }
+    @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } }
 </style>
 
 <div class="reg-wrapper">
     <div class="reg-card">
-        <a href="{% url 'meeting_calls' %}" class="back-btn-custom">← BACK</a>
+        <a href="{% url 'meeting_calls' %}" class="back-btn-custom">← BACK </a>
 
         <h2>{{ title.title }}</h2>
         <div class="description">{{ title.description|safe }}</div>
@@ -33,174 +98,154 @@
         <form id="regForm" method="POST">
             {% csrf_token %}
 
-            {% if messages %}
-                {% for message in messages %}
-                    <p style="text-align:center; color:{% if 'error' in message.tags %}#dc3545{% elif 'success' in message.tags %}#28a745{% else %}#333{% endif %}; font-weight:600;">
-                        {{ message }}
-                    </p>
-                {% endfor %}
-            {% endif %}
-
             <div class="form-row">
                 <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" name="phone" id="phoneInput" required placeholder="e.g. 01700000000 or +8801700000000" value="{{ phone }}">
-                    <div id="phoneError" class="error-text"></div>
-                    <div id="phoneSuccess" class="success-text">Phone No. valid</div>
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" id="phoneInput" required placeholder="017XXXXXXXX">
+                    <div id="phoneSuccess" class="success-badge">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
+                        Member Verified
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Company Name</label>
-                    <input type="text" name="company_name" required value="{{ company_name }}">
+                    <input type="text" name="company_name" id="companyInput" readonly required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Person Name</label>
-                    <input type="text" name="name" required value="{{ name }}">
+                    <label>Name</label>
+                    <input type="text" name="name" id="nameInput" readonly required>
                 </div>
                 <div class="form-group">
-                    <label>No of Person</label>
-                    <input type="number" name="no_of_person" id="noOfPersonInput" required min="1" value="{{ no_of_person }}">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Amount</label>
-                    <input type="text" name="amount" id="amountInput" readonly value="{{ amount }}">
-                </div>
-                <div class="form-group">
-                    <label>Payment Method</label>
-                    <select name="payment_method" required>
-                        <option value="bkash" {% if payment_method == "bkash" %}selected{% endif %}>Bkash</option>
-                        <option value="nagad" {% if payment_method == "nagad" %}selected{% endif %}>Nagad</option>
-                        <option value="rocket" {% if payment_method == "rocket" %}selected{% endif %}>Rocket</option>
-                        <option value="bank_transfer" {% if payment_method == "bank_transfer" %}selected{% endif %}>Bank Transfer</option>
+                    <label>No. of Persons</label>
+                    <select name="no_of_person" id="noOfPersonInput" required>
+                        <option value="1">1 Person</option>
+                        <option value="2">2 Persons</option>
+                        <option value="3">3 Persons</option>
+                        <option value="4">4 Persons</option>
+                        <option value="5">5 Persons</option>
+                        <option value="6">6 Persons</option>
+                        <option value="7">7 Persons</option>
+                        <option value="8">8 Persons</option>
+                        <option value="9">9 Persons</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Transection ID</label>
-                    <input type="text" name="transection_id" required value="{{ transection_id }}">
+                    <label>Total Amount (BDT)</label>
+                    <input type="text" name="amount" id="amountInput" readonly value="0.00">
                 </div>
                 <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" id="emailInput" required value="{{ email }}">
-                    <div id="emailError" class="error-text"></div>
-                    <div id="emailSuccess" class="success-text">Email available</div>
+                    <label>Payment Method</label>
+                    <select name="payment_method" required>
+                        <option value="bkash">Bkash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                    </select>
                 </div>
             </div>
 
-            <button type="submit" class="reg-btn">Submit</button>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Transaction ID</label>
+                    <input type="text" name="transection_id" required placeholder="Ex: 8NH672S1">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" id="emailInput" readonly required>
+                </div>
+            </div>
+
+            <button type="submit" class="reg-btn" id="submitBtn">Complete Registration</button>
         </form>
     </div>
 </div>
 
-<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script>
-// --- Email live check ---
-const emailInput = document.getElementById('emailInput');
-const emailError = document.getElementById('emailError');
-const emailSuccess = document.getElementById('emailSuccess');
-let emailExists = false;
-
-if (emailInput) {
-    emailInput.addEventListener('input', function() {
-        const email = this.value.trim();
-        if (email.length > 5) {
-            fetch('/check_email/?email=' + encodeURIComponent(email))
-                .then(res => res.json())
-                .then(data => {
-                    if (data.exists) {
-                        emailInput.style.borderColor = '#dc3545';
-                        emailError.innerText = "Email already exists!";
-                        emailError.style.display = 'block';
-                        emailSuccess.style.display = 'none';
-                        emailExists = true;
-                    } else {
-                        emailInput.style.borderColor = '#28a745';
-                        emailError.style.display = 'none';
-                        emailSuccess.style.display = 'block';
-                        emailExists = false;
-                    }
-                });
-        }
-    });
-}
-
-// --- Phone validation ---
+const perPersonAmount = parseFloat("{{ title.amount|default:0 }}");
 const phoneInput = document.getElementById('phoneInput');
-const phoneError = document.getElementById('phoneError');
 const phoneSuccess = document.getElementById('phoneSuccess');
-let phoneValid = false;
-
-if (phoneInput) {
-    phoneInput.addEventListener('input', function() {
-        const phone = this.value.trim();
-        const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
-        if (regex.test(phone)) {
-            phoneInput.style.borderColor = '#28a745';
-            phoneError.style.display = 'none';
-            phoneSuccess.style.display = 'block';
-            phoneValid = true;
-        } else {
-            phoneInput.style.borderColor = '#dc3545';
-            phoneError.innerText = "Invalid BD phone number!";
-            phoneError.style.display = 'block';
-            phoneSuccess.style.display = 'none';
-            phoneValid = false;
-        }
-    });
-
-    // --- Fetch aggregator info ---
-    phoneInput.addEventListener('blur', function() {
-        const phone = this.value.trim();
-        const regex = /^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8})$/;
-        if (!regex.test(phone)) return;
-
-        fetch(`/get_aggregator_info/?phone=${encodeURIComponent(phone)}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.exists) {
-                    if (data.data.company_name) document.querySelector('input[name="company_name"]').value = data.data.company_name;
-                    if (data.data.name) document.querySelector('input[name="name"]').value = data.data.name;
-                    if (data.data.no_of_person) document.querySelector('input[name="no_of_person"]').value = data.data.no_of_person;
-                    if (data.data.email) document.querySelector('input[name="email"]').value = data.data.email;
-                }
-            });
-    });
-}
-
-// --- Dynamic amount calculation ---
 const noOfPersonInput = document.getElementById('noOfPersonInput');
 const amountInput = document.getElementById('amountInput');
-const perPersonAmount = {{ title.amount|default:0 }};
 
-if (noOfPersonInput && amountInput) {
-    noOfPersonInput.addEventListener('input', function() {
-        const num = parseInt(this.value) || 0;
-        amountInput.value = (num * perPersonAmount).toFixed(2);
+// Auto-Calculation Logic
+noOfPersonInput.addEventListener('change', function() {
+    const num = parseInt(this.value) || 1;
+    amountInput.value = (num * perPersonAmount).toFixed(2);
+});
+
+// Initial Calc
+noOfPersonInput.dispatchEvent(new Event('change'));
+
+phoneInput.addEventListener('blur', function() {
+    const phone = this.value.trim();
+    if (phone === "" || !/^(?:\+8801[3-9][0-9]{8}|01[3-9][0-9]{8}|8801[3-9][0-9]{8})$/.test(phone)) return;
+
+    // Compact Loading
+    Swal.fire({
+        title: 'Verifying...',
+        allowOutsideClick: false,
+        width: '280px',
+        customClass: { popup: 'compact-swal-popup', title: 'compact-swal-title' },
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    fetch(`/get_aggregator_info/?phone=${encodeURIComponent(phone)}`)
+        .then(res => res.json())
+        .then(data => {
+            Swal.close();
+            if (data.exists) {
+                phoneInput.classList.remove('input-error-shake');
+                phoneInput.style.borderColor = 'var(--primary-green)';
+                phoneSuccess.style.display = 'flex';
+
+                document.getElementById('companyInput').value = data.data.company_name;
+                document.getElementById('nameInput').value = data.data.name;
+                document.getElementById('emailInput').value = data.data.email;
+                
+                if (data.data.no_of_person) {
+                    noOfPersonInput.value = data.data.no_of_person;
+                    noOfPersonInput.dispatchEvent(new Event('change'));
+                }
+            } else {
+                phoneInput.classList.add('input-error-shake');
+                phoneSuccess.style.display = 'none';
+                showCompactAlert(phone);
+            }
+        });
+});
+
+function showCompactAlert(phone) {
+    Swal.fire({
+        title: 'Membership Required',
+        html: `The number <b>${phone}</b> is not registered. Please become a member to register for this event.`,
+        showCancelButton: true,
+        confirmButtonText: 'Register Now',
+        cancelButtonText: 'Dismiss',
+        reverseButtons: true,
+        backdrop: `rgba(15, 23, 42, 0.1)`,
+        customClass: {
+            popup: 'compact-swal-popup',
+            title: 'compact-swal-title',
+            htmlContainer: 'compact-swal-html',
+            confirmButton: 'compact-confirm-btn',
+            cancelButton: 'compact-cancel-btn'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) window.location.href = "{% url 'registration' %}";
     });
 }
 
-// --- Form validation before submit ---
-const form = document.getElementById('regForm');
-form.addEventListener('submit', function(e) {
-    if (emailExists) {
-        e.preventDefault();
-        emailError.innerText = "Email already exists!";
-        emailError.style.display = 'block';
-        emailInput.style.borderColor = '#dc3545';
-    }
-    if (phoneInput && !phoneValid) {
-        e.preventDefault();
-        phoneError.innerText = "Invalid BD phone number!";
-        phoneError.style.display = 'block';
-        phoneInput.style.borderColor = '#dc3545';
-    }
+phoneInput.addEventListener('input', function() {
+    this.classList.remove('input-error-shake');
+    this.style.borderColor = 'var(--border-color)';
+    phoneSuccess.style.display = 'none';
 });
 </script>
+
 {% endblock main %}
