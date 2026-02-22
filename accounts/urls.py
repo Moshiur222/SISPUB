@@ -44,8 +44,8 @@ urlpatterns = [
 
     #api
     path('check_email/',check_email, name='check_email'),
+    path('resend_otp/',resend_otp, name='resend_otp'),
     path('check_phone/',check_phone, name='check_phone'),
-    path("resend-otp/", resend_otp, name="resend_otp"),
     path("get_aggregator_info/", get_aggregator_info, name="get_aggregator_info"),
 
     
@@ -181,5 +181,8 @@ urlpatterns = [
     path('call_delete/<int:id>/', call_delete, name = 'call_delete'),
     path('call_update/<int:id>/', call_update, name = 'call_update'),
 
+    path('admin_member_registration_list/', admin_member_registration_list, name = 'admin_member_registration_list'),
+    path('accept/<int:id>/', accept, name = 'accept'),
+    path('reject/<int:id>/', reject, name = 'reject'),
     #admin_url end
 ]

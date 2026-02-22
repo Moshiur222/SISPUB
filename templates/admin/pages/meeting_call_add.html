@@ -2,14 +2,12 @@
 
 {% block custom_css %}
 <style>
-    /* Hides the increment/decrement arrows in Chrome, Safari, Edge, and Opera */
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
 
-    /* Hides them in Firefox */
     input[type=number] {
         -moz-appearance: textfield;
     }
@@ -23,7 +21,7 @@
 <div class="card mt-4" style="max-width: 600px; margin:auto;">
 
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Add Meeting Call Title</h5>
+        <h5 class="mb-0">Add Meeting Call</h5>
     </div>
 
     <div class="card-body">
@@ -50,9 +48,30 @@
                 <input type="number" name="amount" class="form-control" placeholder="Enter meeting amount..." required>
             </div>
             
+            <!-- ✅ Date + Time Side by Side -->
             <div class="mb-3">
-                <label class="form-label">Expiry Date & Time</label>
-                <input type="text" name="expire_date" id="expiry-datetime" class="form-control bg-white" placeholder="Select Date & Time" required>
+                <div class="row">
+                    <!-- Date -->
+                    <div class="col-md-6">
+                         <label class="form-label">Expiry Date </label>
+                        <input type="text" name="expire_date_date" id="expiry-date"
+                               class="form-control bg-white"
+                               placeholder="Select Date"
+                               required>
+                    </div>
+
+                    <!-- Time -->
+                    <div class="col-md-6">
+                         <label class="form-label">Expiry Time</label>
+                        <input type="text" name="expire_date_time" id="expiry-time"
+                               class="form-control bg-white"
+                               placeholder="Select Time"
+                               required>
+                    </div>
+                </div>
+
+                <!-- Hidden combined -->
+                <input type="hidden" name="expire_date" id="expiry-datetime">
             </div>
 
             <div class="mb-3">
@@ -76,25 +95,39 @@
     </div>
 </div>
 
-<!-- Quill JS -->
+<!-- Quill -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-<!-- Flatpickr JS -->
+<!-- Flatpickr -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-// Initialize Flatpickr for Date & Time
-flatpickr("#expiry-datetime", {
-    enableTime: true,        // Enable time picker
-    dateFormat: "Y-m-d H:i", // Backend format: "2026-02-18 14:30"
-    altInput: true,
-    altFormat: "F j, Y H:i K",  // User sees: "February 18, 2026 02:30 PM"
-    minDate: "today",        // Prevent past date/time
-    time_24hr: false         // 12hr format with AM/PM
+// ✅ Date Picker
+flatpickr("#expiry-date", {
+    dateFormat: "Y-m-d",
+    minDate: "today"
 });
 
-// Image Preview Logic
+// ✅ Time Picker
+flatpickr("#expiry-time", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: false
+});
+
+// ✅ Combine Date + Time before submit
+document.querySelector('form').addEventListener('submit', function () {
+    const date = document.getElementById('expiry-date').value;
+    const time = document.getElementById('expiry-time').value;
+
+    if (date && time) {
+        document.getElementById('expiry-datetime').value = date + " " + time;
+    }
+});
+
+// Image Preview
 document.getElementById('image-input').addEventListener('change', function(event){
     const file = event.target.files[0];
     if(file){
@@ -108,7 +141,7 @@ document.getElementById('image-input').addEventListener('change', function(event
     }
 });
 
-// Quill Initialization
+// Quill
 document.addEventListener("DOMContentLoaded", function() {
     var quill = new Quill('#quill-editor', {
         theme: 'snow',

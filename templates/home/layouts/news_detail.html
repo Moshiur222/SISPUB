@@ -2,184 +2,173 @@
 {% load static %}
 
 {% block extra_css %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Charter:ital,wght@0,400;0,700;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&family=Roboto:wght@400;700&display=swap');
 
     :root {
-        --bg-color: #ffffff;
-        --ink: #111111;
-        --accent: #3b82f6; /* Modern Electric Blue */
-        --muted: #f5f5f7;
+        --bg-color: #f8f9fa; /* Light background to make cards pop */
+        --card-bg: #ffffff;
+        --ink: #1a1a1a;
+        --border-color: #eee;
+        --meta-grey: #757575;
     }
 
     body { 
         background-color: var(--bg-color); 
         color: var(--ink); 
-        font-family: 'Outfit', sans-serif;
-        -webkit-font-smoothing: antialiased;
+        font-family: 'Noto Sans Bengali', 'Roboto', sans-serif;
+        line-height: 1.6;
     }
 
-    /* 1. Ultra-Thin Progress */
-    #progress-bar {
-        position: fixed; top: 0; left: 0; width: 0%; height: 2px;
-        background: var(--ink); z-index: 9999;
-    }
-
-    /* 2. Hero: Clean & Geometric */
-    .hero-wrap {
-        max-width: 1400px;
+    .container-wide {
+        max-width: 1100px; /* Bigger container */
         margin: 0 auto;
-        padding: 80px 40px;
+        padding: 180px 20px 60px 20px; 
     }
 
-    .category-pill {
-        display: inline-block;
-        padding: 4px 12px;
-        background: var(--muted);
-        border-radius: 100px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        margin-bottom: 24px;
-    }
-
-    .main-headline {
-        font-size: clamp(2.5rem, 7vw, 5rem);
-        font-weight: 800;
-        line-height: 1;
-        letter-spacing: -0.04em;
+    /* Card Styling */
+    .article-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 50px; /* Bigger internal space */
         margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
 
-    .hero-image-full {
-        width: 100%;
-        aspect-ratio: 21/9;
-        object-fit: cover;
-        border-radius: 2px;
-        filter: grayscale(20%);
-        transition: filter 0.5s ease;
-    }
-    .hero-image-full:hover { filter: grayscale(0%); }
-
-    /* 3. The Modern Grid */
-    .article-grid {
-        display: grid;
-        grid-template-columns: 1fr 720px 1fr; /* Perfect reading measure */
-        gap: 60px;
-        margin-top: 60px;
-        padding: 0 40px;
+    /* Navigation / Meta Row */
+    .top-nav-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
     }
 
-    .side-meta {
-        grid-column: 1;
-        position: sticky;
-        top: 100px;
-        height: fit-content;
-        text-align: right;
-        border-right: 1px solid #eee;
-        padding-right: 30px;
-    }
-
-    .meta-item {
-        margin-bottom: 30px;
-    }
-
-    .meta-label {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: #999;
-        letter-spacing: 1.5px;
-        display: block;
-    }
-
-    /* 4. Reading Content */
-    .article-body {
-        grid-column: 2;
-        font-family: 'Charter', serif; /* High-readability system font */
-        font-size: 1.35rem;
-        line-height: 1.8;
-        color: #222;
-    }
-
-    .article-body p { margin-bottom: 30px; }
-
-    /* Subtle UI enhancements */
-    .article-body h2 {
-        font-family: 'Outfit', sans-serif;
-        font-size: 2rem;
+    .back-link {
+        text-decoration: none;
+        color: var(--ink);
         font-weight: 700;
-        margin-top: 60px;
-        letter-spacing: -0.02em;
+        font-size: 0.95rem;
     }
 
-    /* 5. Clean Commenting */
-    .comments-wrapper {
-        grid-column: 2;
-        background: var(--muted);
-        padding: 60px;
-        margin-top: 100px;
-        border-radius: 4px;
+    .timestamp {
+        color: var(--meta-grey);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    @media (max-width: 1100px) {
-        .article-grid { grid-template-columns: 1fr; }
-        .article-body, .comments-wrapper { grid-column: 1; }
-        .side-meta { 
-            position: relative; top: 0; text-align: left; 
-            border-right: none; border-bottom: 1px solid #eee; 
-            padding: 0 0 30px 0; margin-bottom: 40px;
+    /* Centered Headline */
+    .main-headline {
+        text-align: center;
+        font-size: 2.8rem; /* Bigger title */
+        font-weight: 700;
+        color: #000;
+        margin: 10px 0 40px 0;
+        line-height: 1.2;
+    }
+
+    /* Layout: Float Wrapping */
+    .news-article-content {
+        display: block; 
+        overflow: hidden;
+    }
+
+    .news-image-box {
+        float: left; 
+        width: 50%; /* Adjusted for better card balance */
+        margin-right: 35px;
+        margin-bottom: px;
+    }
+
+    .news-image-box img {
+        width: 100%;
+        height: auto;
+        display: block; 
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    /* --- JUSTIFY FIX FOR ALL TEXT --- */
+    .quill-text-wrapper, 
+    .quill-text-wrapper p, 
+    .ql-editor, 
+    .ql-editor p {
+        text-align: justify !important;
+        text-justify: inter-word !important; /* Spreads space between words evenly */
+        font-size: 1.2rem;
+        line-height: 1.9;
+        color: #333;
+    }
+
+    /* Remove Quill default styling constraints */
+    .ql-container.ql-snow {
+        border: none !important;
+        font-family: inherit !important;
+    }
+    .ql-editor {
+        padding: 0 !important;
+    }
+
+    .news-article-content::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    @media (max-width: 850px) {
+        .container-wide { padding-top: 100px; }
+        .article-card { padding: 25px; }
+        .news-image-box { 
+            float: none; 
+            width: 100%; 
+            margin-right: 0; 
+            margin-bottom: 25px;
         }
+        .main-headline { font-size: 2rem; }
     }
 </style>
 {% endblock %}
 
 {% block main %}
-<div id="progress-bar"></div>
-
-<section class="hero-wrap">
-    <span class="category-pill">{{ news.category|default:"Insights" }}</span>
-    <h1 class="main-headline">{{ news.title }}</h1>
-    {% if news.image %}
-        <img src="{{ news.image.url }}" class="hero-image-full" alt="{{ news.title }}">
-    {% endif %}
-</section>
-
-<div class="article-grid">
-    <aside class="side-meta">
-        <div class="meta-item">
-            <span class="meta-label">Words by</span>
-            <strong>{{ news.author|default:"Editorial" }}</strong>
-        </div>
-        <div class="meta-item">
-            <span class="meta-label">Date</span>
-            <strong>{{ news.date|date:"M d, Y" }}</strong>
-        </div>
-        <div class="meta-item">
-            <span class="meta-label">Share</span>
-            <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 10px; font-size: 1.1rem;">
-                <i class="fab fa-twitter"></i>
-                <i class="far fa-copy"></i>
+<div class="container-wide">
+    <div class="article-card">
+        <div class="top-nav-row">
+            <a href="{% url 'news' %}" class="back-link">← Back</a>
+            <div class="timestamp">
+                <i class="far fa-clock"></i> {{ news.date|date:"d-m-Y" }}
             </div>
         </div>
-    </aside>
 
-    <main class="article-body">
-        {{ news.description|safe }}
+        <h1 class="main-headline">{{ news.title }}</h1>
 
-        <section class="comments-wrapper">
-            <h4 style="margin-bottom: 30px; font-weight: 800; font-family: 'Outfit';">The Discussion</h4>
-            <div id="fb-root"></div>
-            <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v15.0"></script>
-            <div class="fb-comments" data-href="{{ request.build_absolute_uri }}" data-width="100%" data-numposts="5"></div>
-        </section>
-    </main>
+        <article class="news-article-content">
+            <div class="news-image-box">
+                {% if news.image %}
+                    <img src="{{ news.image.url }}" alt="{{ news.title }}">
+                {% else %}
+                    <img src="{% static 'images/placeholder.jpg' %}" alt="No Image">
+                {% endif %}
+            </div>
+            
+            <div id="quill-content" class="quill-text-wrapper">
+                {{ news.description|safe }}
+            </div>
+        </article>
+    </div>
 </div>
+{% endblock %}
 
+{% block custom_js %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-    window.addEventListener('scroll', () => {
-        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        document.getElementById("progress-bar").style.width = (winScroll / height) * 100 + "%";
+    // Initialize Quill in read-only mode to maintain formatting
+    var quill = new Quill('#quill-content', {
+        modules: { toolbar: false },
+        readOnly: true,
+        theme: 'snow'
     });
 </script>
 {% endblock %}

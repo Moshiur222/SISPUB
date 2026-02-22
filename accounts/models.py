@@ -360,7 +360,27 @@ class Career(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+class TempMember(models.Model):
+    PAYMENT_CHOICES = [
+        ('pending', 'pending'),
+    ]
+
+    company_name = models.CharField(max_length=50)
+    person_name = models.CharField(max_length=50)
+    designation = models.CharField(max_length=50, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True, unique=True)
+    phone = models.CharField(max_length=15,validators=[bd_phone_validator], unique=True)
+    is_aggregator = models.CharField(max_length=4,null=True, blank=True)
+    brtc_licence_no = models.CharField(max_length=50, blank=True)
+    address = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='pending')
+    password = models.CharField(max_length=128)
+    otp = models.CharField(max_length=64, blank=True)
+    otp_created_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.person_name
 
 
 class Aggregator(models.Model):
@@ -368,16 +388,9 @@ class Aggregator(models.Model):
     name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=50)
     designation = models.CharField(max_length=50, null=True)
-    phone = models.CharField(
-        max_length=15,
-        validators=[bd_phone_validator],
-        blank=True,
-        unique=True
-    )
-    brtc_licence_no = models.CharField(
-        max_length=50,
-        blank=True
-    )
+    is_aggregator = models.CharField(max_length=3, null=True)
+    phone = models.CharField(max_length=15,validators=[bd_phone_validator],blank=True,unique=True)
+    brtc_licence_no = models.CharField(max_length=50, blank=True)
     address = models.TextField(blank=True)
 
     def __str__(self):

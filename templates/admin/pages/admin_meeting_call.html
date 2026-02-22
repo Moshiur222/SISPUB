@@ -12,9 +12,9 @@
     {% endif %}
 
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Meeting Call List</h5>
+        <h5 class="mb-0">Meeting Schedule</h5>
         <a href="{% url 'meeting_call_add' %}" class="btn btn-sm btn-success">
-            + Add Title
+            + Add Schudule
         </a>
     </div>
 
@@ -42,8 +42,15 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ title.title }}</td>
                         <td>{{ title.created_at|date:"F d, Y" }}</td>
-                        <td>{{ title.expire_date|date:"F d, Y" }}</td>
-                       <td>{{ title.expire_date|date:"H:i:s" }}</td>
+                        <td>{{ title.expire_date|date:"F d, Y H:i:s" }}</td>
+
+                        <!-- ✅ Countdown Column -->
+                        <td>
+                            <span class="countdown"
+                                  data-expire="{{ title.expire_date|date:'Y-m-d H:i:s' }}">
+                            </span>
+                        </td>
+
                         <td>{{ title.calls.count }}</td>
                         <td>{{ title.description|truncatewords:10|safe }}</td>
                         <td>{{ title.amount }}</td>
@@ -75,7 +82,7 @@
 
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="text-center text-muted">No records found</td> <!-- FIXED -->
+                        <td colspan="10" class="text-center text-muted">No records found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -100,7 +107,7 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-<!-- ✅ Required for export -->
+<!-- ✅ Export dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -114,6 +121,34 @@ $(document).ready(function() {
         responsive: true
     });
 });
+
+// ✅ Countdown Function
+function updateCountdowns() {
+    const elements = document.querySelectorAll('.countdown');
+
+    elements.forEach(el => {
+        const expireTime = new Date(el.getAttribute('data-expire')).getTime();
+        const now = new Date().getTime();
+
+        const distance = expireTime - now;
+
+        if (distance <= 0) {
+            el.innerHTML = "<span style='color:red; font-weight:bold;'>Expired</span>";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((distance / (1000 * 60)) % 60);
+        const seconds = Math.floor((distance / 1000) % 60);
+
+        el.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    });
+}
+
+// Run every second
+setInterval(updateCountdowns, 1000);
+updateCountdowns();
 </script>
 
 {% endblock content %}

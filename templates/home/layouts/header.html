@@ -1,222 +1,250 @@
 {% load static %}
 {% load nav_active %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'home/css/header.css' %}">
+<style>
+    /* --- Responsive Top Bar & Navbar Logic --- */
+
+    /* 1. Top Bar: Stack items on mobile so nothing is hidden */
+    @media (max-width: 768px) {
+        .top-bar {
+            padding: 10px 0;
+            height: auto !important; /* Allow height to expand */
+        }
+        .top-bar-content {
+            flex-direction: column !important; /* Stack contact vs login */
+            gap: 12px;
+            text-align: center;
+        }
+        .contact-info {
+            flex-direction: column !important; /* Stack Phone, Email, Hours */
+            align-items: center;
+            gap: 5px !important;
+        }
+        .contact-item {
+            font-size: 13px;
+        }
+        .auth-links {
+            padding-top: 8px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* 2. Navbar: Toggle Button Styling */
+    .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 5px;
+        color: #333;
+    }
+
+    /* 3. Mobile Menu Drawer (1024px and below) */
+    @media (max-width: 1024px) {
+        .menu-toggle {
+            display: block;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            right: -100%; /* Initially hidden off-screen */
+            width: 280px;
+            height: 100vh;
+            background: #fff;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: 0.3s ease-in-out;
+            z-index: 9999;
+            display: block !important; /* Force block for drawer layout */
+            overflow-y: auto;
+        }
+
+        .nav-menu.active {
+            right: 0; /* Slide in */
+        }
+
+        .nav-list {
+            flex-direction: column !important;
+            padding: 70px 20px 40px !important;
+            margin: 0;
+        }
+
+        .nav-item {
+            width: 100%;
+            margin: 0 !important;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .nav-link {
+            padding: 15px 0;
+            display: block;
+            width: 100%;
+        }
+
+        /* Adjust Multi-Column 'About Us' Dropdown for Mobile */
+        .dropdown-menu {
+            position: static !important;
+            min-width: 100% !important;
+            box-shadow: none !important;
+            display: none; 
+            padding: 10px 0 10px 15px !important;
+            background: #fcfcfc;
+            border: none !important;
+        }
+
+        /* Show dropdown on hover (standard) or click (JS) */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu div[style*="display: flex"] {
+            flex-direction: column !important; /* Stack Column 1 and 2 */
+        }
+
+        .dropdown-menu div[style*="width"] {
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-bottom: 15px;
+        }
+        
+        .logo-img {
+            max-height: 50px; /* Scale logo on mobile */
+        }
+    }
+</style>
+{% endblock extra_css %}
+
 <header class="main-header">
-    <!-- Main Navigation -->
     <nav class="main-nav sticky">
-        <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="container">
-            <div class="top-bar-content">
-                {% for info in all_company_info %}
-                <div class="contact-info">
-                    <span class="contact-item">
-                        <i class="fas fa-phone-alt"></i>
-                        <span>Phone: {{info.phone}}</span>
-                    </span>
-                    <span class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span>Email:{{info.email}}</span>
-                    </span>
-                    <span class="contact-item">
-                        <i class="fas fa-clock"></i>
-                        <span>Sat-Thu: {{info.office_hours}}</span>
-                    </span>
-                </div>
-                {% endfor %}
-                <div class="social-links auth-links">
-                    <a href="{% url 'login' %}" class="auth-link {% active 'login' %}">Login</a>
-                    <span class="auth-separator">|</span>
-                    <a href="{% url 'registration' %}" class="auth-link {% active 'registration' %}">Become a Member</a>
+        <div class="top-bar">
+            <div class="container">
+                <div class="top-bar-content" style="display: flex; justify-content: space-between; align-items: center;">
+                    {% for info in all_company_info %}
+                    <div class="contact-info" style="display: flex; gap: 20px;">
+                        <span class="contact-item">
+                            <i class="fas fa-phone-alt"></i>
+                            <span>Phone: {{info.phone}}</span>
+                        </span>
+                        <span class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>Email: {{info.email}}</span>
+                        </span>
+                        <span class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Sat-Thu: {{info.office_hours}}</span>
+                        </span>
+                    </div>
+                    {% endfor %}
+                    <div class="social-links auth-links">
+                        <a href="{% url 'login' %}" class="auth-link {% active 'login' %}">Login</a>
+                        <span class="auth-separator">|</span>
+                        <a href="{% url 'registration' %}" class="auth-link {% active 'registration' %}">Member Registation</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
- 
-    <hr style = " margin: 0; border: #f5f5f5ea solid  0.5px; border-redius: 50%">
+
+        <hr style="margin: 0; border: #f5f5f5ea solid 0.5px;">
 
         <div class="container nav-container">
-            <!-- Logo -->
             <div class="logo-container">
                 <a href="{% url 'home' %}" class="logo">
                     <img src="{% static 'home/images/logos/logo.png' %}" alt="SISPAB Logo" class="logo-img">
                 </a>
             </div>
 
-            <!-- Desktop Navigation -->
             <div class="nav-menu">
                 <ul class="nav-list">
                     <li class="nav-item {% active 'home' %}"><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+                    
                     <li class="nav-item dropdown {% active 'founder' 'vision' 'mission' 'core_values' 'current_executive_commitee' 'previous_committee' 'sisbup_secretariat' %}">
-                        <a href="" class="nav-link">About Us</a>
-
-                            <div class="dropdown-menu" style="min-width: 420px;">
-                                <div style="display: flex; padding: 0 10px;">
-
-                                    <!-- Column 1 -->
-                                    <div style="width: 70%; margin-left: 20px;">
-                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 30px;">About SiSPUB</a>
-                                        <a href="{% url 'core_values' %}"
-                                        class="dropdown-item {% active 'core_values' %}" style="height: 30px;">
-                                            Core Values
-                                        </a>
-
-                                        <a href="{% url 'vision'%}"
-                                        class="dropdown-item {% active 'vision' %}" style="height: 30px;">
-                                            Vision
-                                        </a>
-                                        <a href="{% url 'mission' %}"
-                                        class="dropdown-item {% active 'mission' %}" style="height: 30px;">
-                                            Mission
-                                        </a>
-                                        <a href="{% url 'founder' %}" class="dropdown-item {% active 'founder' %}" style="height: 30px;"> SISPAB Founders </a>
-                                    </div>
-
-                                    <!-- Column 2 -->
-                                    <div style="width: 100%;">
-                                        <a style = "text-decoration: none; color: #000; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 30px;">Our Team</a>
-                                        <a href="{% url 'current_executive_commitee' %}" class="dropdown-item {% active 'current_executive_commitee' %}" style="height: 30px;">
-                                            Current Executive Committee
-                                        </a>
-                                        <a href="{% url 'previous_committee' %}" class="dropdown-item {% active 'previous_committee' %}" style="height: 30px;">
-                                            Previous Executive Committee
-                                        </a>
-                                        <a href="{% url 'sisbup_secretariat' %}" class="dropdown-item {% active 'sisbup_secretariat' %}" style="height: 30px;">
-                                            SISPAB Secretariat
-                                        </a>
-                                    </div>
-
+                        <a href="#" class="nav-link">About Us</a>
+                        <div class="dropdown-menu" style="min-width: 420px;">
+                            <div style="display: flex; padding: 0 10px;">
+                                <div style="width: 70%; margin-left: 20px;">
+                                    <p style="color: #000; font-weight: bold; font-size: 15px; margin-bottom: 10px;">About SiSPUB</p>
+                                    <a href="{% url 'core_values' %}" class="dropdown-item {% active 'core_values' %}" style="height: 30px;">Core Values</a>
+                                    <a href="{% url 'vision'%}" class="dropdown-item {% active 'vision' %}" style="height: 30px;">Vision</a>
+                                    <a href="{% url 'mission' %}" class="dropdown-item {% active 'mission' %}" style="height: 30px;">Mission</a>
+                                    <a href="{% url 'founder' %}" class="dropdown-item {% active 'founder' %}" style="height: 30px;"> SISPAB Founders </a>
+                                </div>
+                                <div style="width: 100%;">
+                                    <p style="color: #000; font-weight: bold; font-size: 15px; margin-bottom: 10px;">Our Team</p>
+                                    <a href="{% url 'current_executive_commitee' %}" class="dropdown-item {% active 'current_executive_commitee' %}" style="height: 30px;">Current Executive Committee</a>
+                                    <a href="{% url 'previous_committee' %}" class="dropdown-item {% active 'previous_committee' %}" style="height: 30px;">Previous Executive Committee</a>
+                                    <a href="{% url 'sisbup_secretariat' %}" class="dropdown-item {% active 'sisbup_secretariat' %}" style="height: 30px;">SISPAB Secretariat</a>
                                 </div>
                             </div>
-                        </li>
-
+                        </div>
+                    </li>
 
                     <li class="nav-item dropdown {% active 'benefit_od_member' 'advisory_council' 'member_resistation' 'membership_rules' 'process_of_members' %}">
                         <a href="#" class="nav-link dropdown-toggle">Membership</a>
                         <div class="dropdown-menu">
                             <a href="{% url 'benefit_od_member' %}" class="dropdown-item {% active 'benefit_od_member' %}" style="margin-left: 20px; height: 30px">Benefit of Members</a>
-                            <a href="{% url 'advisory_council' %}" class="dropdown-item {% active 'advisory_council' %}"  style="margin-left: 20px; height: 30px">Advisory Council</a>
-                            {% comment %} <a href="{% url 'member_resistation' %}" class="dropdown-item {% active 'member_resistation' %}"  style="margin-left: 20px; height: 30px">Member Registration</a> {% endcomment %}
-                            <a href="{% url 'membership_rules' %}" class="dropdown-item {% active 'membership_rules' %}"  style="margin-left: 20px; height: 30px">Membership Rules</a>
-                            {% comment %} <a href="{% url 'process_of_members' %}" class="dropdown-item {% active 'process_of_members' %}"  style="margin-left: 20px; height: 30px;">Process of Membership</a> {% endcomment %}
+                            <a href="{% url 'advisory_council' %}" class="dropdown-item {% active 'advisory_council' %}" style="margin-left: 20px; height: 30px">Advisory Council</a>
+                            <a href="{% url 'membership_rules' %}" class="dropdown-item {% active 'membership_rules' %}" style="margin-left: 20px; height: 30px">Membership Rules</a>
                         </div>
                     </li>
-                    <li class="nav-item dropdown {% active  'news' 'photo' 'photos' 'video_gallery' 'news_detail_view' %}">
+
+                    <li class="nav-item dropdown {% active 'news' 'photo' 'photos' 'video_gallery' 'news_detail_view' %}">
                         <a href="#" class="nav-link dropdown-toggle">News & Media</a>
                         <div class="dropdown-menu">
-                            <a href="{% url 'news' %}" class="dropdown-item {% active 'news' 'news_detail_view' %}"  style="margin-left: 20px; height: 30px">News</a>
-                            <a href="{% url 'photo' %}" class="dropdown-item {% active 'photo' 'photos' %}"  style="margin-left: 20px; height: 30px">Photo Gallery</a>
-                            <a href="{% url 'video_gallery' %}" class="dropdown-item {% active 'video_gallery' %}"  style="margin-left: 20px; height: 30px">Video Gallery</a>
+                            <a href="{% url 'news' %}" class="dropdown-item {% active 'news' 'news_detail_view' %}" style="margin-left: 20px; height: 30px">News</a>
+                            <a href="{% url 'photo' %}" class="dropdown-item {% active 'photo' 'photos' %}" style="margin-left: 20px; height: 30px">Photo Gallery</a>
+                            <a href="{% url 'video_gallery' %}" class="dropdown-item {% active 'video_gallery' %}" style="margin-left: 20px; height: 30px">Video Gallery</a>
                         </div>
                     </li>
-                    {% comment %} <li class="nav-item dropdown {% active  'publication' 'career' 'blog' %}">
-                        <a class="nav-link dropdown-toggle">Resources</a>
-                        <div class="dropdown-menu">
-                            <a href="" class="dropdown-item "  style="margin-left: 20px;">Publication</a>
-                            <a href="" class="dropdown-item "  style="margin-left: 20px;">Career</a>
-                            <a href="{% url 'blog' %}" class="dropdown-item {% active 'blog' %}"  style="margin-left: 20px;">Blogs</a>
-                        </div>
-                    </li> {% endcomment %}
-                    {% comment %} <li class="nav-item dropdown">
-                        <a class="nav-link">Our Initiatives</a>
 
-                            <div class="dropdown-menu" style="min-width: 420px;">
-                                <div style="display: flex; padding: 0 10px;">
-
-                                    <!-- Column 1 -->
-                                    <div style="width: 100%;">
-                                        <a style = "text-decoration: none; color: #000; font-weight: bold;margin-left: 20px; cursor: pointer; font-size: 15px;">Awards</a>
-                                
-                                        <a href="" class="dropdown-item"></a>
-                                    </div>
-
-                                    <!-- Column 2 -->
-                                    <div style="width: 100%;">
-                                        <a style = "text-decoration: none; color: #000; font-weight: bold;margin-left: 20px; cursor: pointer; font-size: 15px;">Events</a>
-                                        <a href="{% url 'meetings' %}" class="dropdown-item {% active 'meetings' %}"  style="margin-left: 20px;">
-                                            Meetings
-                                        </a>
-                                    </div>
-                                    <div style="width: 100%;">
-                                        <a style = "text-decoration: none; color: #000; font-weight: bold;margin-left: 20px; cursor: pointer; font-size: 15px;">Initiatives</a>
-                                        <a href="" class="dropdown-item ">
-                                            
-                                        </a>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </li> {% endcomment %}
-
-
-                        <li class="nav-item {% active 'complain' %} "><a href="{% url 'complain' %}" class="nav-link">Complain</a></li>
-                        <li class="nav-item {% active 'career' %} "><a href="{% url 'career' %}" class="nav-link">Career</a></li>
-                        <li class="nav-item {% active 'meeting_calls' 'meeting_call' %} "><a href="{% url 'meeting_calls' %}" class="nav-link">Meeting Call</a></li>
-                        <li class="nav-item {% active 'contact' %} "><a href="{% url 'contact' %}" class="nav-link">Contacts</a></li>
+                    <li class="nav-item {% active 'complain' %} "><a href="{% url 'complain' %}" class="nav-link">Complain</a></li>
+                    <li class="nav-item {% active 'career' %} "><a href="{% url 'career' %}" class="nav-link">Career</a></li>
+                    <li class="nav-item {% active 'meeting_calls' 'meeting_call' %} "><a href="{% url 'meeting_calls' %}" class="nav-link">Meeting Call</a></li>
+                    <li class="nav-item {% active 'contact' %} "><a href="{% url 'contact' %}" class="nav-link">Contacts</a></li>
                 </ul>
             </div>
 
-            <!-- Action Buttons -->
             <div class="nav-actions">
-            {% comment %} <div class="search-wrapper" id="autocomplete">
-                <input
-                    type="text"
-                    id="search-input"
-                    class="search-input"
-                    name="search"
-                    list="global-search-list"
-                    placeholder="What are you looking for?"
-                >
-                <datalist id="global-search-list">
-                    {% for name, url in global_search_items %}
-                        <option value="{{ name }}" data-url="{{ url }}">
-                    {% endfor %}
-                </datalist>
-
-                <button class="search-btn"><i class="fas fa-search"></i></button>
-            </div> {% endcomment %}
-
-            <button class="menu-toggle" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
-
+                <button class="menu-toggle" aria-label="Toggle Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </nav>
 </header>
 
 <script>
-const searchWrapper = document.querySelector('.search-wrapper');
-const searchBtn = document.querySelector('.search-btn');
-
-searchBtn.addEventListener('click', () => {
-    searchWrapper.classList.toggle('active');
-    if(searchWrapper.classList.contains('active')){
-        searchWrapper.querySelector('.search-input').focus();
-    }
-
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('search-input');
-    const options = document.querySelectorAll('#global-search-list option');
-
-    input.addEventListener('change', function() {
-        const val = this.value;  // user input
-        let url = null;
-
-        // Find the option with the same value
-        options.forEach(option => {
-            if(option.value === val) {
-                url = option.getAttribute('data-url');
-            }
-        });
-
-        // Redirect to the URL if found
-        if(url) {
-            window.location.href = url;
+    // Logic to open/close the mobile drawer
+    const menuBtn = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    const menuIcon = menuBtn.querySelector('i');
+    
+    menuBtn.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+        
+        // Toggle icon between bars and X
+        if(navMenu.classList.contains('active')) {
+            menuIcon.classList.replace('fa-bars', 'fa-times');
+        } else {
+            menuIcon.classList.replace('fa-times', 'fa-bars');
         }
     });
-});
 
-
+    // Close drawer when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!navMenu.contains(e.target) && !menuBtn.contains(e.target) && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            menuIcon.classList.replace('fa-times', 'fa-bars');
+        }
+    });
 </script>
-
-
-

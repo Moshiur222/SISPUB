@@ -1,0 +1,421 @@
+<!-- registration.html (template) -->
+{% extends "home/base/base.html" %}
+{% load static %}
+{% block title %}Register{% endblock %}
+{% block main %}
+<style>
+    /* Registration page wrapper with background image */
+.reg-wrapper {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    
+    /* Background image */
+    background: url("{% static 'home/images/banner4.png' %}") no-repeat center center;
+    background-size: cover;
+    position: relative;
+}
+
+/* Dark overlay for contrast */
+.reg-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+
+/* Registration card */
+.reg-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 500px;
+    position: relative; /* Keep card above overlay */
+    z-index: 1;
+}
+
+/* Card text */
+.reg-card h2 {
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
+    font-weight: 700;
+}
+
+.reg-card p {
+    text-align: center;
+    color: #777;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+/* Form styles */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 0.85rem; font-weight: 600; }
+.form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; }
+.form-group input:focus { border-color: #28a745; outline: none; }
+
+.reg-btn { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
+.reg-btn:hover { background-color: #218838; }
+
+.reg-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.reg-btn:disabled:hover {
+    background-color: #6c757d;
+}
+
+.footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; }
+.error-text { color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none; }
+.success-text { color: #28a745; font-size: 0.8rem; margin-top: 4px; display: none; }
+
+.timer { text-align: center; margin-top: 10px; font-size: 0.85rem; color: #555; }
+#resendBtn { padding: 5px 10px; margin-left: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; display: inline-block; }
+#resendBtn:disabled { display: none; }
+.change-number-btn { padding: 6px 12px; margin-top: 8px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 0.85rem; }
+.change-number-btn:hover { background-color: #0056b3; }
+
+/* Aggregator toggle button - Yes/No style */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.toggle-btn {
+    position: relative;
+    width: 80px;
+    height: 36px;
+    background-color: #e0e0e0;
+    border-radius: 40px;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.toggle-btn.yes {
+    background-color: #28a745;
+    border-color: #218838;
+}
+
+.toggle-btn.no {
+    background-color: #dc3545;
+    border-color: #c82333;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    width: 30px;
+    height: 28px;
+    background-color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.toggle-btn.yes .toggle-slider {
+    left: 46px;
+}
+
+.toggle-btn.no .toggle-slider {
+    left: 2px;
+}
+
+.toggle-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.toggle-btn.yes .toggle-text.yes-text {
+    left: 10px;
+    opacity: 1;
+}
+
+.toggle-btn.yes .toggle-text.no-text {
+    right: 10px;
+    opacity: 0;
+}
+
+.toggle-btn.no .toggle-text.no-text {
+    right: 10px;
+    opacity: 1;
+}
+
+.toggle-btn.no .toggle-text.yes-text {
+    left: 10px;
+    opacity: 0;
+}
+
+.toggle-label {
+    margin-left: 15px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reg-wrapper { padding: 20px; }
+    .form-row { grid-template-columns: 1fr; }
+}
+
+/* Loading indicator for AJAX checks */
+.checking-indicator {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Field validation states */
+.field-valid {
+    border-color: #28a745 !important;
+    background-color: #f0fff0;
+}
+
+.field-invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff0f0;
+}
+
+.field-checking {
+    border-color: #ffc107 !important;
+}
+
+/* Password strength indicator */
+.password-strength {
+    height: 5px;
+    margin-top: 5px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak {
+    background-color: #dc3545;
+    width: 33.33%;
+}
+
+.strength-medium {
+    background-color: #ffc107;
+    width: 66.66%;
+}
+
+.strength-strong {
+    background-color: #28a745;
+    width: 100%;
+}
+
+/* Tooltip for requirements */
+.requirements-tooltip {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 2px;
+    display: none;
+}
+
+.form-group input:focus + .requirements-tooltip {
+    display: block;
+}
+/* (keep all your existing CSS exactly as you had it) */
+.reg-wrapper { ... }  /* copy your full CSS here */
+/* ... */
+</style>
+
+<div class="reg-wrapper" style="margin-top: 100px">
+    <div class="reg-card">
+        <h2>{% if otp_sent %}Verify OTP{% else %}Create Account{% endif %}</h2>
+
+        {% if otp_sent %}
+            <p>Code sent to your phone <strong>{{ phone }}</strong></p>
+        {% else %}
+            <p>Join us today! It only takes a minute.</p>
+        {% endif %}
+
+        <!-- Aggregator Toggle -->
+        <div class="form-group">
+            <label>Will you be an aggregator?</label>
+            <div class="toggle-container">
+                <div class="toggle-btn" id="aggregatorToggle">
+                    <span class="toggle-text yes-text">YES</span>
+                    <span class="toggle-text no-text">NO</span>
+                    <div class="toggle-slider"></div>
+                </div>
+                <span class="toggle-label" id="toggleLabel"></span>
+            </div>
+            <input type="hidden" name="is_aggregator" id="aggregatorValue" value="no">
+        </div>
+
+        <form id="regForm" method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if messages %}
+                {% for message in messages %}
+                    <p style="text-align:center; color: {% if 'error' in message.tags %}#dc3545{% elif 'success' in message.tags %}#28a745{% else %}#333{% endif %}; font-weight: 600;">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            {% endif %}
+
+            {% if not otp_sent %}
+                <!-- Registration Form -->
+                <div class="form-group">
+                    <label>BRTC Licence No</label>
+                    <input type="text" name="brtc_licence_no" id="brtcLicenceInput" placeholder="Enter BRTC license number" disabled>
+                    <div class="requirements-tooltip">Required if you are an aggregator</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" name="company_name" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label>Person Name</label>
+                        <input type="text" name="name" required maxlength="50">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Designation</label>
+                        <input type="text" name="designation" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" name="address">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" name="phone" required placeholder="e.g. 01700000000 or +8801700000000" maxlength="15">
+                        <div class="requirements-tooltip">Bangladeshi number: 01XXXXXXXXX or +8801XXXXXXXXX</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" required placeholder="example@domain.com">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="pass1" name="password" required minlength="8">
+                        <div class="password-strength" id="passwordStrength"></div>
+                        <div class="requirements-tooltip">Min 8 characters with letters and numbers</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="pass2" name="confirm_password" required>
+                        <div id="matchError" class="error-text" style="display:none;">Passwords do not match!</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="reg-btn" id="submitBtn">Send OTP</button>
+
+            {% else %}
+                <!-- OTP Verification Form -->
+                <input type="hidden" name="phone" value="{{ phone }}">
+                <input type="text" name="otp_code" maxlength="6" required style="text-align:center; font-size:1.5rem; letter-spacing:5px; width:100%; margin-bottom:10px;" placeholder="000000">
+
+                <div style="text-align: center; margin-top: 10px;">
+                    <button type="submit" class="reg-btn" style="width: auto; display: inline-block;">Verify OTP</button>
+                </div>
+
+                <!-- Resend OTP form (non-AJAX) -->
+                <form method="POST" action="{% url 'resend_otp' %}" style="text-align: center; margin-top: 15px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="phone" value="{{ phone }}">
+                    <button type="submit" class="change-number-btn" style="background-color: #007bff;">Resend OTP</button>
+                </form>
+            {% endif %}
+
+            <div class="footer-link">
+                Already have an account? <a href="{% url 'login' %}">Login here</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Minimal JavaScript for password match and toggle UI (no AJAX)
+(function() {
+    // Password match
+    const pass1 = document.getElementById('pass1');
+    const pass2 = document.getElementById('pass2');
+    const matchError = document.getElementById('matchError');
+    if (pass1 && pass2) {
+        function checkMatch() {
+            if (pass2.value.length > 0 && pass1.value !== pass2.value) {
+                matchError.style.display = 'block';
+                pass2.style.borderColor = '#dc3545';
+            } else {
+                matchError.style.display = 'none';
+                pass2.style.borderColor = '';
+            }
+        }
+        pass1.addEventListener('input', checkMatch);
+        pass2.addEventListener('input', checkMatch);
+    }
+
+    // Aggregator toggle
+    const toggleBtn = document.getElementById('aggregatorToggle');
+    const aggregatorValue = document.getElementById('aggregatorValue');
+    const brtcInput = document.getElementById('brtcLicenceInput');
+    if (toggleBtn && aggregatorValue && brtcInput) {
+        // Initial state: NO
+        toggleBtn.classList.add('no');
+        aggregatorValue.value = 'no';
+        brtcInput.disabled = true;
+
+        toggleBtn.addEventListener('click', function() {
+            if (this.classList.contains('no')) {
+                // Switch to YES
+                this.classList.remove('no');
+                this.classList.add('yes');
+                aggregatorValue.value = 'yes';
+                brtcInput.disabled = false;
+                brtcInput.required = true;
+                brtcInput.focus();
+            } else {
+                // Switch to NO
+                this.classList.remove('yes');
+                this.classList.add('no');
+                aggregatorValue.value = 'no';
+                brtcInput.disabled = true;
+                brtcInput.required = false;
+                brtcInput.value = '';
+            }
+        });
+    }
+})();
+</script>
+{% endblock main %}

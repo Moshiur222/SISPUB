@@ -238,7 +238,7 @@ textarea {
       {% for message in messages %}
         <div class="alert alert-success fade show" role="alert">
           ✅ {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" style="background:none; border:none; cursor:pointer; font-size:20px;">&times;</button>
         </div>
       {% endfor %}
     </div>
@@ -249,51 +249,43 @@ textarea {
     <form action="{% url 'complain' %}" method="post" class="complain-form">
       {% csrf_token %}
       
-      <!-- Name & Email -->
-      <div class="form-group double-input">
+      <div class="double-input">
         <div class="input-wrapper">
-          <input type="text" name="name" required>
+          <input type="text" name="name" placeholder=" " required>
           <label>Name</label>
         </div>
         <div class="input-wrapper">
-          <input type="email" name="email" required>
+          <input type="email" name="email" placeholder=" " required>
           <label>Email Address</label>
         </div>
       </div>
-      <div class="form-group double-input">
-        <!-- Phone -->
-      <div class="form-group input-wrapper">
-        <input type="text" name="phone" required>
-        <label>Phone Number</label>
+
+      <div class="double-input">
+        <div class="input-wrapper">
+          <input type="text" name="phone" placeholder=" " required>
+          <label>Phone Number</label>
+        </div>
+        <div class="input-wrapper">
+          <select name="aggregator" required onchange="this.setAttribute('value', this.value);">
+            <option value="" disabled selected></option>
+            {% for aggregator in aggregators %}
+              <option value="{{ aggregator.id }}">{{ aggregator.name }}</option>
+            {% endfor %}
+          </select>
+          <label>Aggregator Name</label>
+        </div>
       </div>
 
-      <!-- Aggregator -->
-      <div class="form-group input-wrapper">
-        <select name="aggregator" required>
-          <option value="" disabled selected>Select Aggregator</option>
-          {% for aggregator in aggregators %}
-            <option value="{{ aggregator.id }}">{{ aggregator.name }}</option>
-          {% endfor %}
-        </select>
-        <label>Aggregator Name</label>
-      </div>
-      </div>
-
-      
-
-      <!-- Complaint -->
-      <div class="form-group input-wrapper">
-        <textarea name="issue" rows="5" required></textarea>
+      <div class="input-wrapper">
+        <textarea name="issue" rows="5" placeholder=" " required></textarea>
         <label>Complaint</label>
       </div>
 
-      <!-- Suggestion -->
-      <div class="form-group input-wrapper">
-        <textarea name="suggestion" rows="5"></textarea>
+      <div class="input-wrapper">
+        <textarea name="suggestion" rows="5" placeholder=" "></textarea>
         <label>Suggestion (Optional)</label>
       </div>
 
-      <!-- Submit Button -->
       <div class="form-group">
         <button type="submit" class="submit-btn">Submit Complaint</button>
       </div>
@@ -302,6 +294,7 @@ textarea {
 </div>
 
 <style>
+/* --- Base Styles --- */
 body {
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
@@ -312,9 +305,10 @@ body {
 .complain-wrapper {
   max-width: 900px;
   margin: 50px auto;
-  padding: 0 20px;
+  padding: 0 15px; /* Mobile Friendly Padding */
 }
 
+/* --- Alerts --- */
 .alerts-container .alert {
   display: flex;
   align-items: center;
@@ -329,132 +323,141 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
+/* --- Form Section --- */
 .complain-section {
   background: #ffffff;
-  padding: 40px 50px;
+  padding: 40px;
   border-radius: 20px;
   box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.complain-section:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 45px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
 }
 
 .complain-section h1 {
   text-align: center;
-  font-size: 32px;
-  margin-bottom: 30px;
+  font-size: 28px; /* Slightly smaller for better fit */
+  margin-bottom: 35px;
   color: #111827;
   font-weight: 600;
 }
 
-.complain-form .form-group {
-  margin-bottom: 20px;
-  position: relative;
+/* --- Double Input Layout (Flexible) --- */
+.double-input {
+  display: flex;
+  gap: 20px;
+  width: 100%;
 }
 
+.double-input > .input-wrapper {
+  flex: 1;
+}
+
+/* --- Responsive Layout (Mobile First) --- */
+@media (max-width: 768px) {
+  .double-input {
+    flex-direction: column; /* মোবাইলে একটির নিচে আরেকটি আসবে */
+    gap: 0;
+  }
+  
+  .complain-section {
+    padding: 25px 20px;
+  }
+
+  .complain-section h1 {
+    font-size: 24px;
+  }
+}
+
+/* --- Floating Labels & Inputs --- */
 .input-wrapper {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 25px; /* Increased spacing */
 }
+
 .input-wrapper input,
 .input-wrapper select,
 .input-wrapper textarea {
   width: 100%;
-  padding: 15px 15px 15px 15px;
+  padding: 15px;
   border-radius: 12px;
   border: 1px solid #ddd;
   font-size: 15px;
   background: #f9fafb;
+  box-sizing: border-box; /* Padding won't break width */
   transition: all 0.3s ease;
 }
+
 .input-wrapper input:focus,
 .input-wrapper select:focus,
 .input-wrapper textarea:focus {
   outline: none;
-  border-color: #22c55e;
-  box-shadow: 0 0 8px rgba(34,197,94,0.2);
+  border-color: #16a34a;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(22,163,74,0.1);
 }
 
-/* Floating labels */
 .input-wrapper label {
   position: absolute;
   left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 15px; /* Matches padding */
   background: #fff;
-  padding: 0 5px;
+  padding: 0 8px;
   color: #9ca3af;
   font-size: 14px;
   pointer-events: none;
   transition: all 0.3s ease;
 }
+
+/* Floating Label Animation */
 .input-wrapper input:focus + label,
 .input-wrapper input:not(:placeholder-shown) + label,
-.input-wrapper select:focus + label,
-.input-wrapper select:not([value=""]) + label,
 .input-wrapper textarea:focus + label,
-.input-wrapper textarea:not(:placeholder-shown) + label {
-  top: -10px;
-  left: 10px;
-  font-size: 15px;
-  color: #000;
+.input-wrapper textarea:not(:placeholder-shown) + label,
+.input-wrapper select:focus + label,
+.input-wrapper select:not([value=""]) + label {
+  top: -12px;
+  left: 12px;
+  font-size: 13px;
+  color: #16a34a;
+  font-weight: 600;
 }
 
-/* Double input fields side by side */
-.double-input {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.double-input > div {
-  flex: 1;
-}
-
-/* Submit button */
+/* --- Submit Button --- */
 .submit-btn {
   width: 100%;
-  padding: 15px;
+  padding: 16px;
   font-size: 16px;
   font-weight: 600;
   color: #fff;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  background: linear-gradient(90deg, #71e99d, #16a34a);
+  background: linear-gradient(90deg, #34d399, #16a34a);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
   transition: all 0.3s ease;
 }
+
 .submit-btn:hover {
-  background: linear-gradient(90deg, #b5d4c0, #15803d);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(22, 163, 74, 0.3);
+  filter: brightness(1.05);
 }
 
-/* Textareas */
-textarea {
-  resize: vertical;
-}
-
-/* Auto-hide alerts */
-.alert.fade {
-  opacity: 1;
-}
-.alert.fade.hide {
+.alert.hide {
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transform: translateY(-20px);
+  transition: all 0.5s ease;
 }
 </style>
 
 <script>
+
   setTimeout(function() {
     document.querySelectorAll('.alert').forEach(alert => {
       alert.classList.add('hide'); 
       setTimeout(() => alert.remove(), 500); 
     });
-  }, 2500);
+  }, 3000);
 </script>
-
-
 			
 			</div><div class="et_pb_column et_pb_column_1_3 et_pb_column_8  et_pb_css_mix_blend_mode_passthrough et-last-child et_pb_column_empty">
 				

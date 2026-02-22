@@ -15,6 +15,12 @@
     height: 0;
 }
 
+.et_pb_button_0_wrapper {
+    display: flex;
+    justify-content: flex-start; /* moves left */
+    padding-left: 5px; /* control spacing */
+}
+
 .responsive-video-wrapper iframe {
     position: absolute;
     top: 0;
@@ -81,10 +87,7 @@
 													<div
 														class="et_pb_column et_pb_column_1_4 et_pb_column_inner et_pb_column_inner_0 et_pb_column_empty">
 													</div>
-													<div
-														class="et_pb_column et_pb_column_1_4 et_pb_column_inner et_pb_column_inner_1 et-last-child">
-														<div class="et_pb_button_module_wrapper et_pb_button_0_wrapper et_pb_button_alignment_center et_pb_module et_had_animation"
-															style="">
+													<div class="et_pb_button_module_wrapper et_pb_button_0_wrapper et_pb_button_alignment_center et_pb_module et_had_animation">
 															<a style = " color: #fff; background: #2573f9 ; font-family: 'Open Sans', Helvetica, Arial, Lucida, sans-serif; font-size: 15px;text-decoration: none; width: 180px ;border: 20px solid #2573f9; border-radius: 30px; "
 																href="{% url 'contact' %}">Contact Us</a>
 														</div>
@@ -122,22 +125,22 @@
 															<div class="et_pb_blurb_description">
 																{% for hero_area in hero_areas %}
 																<p style="text-align: justify;" class="quill-content" id="quill-{{ forloop.counter }}">{{ hero_area.descriptions|safe }}</p>
-																{% endfor %}
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
 											<div
-												class="et_pb_column et_pb_column_2_5 et_pb_column_5  et_pb_css_mix_blend_mode_passthrough et-last-child">
-												<div class="et_pb_with_border et_pb_module et_pb_blurb et_pb_blurb_2 et_pb_text_align_left et_pb_blurb_position_top et_pb_bg_layout_light et_had_animation"
-													style="">
+												class="et_pb_column et_pb_column_2_5 et_pb_column_5 et_pb_css_mix_blend_mode_passthrough et-last-child">
+												
+												<div class="et_pb_with_border et_pb_module et_pb_blurb et_pb_blurb_2 et_pb_text_align_left et_pb_blurb_position_top et_pb_bg_layout_light"
+     												style="background-image: url('{{ hero_area.image.url }}'); background-size: cover; background-position: center;">
 													<div class="et_pb_blurb_content">
-
 														<div class="et_pb_blurb_container">
 														</div>
 													</div>
 												</div>
+												{% endfor %}
 											</div>
 										</div>
 									</div>

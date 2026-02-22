@@ -63,7 +63,8 @@ SMS_SENDER_ID = "01844532630"
 SMS_SEND_URL = "http://sms.iglweb.com/api/v1/send"
 SMS_BALANCE_URL = "http://sms.iglweb.com/api/v1/balance"
 
-
+TIME_ZONE = 'Asia/Dhaka'
+USE_TZ = True
 
 TEMPLATES = [
     {
