@@ -1,0 +1,110 @@
+{% extends "admin/base/base.html" %}
+{% block content %}
+<div class="card mt-4">
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <button class="btn btn-secondary btn-sm" onclick="window.history.back()">
+            &larr; Back
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="example" class="table table-striped table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>email_address</th>
+                        <th>NID</th>
+                        <th>phone</th>
+                        <th>is_aggregator</th>
+                        <th>brtc_licence_no</th>
+                        <th>address</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>{{ members.user.email }}</td>
+                        <td>{{ members.n_id }}</td>
+                        <td>{{ members.phone }}</td>
+                        <td>{{ members.is_aggregator }}</td>
+                        <td>{{ members.brtc_licence_no }}</td>
+                        <td>{{ members.address }}</td>
+                        <td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+<!-- ✅ jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<!-- ✅ DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- ✅ Buttons -->
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<!-- ✅ Export dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#example').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['copy', 'excel', 'pdf', 'print'],
+        pageLength: 10,
+        responsive: true
+    });
+});
+
+// ✅ Countdown Function
+function updateCountdowns() {
+    const elements = document.querySelectorAll('.countdown');
+
+    elements.forEach(el => {
+        const expireTime = new Date(el.getAttribute('data-expire')).getTime();
+        const now = new Date().getTime();
+
+        const distance = expireTime - now;
+
+        if (distance <= 0) {
+            el.innerHTML = "<span style='color:red; font-weight:bold;'>Expired</span>";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((distance / (1000 * 60)) % 60);
+        const seconds = Math.floor((distance / 1000) % 60);
+
+        el.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    });
+}
+
+// Run every second
+setInterval(updateCountdowns, 1000);
+updateCountdowns();
+</script>
+
+{% endblock content %}

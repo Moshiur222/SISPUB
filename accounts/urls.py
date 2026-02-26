@@ -41,6 +41,11 @@ urlpatterns = [
     path('career/', career, name = 'career' ),
     path('meeting_call/<int:id>/', meeting_call, name = 'meeting_call' ),
     path('meeting_calls/', meeting_calls, name = 'meeting_calls' ),
+    path('membership_list/', membership_list, name = 'membership_list' ),
+
+    path('search/', search, name = 'search' ),
+    path('profile/', profile, name = 'profile' ),
+    path('edit_profile/', edit_profile, name = 'edit_profile' ),
 
     #api
     path('check_email/',check_email, name='check_email'),
@@ -149,6 +154,9 @@ urlpatterns = [
     path('AdminMembersRulesUpdate/<int:id>/', AdminMembersRulesUpdate, name='AdminMembersRulesUpdate'),
     path('AdminMembersRulesDelete/<int:id>/', AdminMembersRulesDelete, name='AdminMembersRulesDelete'),
 
+    path('admin_membership_list/', admin_membership_list, name='admin_membership_list'),
+    path('admin_membership_list_details/<int:id>', admin_membership_list_details, name='admin_membership_list_details'),
+
     path('admin_photo_list/<int:id>/', admin_photo_list, name='admin_photo_list'),
     path('admin_add_photo/<int:id>', admin_add_photo, name='admin_add_photo'),
     path('admin_update_photo/<int:id>/', admin_update_photo, name='admin_update_photo'),
@@ -181,8 +189,12 @@ urlpatterns = [
     path('call_delete/<int:id>/', call_delete, name = 'call_delete'),
     path('call_update/<int:id>/', call_update, name = 'call_update'),
 
-    path('admin_member_registration_list/', admin_member_registration_list, name = 'admin_member_registration_list'),
+    path('admin_member_registration_list/', admin_member_registration_list, name = 'admin_member_registration_list'), 
+    path('admin_member_registration_list_details/<int:id>/', admin_member_registration_list_details, name = 'admin_member_registration_list_details'), 
     path('accept/<int:id>/', accept, name = 'accept'),
     path('reject/<int:id>/', reject, name = 'reject'),
     #admin_url end
+
+
+
 ]

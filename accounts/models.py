@@ -365,14 +365,18 @@ class TempMember(models.Model):
     PAYMENT_CHOICES = [
         ('pending', 'pending'),
     ]
-
     company_name = models.CharField(max_length=50)
     person_name = models.CharField(max_length=50)
     designation = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True, unique=True)
-    phone = models.CharField(max_length=15,validators=[bd_phone_validator], unique=True)
     is_aggregator = models.CharField(max_length=4,null=True, blank=True)
     brtc_licence_no = models.CharField(max_length=50, blank=True)
+    mobile = models.CharField(max_length=15,validators=[bd_phone_validator],blank=True,unique=True)
+    phone = models.CharField(max_length=20,blank=True, null=True)
+    n_id = models.CharField(max_length=22,null=True, unique=True)
+    appoinment_letter = models.FileField(upload_to="letter/", blank=True, null=True)
+    cv = models.FileField(upload_to="cv/", blank=True, null=True)
+    address = models.TextField(blank=True)
     address = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='pending')
     password = models.CharField(max_length=128)
@@ -385,13 +389,30 @@ class TempMember(models.Model):
 
 class Aggregator(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="aggregators")
+    member_id = models.CharField(max_length=10, unique=True, blank=True)
     name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=50)
+    image = models.ImageField( upload_to="Aggregator/", null=True)
     designation = models.CharField(max_length=50, null=True)
     is_aggregator = models.CharField(max_length=3, null=True)
-    phone = models.CharField(max_length=15,validators=[bd_phone_validator],blank=True,unique=True)
+    mobile = models.CharField(max_length=15,validators=[bd_phone_validator],blank=True,unique=True)
+    phone = models.CharField(max_length=20,blank=True, null=True)
     brtc_licence_no = models.CharField(max_length=50, blank=True)
+    n_id = models.CharField(max_length=22,null=True, unique=True)
+    appoinment_letter = models.FileField(upload_to="letter/", blank=True, null=True)
+    cv = models.FileField(upload_to="cv/", blank=True, null=True)
     address = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.member_id:
+            last_member = Aggregator.objects.order_by('id').last()
+            if last_member and last_member.member_id:
+                last_number = int(last_member.member_id.split('-')[1])
+                new_number = last_number + 1
+            else:
+                new_number = 445990  
+            self.member_id = f"SIS-{new_number}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} ({self.company_name})"

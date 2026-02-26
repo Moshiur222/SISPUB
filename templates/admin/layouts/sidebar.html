@@ -88,6 +88,11 @@
                         <span class="sub-item">Member Registration</span>
                       </a>
                     </li> {% endcomment %}
+                    <li class="{% admin_active 'admin_membership_list' %}">
+                      <a href="{% url 'admin_membership_list' %}">
+                        <span class="sub-item">Membership List</span>
+                      </a>
+                    </li> 
                     <li class="{% admin_active 'AdminMembersRules' %}">
                       <a href="{% url 'AdminMembersRules' %}">
                         <span class="sub-item">Membership Rules</span>

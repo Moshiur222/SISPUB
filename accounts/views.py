@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.core.paginator import Paginator
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from collections import defaultdict
 from django.contrib import messages
@@ -109,13 +110,19 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
-            login(request, user)
             if user.user_type == 1:
-                messages.success(request, "Welcome to Sispub")
+                login(request, user)
+                messages.success(request, "Welcome Admin")
                 return redirect("dashboard")
-            else:
-                messages.success(request, "Login Succesfully")                    
+
+            elif user.user_type == 2:
+                login(request, user)
+                messages.success(request, "Welcome User")
                 return redirect("home")
+
+            else:
+                messages.error(request, "Unauthorized user type")
+                return render(request, "home/layouts/login.html")
 
         else:
             messages.error(request, "Invalid email or password")
@@ -127,143 +134,161 @@ def logout_view(request):
     messages.success(request, "Logout")
     return redirect('login') 
 
+@login_required
+def profile(request):
+    """Display aggregator profile"""
+    # Get the aggregator profile for the logged-in user
+    aggregator = Aggregator.objects.filter(user=request.user).first()
+    
+    # Prepare context
+    context = {
+        'aggregator': aggregator,
+    }
+    
+    return render(request, "home/layouts/profile.html", context)
+
+
+@login_required
+def edit_profile(request):
+    """Edit aggregator profile"""
+    # Get the aggregator profile
+    aggregator = Aggregator.objects.filter(user=request.user).first()
+    
+    if not aggregator:
+        messages.warning(request, "Profile not found.")
+        return redirect('profile')
+    
+    context = {
+        'aggregator': aggregator,
+    }
+    
+    return render(request, "home/layouts/edit_profile.html", context)
+
 
 def registration_view(request):
-    # Handle OTP verification (POST with otp_code)
-    if request.method == "POST" and "otp_code" in request.POST:
-        phone = normalize_phone(request.POST.get("phone"))
+    # --- OTP VERIFY / RESEND ---
+    if request.method == "POST" and ("otp_code" in request.POST or "resend_otp" in request.POST):
+        mobile = normalize_phone(request.POST.get("mobile"))
+        reg_data = request.session.get('pending_registration')
+
+        if not reg_data or reg_data.get('mobile') != mobile:
+            messages.error(request, "Session expired or invalid request. Please register again.")
+            return redirect("registration")
+
+        # RESEND OTP
+        if "resend_otp" in request.POST:
+            new_otp = str(random.randint(100000, 999999))
+            reg_data['otp'] = hash_otp(new_otp)
+            reg_data['otp_created_at'] = timezone.now().isoformat()
+            request.session['pending_registration'] = reg_data
+
+            print(f"[RESEND OTP] Phone: {mobile}, OTP: {new_otp}")
+            return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
+
+        # VERIFY OTP
         user_otp = request.POST.get("otp_code")
+        otp_time = timezone.datetime.fromisoformat(reg_data.get('otp_created_at'))
 
-        try:
-            temp = TempMember.objects.get(phone=phone)
-        except TempMember.DoesNotExist:
-            messages.error(request, "Invalid request. Please register again.")
-            return redirect("registration")
+        if (timezone.now() - otp_time).total_seconds() > 60:
+            messages.error(request, "OTP expired. Please click 'Resend OTP'.")
+            return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
 
-        # Check expiry (5 minutes)
-        if not temp.otp_created_at or (timezone.now() - temp.otp_created_at).seconds > 300:
-            messages.error(request, "OTP expired. Please request a new one.")
-            return redirect("registration")
-
-        if hash_otp(user_otp) != temp.otp:
+        if hash_otp(user_otp) != reg_data.get('otp'):
             messages.error(request, "Invalid OTP.")
-            return render(request, "home/layouts/registration.html", {
-                "otp_sent": True,
-                "phone": phone
-            })
+            return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
 
-        # OTP correct – create actual user/aggregator
-        if temp.is_aggregator == "Yes":
-            # Create Aggregator (assuming Aggregator model has phone field)
-            aggregator = Aggregator.objects.create(
-                company_name=temp.company_name,
-                person_name=temp.person_name,
-                designation=temp.designation,
-                email=temp.email,
-                phone=temp.phone,
-                password=temp.password,
-                brtc_licence_no=temp.brtc_licence_no,
-                address=temp.address,
-                is_aggregator="Yes"
-            )
-        else:
-            # Create regular User (Django's User model doesn't have phone)
-            # Split name into first_name and last_name
-            name_parts = temp.person_name.split()
-            first_name = name_parts[0] if name_parts else ""
-            last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
-            
-            user = User.objects.create_user(
-                username=temp.email,  # Use email as username
-                email=temp.email,
-                password=temp.password,  # This will re-hash, but it's okay
-                first_name=first_name,
-                last_name=last_name
-            )
-            
-            # If you have a separate profile model for additional fields
-            # You might want to create a profile here with phone, company_name, etc.
-            # Profile.objects.create(user=user, phone=temp.phone, company_name=temp.company_name, address=temp.address)
-            
-        temp.delete()
-        messages.success(request, "Registration successful! Please log in.")
-        return redirect("login")
+        # Save files to disk first
+        cv_file = reg_data.get('cv_file')
+        app_file = reg_data.get('app_file')
 
-    # Handle initial registration form submission
+        TempMember.objects.create(
+            company_name=reg_data.get("company_name"),
+            person_name=reg_data.get("person_name"),
+            designation=reg_data.get("designation"),
+            email=reg_data.get("email"),
+            mobile=reg_data.get("mobile"),
+            phone=reg_data.get("phone"),
+            password=reg_data.get("password"),
+            brtc_licence_no=reg_data.get("brtc_licence_no"),
+            is_aggregator=reg_data.get("is_aggregator"),
+            n_id=reg_data.get("n_id"),
+            address=reg_data.get("address"),
+            cv=cv_file,
+            appoinment_letter=app_file,
+            otp=reg_data.get("otp"),
+            otp_created_at=otp_time,
+            status='pending'
+        )
+
+        del request.session['pending_registration']
+        messages.success(request, "Registration successful! Wait for approval.")
+        return redirect("registration")
+
+    # --- INITIAL FORM SUBMISSION ---
     elif request.method == "POST":
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
         if password != confirm_password:
-            messages.error(request, "Passwords do not match")
+            messages.error(request, "Passwords do not match.")
             return redirect("registration")
 
-        brtc_no = request.POST.get("brtc_licence_no", "").strip()
-        is_aggregator = "Yes" if brtc_no else "No"
-
-        if is_aggregator == "Yes" and not brtc_no:
-            messages.error(request, "BRTC License is required for aggregators.")
-            return redirect("registration")
-
-        phone = normalize_phone(request.POST.get("phone"))
+        mobile = normalize_phone(request.POST.get("mobile"))
         email = request.POST.get("email")
 
-        # Server-side duplicate checks
-        if TempMember.objects.filter(phone=phone).exists():
-            messages.error(request, "Phone number already in registration process.")
+        if TempMember.objects.filter(mobile=mobile).exists():
+            messages.error(request, "Phone already registered or in process.")
             return redirect("registration")
-        
-        # Check in Aggregator model (assuming it has phone field)
-        try:
-            if Aggregator.objects.filter(phone=phone).exists():
-                messages.error(request, "Phone number already registered as aggregator.")
-                return redirect("registration")
-        except:
-            pass  # Aggregator might not have phone field
-        
-        # Check email in User model (User has email field)
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "Email already registered.")
-            return redirect("registration")
-        
-        # Check email in Aggregator model
-        try:
-            if Aggregator.objects.filter(email=email).exists():
-                messages.error(request, "Email already registered as aggregator.")
-                return redirect("registration")
-        except:
-            pass
 
-        # Generate OTP
         otp = str(random.randint(100000, 999999))
-        hashed_password = make_password(password)
 
-        temp = TempMember.objects.create(
-            company_name=request.POST.get("company_name"),
-            person_name=request.POST.get("name"),
-            designation=request.POST.get("designation"),
-            email=email,
-            phone=phone,
-            password=hashed_password,
-            brtc_licence_no=brtc_no,
-            is_aggregator=is_aggregator,
-            address=request.POST.get("address"),
-            otp=hash_otp(otp),
-            otp_created_at=timezone.now(),
-            status='pending'
-        )
+        # Save uploaded files to disk
+        cv = request.FILES.get("cv")
+        app_letter = request.FILES.get("appoinment_letter")
 
-        if not send_sms(phone, f"Your OTP is {otp}"):
-            messages.error(request, "Failed to send OTP. Please try again.")
-            temp.delete()
-            return redirect("registration")
+        cv_path = default_storage.save(f"cv/{cv.name}", ContentFile(cv.read())) if cv else None
+        app_path = default_storage.save(f"letter/{app_letter.name}", ContentFile(app_letter.read())) if app_letter else None
 
-        return render(request, "home/layouts/registration.html", {
-            "otp_sent": True,
-            "phone": phone
-        })
+        # Save only paths & other text data in session
+        request.session['pending_registration'] = {
+            "company_name": request.POST.get("company_name"),
+            "person_name": request.POST.get("person_name"),
+            "designation": request.POST.get("designation"),
+            "n_id": request.POST.get("n_id"),
+            "cv_file": cv_path,
+            "app_file": app_path,
+            "email": email,
+            "mobile": mobile,
+            "phone":  request.POST.get("phone"),
+            "password": make_password(password),
+            "brtc_licence_no": request.POST.get("brtc_licence_no", "").strip(),
+            "is_aggregator": 'Yes' if request.POST.get("is_aggregator") == 'yes' else 'No',
+            "address": request.POST.get("address"),
+            "otp": hash_otp(otp),
+            "otp_created_at": timezone.now().isoformat()
+        }
 
-    # GET request
-    return render(request, "home/layouts/registration.html", {"otp_sent": False})    
+        print(f"[NEW OTP] mobile: {mobile}, OTP: {otp}")
+        return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
+
+    return render(request, "home/layouts/registration.html", {"otp_sent": False})
+
+def search(request):
+    member_id = request.GET.get('member_id')
+    member = None
+    if member_id:
+        try:
+            member = Aggregator.objects.get(member_id=member_id)
+        except Aggregator.DoesNotExist:
+            member = None
+
+    context = {
+        'member': member,
+        'member_id': member_id
+    }
+    return render(request, "home/layouts/search_result.html", context)
+
+
+
 
 
 def meeting_calls(request):
@@ -289,14 +314,14 @@ def get_aggregator_info(request):
 
         if aggregator:
             data = {
-                'is_aggregator': aggregator.is_aggregator,
+                'is_aggregator': "Yes" if aggregator.is_aggregator else "No",
                 'company_name': aggregator.company_name,
                 'name': aggregator.name,
                 'no_of_person': getattr(aggregator, 'no_of_person', 1),
                 'email': aggregator.user.email if aggregator.user else "",
             }
             return JsonResponse({'exists': True, 'data': data})
-        
+
         return JsonResponse({'exists': False, 'data': {}})
 
     except Exception as e:
@@ -306,24 +331,24 @@ def get_aggregator_info(request):
 def meeting_call(request, id):
     last_title = get_object_or_404(MeetingTitle, id=id)
 
-    # Initialize empty form data
+
     context_data = {
         'company_name': '', 'name': '', 'no_of_person': '',
         'phone': '', 'email': '', 'payment_method': '', 'transection_id': '',
     }
 
     if request.method == 'POST':
-        # Update context with submitted data to repopulate on error
+
         for field in context_data:
             context_data[field] = request.POST.get(field, '').strip()
 
-        # 1. Server-side Membership Check (Security)
+
         phone = context_data['phone']
         if not Aggregator.objects.filter(phone__icontains=phone[-10:]).exists():
             messages.error(request, "Registration failed: Phone number not found in member list.")
             return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **context_data})
 
-        # 2. Save logic
+
         try:
             no_of_person = int(context_data['no_of_person'])
             total_price = (last_title.amount or 0) * no_of_person
@@ -426,6 +451,16 @@ def photos(request):
         'albums': albums
     }
     return render(request, "home/layouts/gallery.html", context)
+
+
+def membership_list(request):
+    members = Aggregator.objects.all().order_by('company_name')
+    
+    context = {
+        "members": members,
+    }
+    
+    return render(request, "home/layouts/membership_lists.html", context)
 
 
 def events_view(request):
@@ -1437,7 +1472,23 @@ def AdminMembersRulesDelete(request, id):
         membership.delete()
         messages.success(request, "Membership Title Descriptions deleted successfully!")
         return redirect("AdminMembersRules")
+    
 
+@login_required
+def admin_membership_list(request):
+    members = Aggregator.objects.all().order_by('company_name')
+    comtext = {
+        "members" : members
+    }
+    return render(request, "admin/pages/admin_membership_list.html", comtext)
+
+@login_required
+def admin_membership_list_details(request, id):
+    members = get_object_or_404(Aggregator, id=id)
+    comtext = {
+        "members" : members
+    }
+    return render(request, "admin/pages/admin_membership_list_details.html", comtext)
 
 @login_required
 def AdminNews(request):
@@ -1851,32 +1902,44 @@ def admin_member_registration_list(request):
     }
     return render(request, "admin/pages/admin_member_registration_list.html", context)
 
+
+@login_required
+def admin_member_registration_list_details(request, id):
+    registrations = get_object_or_404(TempMember, id=id)
+    context = {
+        'registrations': registrations
+    }
+    return render(request, "admin/pages/admin_member_registration_list_details.html", context)
+
+
 @login_required
 def accept(request, id):
-    # 1. Fetch the temporary record
     temp_member = get_object_or_404(TempMember, id=id)
     
     try:
         with transaction.atomic():
             user = User.objects.create_user(
                 email=temp_member.email,
-                password=temp_member.password, 
                 user_type=2
             )
+            user.password = temp_member.password
+            user.save()
 
-            # 3. Create the Aggregator linked to that user
             Aggregator.objects.create(
                 user=user,
                 name=temp_member.person_name,
                 company_name=temp_member.company_name,
                 designation=temp_member.designation,
+                mobile=temp_member.mobile,
                 phone=temp_member.phone,
+                is_aggregator=temp_member.is_aggregator,
                 brtc_licence_no=temp_member.brtc_licence_no,
+                appoinment_letter=temp_member.appoinment_letter,
+                cv=temp_member.cv,
                 address=temp_member.address,
-                is_aggregator="Yes" if temp_member.is_aggregator else "No"
+                n_id = temp_member.n_id,
             )
 
-            # 4. Remove the temp record after successful migration
             temp_member.delete()
             
             messages.success(request, f"Member {user.email} has been approved.")
@@ -1916,15 +1979,21 @@ def contact_submit(request):
    
    
 def check_email(request):
-    email = request.GET.get('email')
-
+    email = request.GET.get('email', '').strip()
     exists = User.objects.filter(email=email).exists() or TempMember.objects.filter(email=email).exists()
-
     return JsonResponse({'exists': exists})
 
+
 def check_phone(request):
-    phone = request.GET.get('phone')
-
-    phone_exists = Aggregator.objects.filter(phone=phone).exists() or TempMember.objects.filter(phone=phone).exists()
-
+    mobile = normalize_phone(request.GET.get('mobile', ''))
+    phone_exists = Aggregator.objects.filter(mobile=mobile).exists() or TempMember.objects.filter(mobile=mobile).exists()
     return JsonResponse({'phone_exists': phone_exists})
+
+
+
+
+
+
+
+
+#profile

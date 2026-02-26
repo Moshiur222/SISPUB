@@ -1,0 +1,715 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<title>Edit Profile · Aggregator</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    /* RESET CONTEXT */
+    .modern-settings *,
+    .modern-settings *::before,
+    .modern-settings *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .modern-settings {
+        display: block;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        max-width: 1320px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 7rem 1rem;
+        color: #1e293b;
+    }
+
+    .modern-settings {
+        background: transparent;
+    }
+
+    /* Navigation pills */
+    .modern-settings .nav-elegant {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+        background: rgba(255,255,255,0.6) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        border-radius: 3rem !important;
+        padding: 0.5rem 0.75rem !important;
+        box-shadow: 0 6px 18px rgba(0,20,50,0.06) !important;
+        border: 1px solid rgba(255,255,255,0.7) !important;
+        margin-bottom: 2.5rem !important;
+        width: fit-content !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link {
+        padding: 0.6rem 1.8rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 550 !important;
+        border-radius: 3rem !important;
+        color: #4a5a6e !important;
+        text-decoration: none !important;
+        transition: 0.2s ease !important;
+        background: transparent !important;
+        border: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link i {
+        margin-right: 8px !important;
+        font-size: 1rem !important;
+        color: #5f6c80 !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link.active {
+        background: #1e2b3c !important;
+        color: white !important;
+        box-shadow: 0 8px 16px -6px rgba(20,40,70,0.2) !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link.active i {
+        color: white !important;
+    }
+
+    /* Card design */
+    .modern-settings .card-elegant {
+        background: rgba(255,255,255,0.85) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-radius: 2.5rem !important;
+        border: 1px solid rgba(255,255,255,0.9) !important;
+        box-shadow: 0 30px 60px -20px rgba(0,40,80,0.2), 0 6px 12px rgba(0,0,0,0.02) !important;
+        overflow: hidden !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .modern-settings .card-header-elegant {
+        background: transparent !important;
+        border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+        padding: 1.5rem 2rem 0.5rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 1.2rem !important;
+        color: #1c2c3f !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .modern-settings .card-header-elegant i {
+        background: #eef2f7 !important;
+        padding: 0.4rem !important;
+        border-radius: 50% !important;
+        margin-right: 0.7rem !important;
+        font-size: 1.1rem !important;
+        color: #2e4b6e !important;
+    }
+
+    .modern-settings .card-body-elegant {
+        padding: 1.8rem 2rem 2.2rem 2rem !important;
+    }
+
+    /* Form Elements */
+    .modern-settings .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .modern-settings .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2e4b6e;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .modern-settings .section-title i {
+        color: #5f7d9c;
+    }
+
+    /* Profile image upload area */
+    .modern-settings .profile-upload-container {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 1rem !important;
+        background: #f8fafd !important;
+        border-radius: 2rem !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .modern-settings .profile-preview {
+        width: 140px !important;
+        height: 140px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        border: 4px solid white !important;
+        box-shadow: 0 20px 30px -8px rgba(30,60,90,0.25) !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .modern-settings .file-input-wrapper {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 250px !important;
+    }
+
+    .modern-settings .file-input-label {
+        background: #ffffff !important;
+        border: 1px solid #d0ddee !important;
+        padding: 0.7rem 1.8rem !important;
+        border-radius: 50px !important;
+        font-size: 0.9rem !important;
+        font-weight: 550 !important;
+        color: #1e3a5f !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.6rem !important;
+        cursor: pointer !important;
+        transition: 0.2s !important;
+        box-shadow: 0 8px 14px -8px rgba(0,32,64,0.15) !important;
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .modern-settings .file-input-label i {
+        font-size: 1rem !important;
+        color: #286aa6 !important;
+    }
+
+    .modern-settings .file-input-label:hover {
+        background: #f5f9ff !important;
+        border-color: #9bb5d4 !important;
+        transform: translateY(-2px) !important;
+    }
+
+    .modern-settings input[type="file"] {
+        display: none !important;
+    }
+
+    /* Input floating style */
+    .modern-settings .input-floating {
+        position: relative !important;
+        margin-bottom: 1.8rem !important;
+    }
+
+    .modern-settings .input-floating label {
+        position: absolute !important;
+        left: 1.2rem !important;
+        top: -0.55rem !important;
+        background: white !important;
+        padding: 0 0.4rem !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.4px !important;
+        color: #53718e !important;
+        border-radius: 12px !important;
+        z-index: 10 !important;
+    }
+
+    .modern-settings .input-floating .form-control-elegant {
+        width: 100% !important;
+        padding: 0.9rem 1.4rem !important;
+        font-size: 0.95rem !important;
+        border: 1.5px solid #e2eaf1 !important;
+        border-radius: 2rem !important;
+        background: white !important;
+        transition: 0.2s !important;
+        color: #1d2b3e !important;
+        font-weight: 450 !important;
+    }
+
+    .modern-settings .input-floating .form-control-elegant:focus {
+        border-color: #88a9ce !important;
+        outline: none !important;
+        box-shadow: 0 0 0 4px rgba(90, 146, 212, 0.1) !important;
+    }
+
+    .modern-settings .input-floating textarea.form-control-elegant {
+        min-height: 100px !important;
+        resize: vertical !important;
+    }
+
+    /* File upload cards for documents */
+    .modern-settings .document-upload-card {
+        background: #f8fafd !important;
+        border-radius: 1.5rem !important;
+        padding: 1.2rem !important;
+        border: 1.5px dashed #cbd5e1 !important;
+        transition: 0.2s !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .modern-settings .document-upload-card:hover {
+        border-color: #88a9ce !important;
+        background: #f0f5fc !important;
+    }
+
+    .modern-settings .document-info {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .modern-settings .document-icon {
+        width: 40px !important;
+        height: 40px !important;
+        background: white !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #2e4b6e !important;
+        font-size: 1.2rem !important;
+    }
+
+    .modern-settings .document-details {
+        flex: 1 !important;
+    }
+
+    .modern-settings .document-name {
+        font-weight: 600 !important;
+        color: #1e2b3c !important;
+        margin-bottom: 0.2rem !important;
+    }
+
+    .modern-settings .document-meta {
+        font-size: 0.75rem !important;
+        color: #6b7c93 !important;
+    }
+
+    .modern-settings .current-file {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.3rem !important;
+        background: white !important;
+        padding: 0.3rem 1rem !important;
+        border-radius: 2rem !important;
+        font-size: 0.8rem !important;
+        color: #2e4b6e !important;
+        text-decoration: none !important;
+        border: 1px solid #d0ddee !important;
+    }
+
+    .modern-settings .current-file:hover {
+        background: #eef2f7 !important;
+    }
+
+    /* Row and column */
+    .modern-settings .row-elegant {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 1.2rem !important;
+        margin-bottom: 0.8rem !important;
+    }
+
+    .modern-settings .col-elegant {
+        flex: 1 1 calc(50% - 0.6rem) !important;
+        min-width: 250px !important;
+    }
+
+    /* Buttons */
+    .modern-settings .btn-glossy {
+        background: linear-gradient(115deg, #1f344b, #16304b) !important;
+        border: none !important;
+        padding: 0.8rem 2.2rem !important;
+        border-radius: 3rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        font-size: 0.95rem !important;
+        box-shadow: 0 15px 25px -12px #122b44 !important;
+        transition: 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+    }
+
+    .modern-settings .btn-glossy:hover {
+        background: linear-gradient(115deg, #1f3c5c, #1a3455) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 24px 32px -14px #16324d !important;
+    }
+
+    .modern-settings .btn-outline {
+        background: transparent !important;
+        border: 1.5px solid #cbd5e1 !important;
+        padding: 0.8rem 2.2rem !important;
+        border-radius: 3rem !important;
+        font-weight: 600 !important;
+        color: #4a5a6e !important;
+        transition: 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+        text-decoration: none !important;
+    }
+
+    .modern-settings .btn-outline:hover {
+        background: #f5f9ff !important;
+        border-color: #88a9ce !important;
+        color: #1e2b3c !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Divider */
+    .modern-settings .divider-light {
+        margin: 1.5rem 0 !important;
+        height: 1px !important;
+        background: linear-gradient(to right, transparent, #d9e2ef, transparent) !important;
+    }
+
+    /* Wrapper */
+    .modern-settings-wrapper {
+        background: linear-gradient(145deg, #f0f4fa 0%, #f8fafd 100%);
+        padding: 3rem 1.5rem;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* Alert messages */
+    .modern-settings .alert-message {
+        background: #e8f4fd !important;
+        border-left: 4px solid #3498db !important;
+        padding: 1rem 1.5rem !important;
+        border-radius: 1rem !important;
+        margin-bottom: 2rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+    }
+
+    .modern-settings .alert-message i {
+        color: #3498db !important;
+        font-size: 1.2rem !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .modern-settings .col-elegant {
+            flex: 1 1 100% !important;
+        }
+        
+        .modern-settings .profile-preview {
+            width: 120px !important;
+            height: 120px !important;
+        }
+    }
+</style>
+{% endblock extra_css %}
+
+{% block main %}
+<div class="modern-settings-wrapper">
+    <div class="modern-settings">
+        <!-- Navigation Tabs -->
+        <div class="nav-elegant">
+            <a href="{% url 'profile' %}" class="nav-link">
+                <i class="fas fa-user-circle"></i> Account Details
+            </a>
+            <a href="{% url 'edit_profile' %}" class="nav-link active">
+                <i class="fas fa-edit"></i> Edit Profile
+            </a>
+        </div>
+
+        <!-- Alert Messages -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert-message">
+                <i class="fas fa-info-circle"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Edit Profile Form -->
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Main Content -->
+            <div class="row-elegant" style="gap: 2rem;">
+                <!-- Left Column - Profile Image Upload -->
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="card-elegant">
+                        <div class="card-header-elegant">
+                            <i class="fas fa-camera"></i> Profile Photo
+                        </div>
+                        <div class="card-body-elegant">
+                            <div class="profile-upload-container">
+                                <!-- Profile Image Preview -->
+                                <img class="profile-preview" 
+                                     src="{% if aggregator.image %}{{ aggregator.image.url }}{% else %}https://bootdey.com/img/Content/avatar/avatar1.png{% endif %}" 
+                                     alt="Profile Preview" 
+                                     id="profilePreview">
+                                
+                                <!-- File Input -->
+                                <div class="file-input-wrapper">
+                                    <label for="id_image" class="file-input-label">
+                                        <i class="fas fa-cloud-upload-alt"></i> Upload New Photo
+                                    </label>
+                                    <input type="file" id="id_image" name="image" accept="image/*" onchange="previewImage(this);">
+                                </div>
+                                <p style="font-size: 0.75rem; color: #6b7c93; margin-top: 0.8rem;">
+                                    <i class="fas fa-info-circle"></i> Square image recommended. Max size 5MB.
+                                </p>
+                            </div>
+
+                            <!-- Member ID Info -->
+                            <div style="background: #f0f5fb; border-radius: 1.5rem; padding: 1.2rem; text-align: center;">
+                                <div style="font-size: 0.8rem; color: #6b7c93; margin-bottom: 0.3rem;">Member ID</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #1e2b3c;">
+                                    {{ aggregator.member_id }}
+                                </div>
+                                <div style="font-size: 0.75rem; color: #8a9bb0; margin-top: 0.5rem;">
+                                    <i class="far fa-calendar-alt"></i> Joined: {{ aggregator.created_at|date:"F d, Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Edit Forms -->
+                <div style="flex: 2.2; min-width: 400px;">
+                    <!-- Personal Information Card -->
+                    <div class="card-elegant">
+                        <div class="card-header-elegant">
+                            <i class="fas fa-user"></i> Personal Information
+                        </div>
+                        <div class="card-body-elegant">
+                            <div class="form-section">
+                                <div class="row-elegant">
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_name">Full Name *</label>
+                                        <input class="form-control-elegant" 
+                                               type="text" 
+                                               id="id_name" 
+                                               name="name" 
+                                               value="{{ aggregator.name }}" 
+                                               placeholder="Enter your full name"
+                                               required>
+                                    </div>
+                                    
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_designation">Designation</label>
+                                        <input class="form-control-elegant" 
+                                               type="text" 
+                                               id="id_designation" 
+                                               name="designation" 
+                                               value="{{ aggregator.designation|default:'' }}" 
+                                               placeholder="e.g., Managing Director">
+                                    </div>
+                                </div>
+
+                                <div class="row-elegant">
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_company_name">Company Name *</label>
+                                        <input class="form-control-elegant" 
+                                               type="text" 
+                                               id="id_company_name" 
+                                               name="company_name" 
+                                               value="{{ aggregator.company_name }}" 
+                                               placeholder="Enter company name"
+                                               required>
+                                    </div>
+                                    
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_is_aggregator">Aggregator Status</label>
+                                        <select class="form-control-elegant" id="id_is_aggregator" name="is_aggregator">
+                                            <option value="YES" {% if aggregator.is_aggregator == 'YES' %}selected{% endif %}>Yes</option>
+                                            <option value="NO" {% if aggregator.is_aggregator == 'NO' %}selected{% endif %}>No</option>
+                                            <option value="PND" {% if aggregator.is_aggregator == 'PND' %}selected{% endif %}>Pending</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information Card -->
+                    <div class="card-elegant">
+                        <div class="card-header-elegant">
+                            <i class="fas fa-address-book"></i> Contact Information
+                        </div>
+                        <div class="card-body-elegant">
+                            <div class="form-section">
+                                <div class="row-elegant">
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_mobile">Mobile Number *</label>
+                                        <input class="form-control-elegant" 
+                                               type="tel" 
+                                               id="id_mobile" 
+                                               name="mobile" 
+                                               value="{{ aggregator.mobile }}" 
+                                               placeholder="017xxxxxxxx"
+                                               required>
+                                    </div>
+                                    
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_phone">Alternate Phone</label>
+                                        <input class="form-control-elegant" 
+                                               type="tel" 
+                                               id="id_phone" 
+                                               name="phone" 
+                                               value="{{ aggregator.phone|default:'' }}" 
+                                               placeholder="Optional">
+                                    </div>
+                                </div>
+
+                                <div class="input-floating">
+                                    <label for="id_email">Email Address</label>
+                                    <input class="form-control-elegant" 
+                                           type="email" 
+                                           id="id_email" 
+                                           name="email" 
+                                           value="{{ aggregator.user.email|default:'' }}" 
+                                           placeholder="name@example.com">
+                                </div>
+
+                                <div class="input-floating">
+                                    <label for="id_address">Full Address</label>
+                                    <textarea class="form-control-elegant" 
+                                              id="id_address" 
+                                              name="address" 
+                                              placeholder="Enter your complete address">{{ aggregator.address|default:'' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Identification Card -->
+                    <div class="card-elegant">
+                        <div class="card-header-elegant">
+                            <i class="fas fa-id-card"></i> Identification & Documents
+                        </div>
+                        <div class="card-body-elegant">
+                            <div class="form-section">
+                                <div class="row-elegant">
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_n_id">National ID (NID)</label>
+                                        <input class="form-control-elegant" 
+                                               type="text" 
+                                               id="id_n_id" 
+                                               name="n_id" 
+                                               value="{{ aggregator.n_id|default:'' }}" 
+                                               placeholder="Enter NID number">
+                                    </div>
+                                    
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_brtc_licence_no">BRTC Licence No</label>
+                                        <input class="form-control-elegant" 
+                                               type="text" 
+                                               id="id_brtc_licence_no" 
+                                               name="brtc_licence_no" 
+                                               value="{{ aggregator.brtc_licence_no|default:'' }}" 
+                                               placeholder="Enter licence number">
+                                    </div>
+                                </div>
+
+                                <!-- CV Upload -->
+                                <div class="document-upload-card">
+                                    <div class="document-info">
+                                        <div class="document-icon">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </div>
+                                        <div class="document-details">
+                                            <div class="document-name">CV / Resume</div>
+                                            <div class="document-meta">PDF, DOC, DOCX (Max 10MB)</div>
+                                        </div>
+                                        {% if aggregator.cv %}
+                                        <a href="{{ aggregator.cv.url }}" class="current-file" target="_blank">
+                                            <i class="fas fa-eye"></i> View Current
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="file-input-wrapper">
+                                        <label for="id_cv" class="file-input-label" style="background: #f0f5fb;">
+                                            <i class="fas fa-cloud-upload-alt"></i> 
+                                            {% if aggregator.cv %}Replace CV{% else %}Upload CV{% endif %}
+                                        </label>
+                                        <input type="file" id="id_cv" name="cv" accept=".pdf,.doc,.docx">
+                                    </div>
+                                </div>
+
+                                <!-- Appointment Letter Upload -->
+                                <div class="document-upload-card">
+                                    <div class="document-info">
+                                        <div class="document-icon">
+                                            <i class="fas fa-file-alt"></i>
+                                        </div>
+                                        <div class="document-details">
+                                            <div class="document-name">Appointment Letter</div>
+                                            <div class="document-meta">PDF, DOC, DOCX (Max 10MB)</div>
+                                        </div>
+                                        {% if aggregator.appoinment_letter %}
+                                        <a href="{{ aggregator.appoinment_letter.url }}" class="current-file" target="_blank">
+                                            <i class="fas fa-eye"></i> View Current
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="file-input-wrapper">
+                                        <label for="id_appoinment_letter" class="file-input-label" style="background: #f0f5fb;">
+                                            <i class="fas fa-cloud-upload-alt"></i> 
+                                            {% if aggregator.appoinment_letter %}Replace Letter{% else %}Upload Letter{% endif %}
+                                        </label>
+                                        <input type="file" id="id_appoinment_letter" name="appoinment_letter" accept=".pdf,.doc,.docx">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                        <a href="{% url 'profile' %}" class="btn-outline">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn-glossy">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Footer Note -->
+        <div style="margin-top: 3rem; text-align: right; font-size: 0.75rem; color: #7d8b9f;">
+            <i class="fas fa-lock" style="opacity: 0.6;"></i> Your information is securely stored
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Image Preview -->
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// File name display for document uploads
+document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const label = this.previousElementSibling;
+            if (label && label.classList.contains('file-input-label')) {
+                const fileName = this.files[0].name;
+                const shortName = fileName.length > 20 ? fileName.substr(0, 17) + '...' : fileName;
+                label.innerHTML = `<i class="fas fa-check-circle"></i> ${shortName}`;
+            }
+        }
+    });
+});
+</script>
+{% endblock main %}

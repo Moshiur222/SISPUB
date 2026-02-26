@@ -16,6 +16,23 @@
         border-radius: 5px;
         padding: 8px 12px;
     }
+
+    #preview-container {
+        width: 200px;
+        height: 300px;
+        border: 1px solid #ddd;
+        overflow: hidden;
+        border-radius: 4px;
+        margin-top: 10px;
+        background-color: #f8f9fa;
+    }
+
+    #image-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures image fills 200x300 without stretching */
+    }
+
 </style>
 {% endblock custom_css %}
 
@@ -89,14 +106,17 @@
 
             <!-- Image -->
             <div class="mb-3">
-                <label class="form-label">Image</label>
-                <input type="file" name="image" class="form-control" accept="image/*" id="image-input">
-                {% if meeting.image %}
-                    <img id="image-preview" src="{{ meeting.image.url }}" alt="Preview" style="max-width: 200px; margin-top:10px; display:block;">
-                {% else %}
-                    <img id="image-preview" src="" alt="Preview" style="max-width: 200px; margin-top:10px; display:none;">
-                {% endif %}
+            <label class="form-label">Image</label>
+            <input type="file" name="image" class="form-control" accept="image/*" id="image-input">
+            
+            <p id="size-error" style="color: #e67e22; font-size: 0.85rem; margin-top: 5px; display: block;">
+                <strong>Note:</strong> Photo size must be exactly 200x300 pixels.
+            </p>
+
+            <div id="preview-container" style="{% if meeting.image %}display:block;{% else %}display:none;{% endif %}">
+                <img id="image-preview" src="{% if meeting.image %}{{ meeting.image.url }}{% endif %}" alt="Preview">
             </div>
+        </div>
 
             <!-- Buttons -->
             <div class="d-flex justify-content-end gap-2">
@@ -181,6 +201,43 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('description-input').value = quill.root.innerHTML;
     };
 });
+
+// ✅ Strict 200x300 Validation & Preview
+document.getElementById('image-input').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    const input = event.target;
+    const preview = document.getElementById('image-preview');
+    const container = document.getElementById('preview-container');
+
+    if (file) {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = function() {
+            // Check for exact dimensions
+            if (this.width !== 200 || this.height !== 300) {
+                alert("Error: Image is " + this.width + "x" + this.height + "px. It must be exactly 200x300 pixels.");
+                
+                // Reset to previous state
+                input.value = ""; 
+                // If it's an update, show the old image again; if new, hide.
+                const originalUrl = "{{ meeting.image.url|default:'' }}";
+                if (originalUrl) {
+                    preview.src = originalUrl;
+                } else {
+                    container.style.display = 'none';
+                }
+            } else {
+                // Dimensions are correct
+                preview.src = objectUrl;
+                container.style.display = 'block';
+            }
+            URL.revokeObjectURL(objectUrl);
+        };
+        img.src = objectUrl;
+    }
+});
+
 </script>
 
 {% endblock content %}

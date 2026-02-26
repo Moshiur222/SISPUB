@@ -80,10 +80,15 @@
                 <input type="hidden" name="description" id="description-input">
             </div>
 
-            <div class="mb-3">
+           <div class="mb-3">
                 <label class="form-label">Image</label>
                 <input type="file" name="image" class="form-control" accept="image/*" id="image-input">
-                <img id="image-preview" src="" alt="Preview" style="max-width: 200px; margin-top:10px; display:none;">
+                <p id="size-error" style="color: #e67e22; font-size: 0.85rem; margin-top: 5px; display: block;">
+                    <strong>Note:</strong> Photo size must be exactly 200x300 pixels.
+                </p>
+                <div id="preview-container" style="margin-top:10px; display:none; width: 200px; height: 300px; border: 1px solid #ddd; overflow: hidden; border-radius: 4px;">
+                    <img id="image-preview" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
@@ -161,6 +166,56 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('description-input').value = quill.root.innerHTML;
     };
 });
+
+// Image Preview
+document.getElementById('image-input').addEventListener('change', function(event){
+    const file = event.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            const preview = document.getElementById('image-preview');
+            const container = document.getElementById('preview-container');
+            
+            preview.src = e.target.result;
+            container.style.display = 'block'; // Show the container
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+// ✅ Image Preview & Dimension Validation (Strict 200x300)
+document.getElementById('image-input').addEventListener('change', function(event){
+    const file = event.target.files[0];
+    const input = event.target;
+    const preview = document.getElementById('image-preview');
+    const container = document.getElementById('preview-container');
+
+    if(file){
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = function() {
+           
+            if (this.width !== 200 || this.height !== 300) {
+                alert("Invalid image dimensions! Please upload an image that is exactly 200x300 pixels.\n\nYour image: " + this.width + "x" + this.height);
+                
+                // Reset input and hide preview
+                input.value = ""; 
+                container.style.display = 'none';
+            } else {
+                // ✅ Correct size: Show preview
+                preview.src = objectUrl;
+                container.style.display = 'block';
+            }
+            // Free memory
+            URL.revokeObjectURL(objectUrl);
+        };
+
+        img.src = objectUrl;
+    }
+});
+
 </script>
+
 
 {% endblock content %}

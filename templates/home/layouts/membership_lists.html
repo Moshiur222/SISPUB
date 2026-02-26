@@ -1,0 +1,241 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* --- Header Section (Your Original Design) --- */
+.news-header {
+    text-align: center;
+    padding: 310px 20px 50px;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("{% static 'home/images/banner4.png' %}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    margin-bottom: 50px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.news-header h1 {
+    font-size: 3rem;
+    font-weight: 400;
+    margin-bottom: 15px;
+    color: #ffff
+}
+
+/* --- ADDED: Filter Bar Styling (Matching your design style) --- */
+.filter-bar {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.filter-btn {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 25px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: 0.3s;
+    color: #333;
+}
+
+.filter-btn.active {
+    background: #3498db;
+    color: #fff;
+    border-color: #3498db;
+}
+
+/* --- Grid Layout (Your Original Design) --- */
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 35px;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto 70px;
+}
+
+/* --- News Card (Your Original Design) --- */
+.news-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+}
+
+.news-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.news-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-bottom: 3px solid #3498db;
+}
+
+.news-title {
+    font-size: 1.4rem;
+    margin: 15px 20px 8px;
+    color: #000;
+    font-weight: 600;
+}
+
+.news-date {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin: 0 20px 15px;
+}
+
+/* --- No News (Your Original Design) --- */
+.no-news {
+    grid-column: 1 / -1;
+    border-radius: 8px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #fff;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.no-news h3 { color: #000; }
+
+/* --- Modal (Your Original Design) --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 30px;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+</style>
+{% endblock %}
+
+{% block main %}
+
+<div class="news-header">
+    <h1>Membership List</h1>
+</div>
+
+<div class="filter-bar">
+    <button class="filter-btn active" onclick="filterMembers('all', this)">All</button>
+    <button class="filter-btn" onclick="filterMembers('Yes', this)">Aggregator</button>
+    <button class="filter-btn" onclick="filterMembers('No', this)">No Aggregator</button>
+</div>
+
+<div class="news-grid" id="memberGrid">
+    {% for member in members %}
+        <div class="news-card" data-aggregator="{{ member.is_aggregator }}">
+            {% if member.image %}
+                <img src="" data-src="{{ member.image.url }}" class="news-image" alt="{{ member.company_name }}">
+            {% else %}
+                <img src="{% static 'home/images/PP.jpg' %}" class="news-image">
+            {% endif %}
+            <div class="news-title">{{ member.company_name }}</div>
+            <div class="news-date">
+                Name: {{ member.name }}<br>
+                <small>Designation: {{ member.designation }}</small>
+            </div>
+        </div>
+    {% empty %}
+        <div class="no-news">
+            <h3>No Members Found</h3>
+        </div>
+    {% endfor %}
+</div>
+
+<div id="news-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Filter Functionality
+function filterMembers(type, btn) {
+    // Update button colors
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Filter cards
+    const cards = document.querySelectorAll('.news-card');
+    cards.forEach(card => {
+        if (type === 'all') {
+            card.style.display = 'flex';
+        } else {
+            const isAggregator = card.getAttribute('data-aggregator');
+            if (isAggregator === type) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Lazy load (Your Original Logic)
+    const images = document.querySelectorAll('.news-image');
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                }
+                obs.unobserve(img);
+            }
+        });
+    });
+
+    images.forEach(img => observer.observe(img));
+
+    // Modal close (Your Original Logic)
+    const modal = document.getElementById('news-modal');
+    const closeBtn = document.querySelector('.modal-close');
+
+    if (closeBtn) {
+        closeBtn.onclick = () => modal.style.display = "none";
+    }
+
+    window.onclick = (e) => {
+        if(e.target === modal){
+            modal.style.display = "none";
+        }
+    };
+});
+</script>
+{% endblock %}

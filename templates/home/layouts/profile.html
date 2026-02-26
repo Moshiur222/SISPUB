@@ -1,0 +1,507 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<title>Aggregator Account Details · modern elegance</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    /* RESET CONTEXT */
+    .modern-settings *,
+    .modern-settings *::before,
+    .modern-settings *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .modern-settings {
+        display: block;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        max-width: 1320px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 7rem 1rem;
+        color: #1e293b;
+    }
+
+    .modern-settings {
+        background: transparent;
+    }
+
+    /* Navigation pills */
+    .modern-settings .nav-elegant {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+        background: rgba(255,255,255,0.6) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        border-radius: 3rem !important;
+        padding: 0.5rem 0.75rem !important;
+        box-shadow: 0 6px 18px rgba(0,20,50,0.06) !important;
+        border: 1px solid rgba(255,255,255,0.7) !important;
+        margin-bottom: 2.5rem !important;
+        width: fit-content !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link {
+        padding: 0.6rem 1.8rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 550 !important;
+        border-radius: 3rem !important;
+        color: #4a5a6e !important;
+        text-decoration: none !important;
+        transition: 0.2s ease !important;
+        background: transparent !important;
+        border: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link i {
+        margin-right: 8px !important;
+        font-size: 1rem !important;
+        color: #5f6c80 !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link.active {
+        background: #1e2b3c !important;
+        color: white !important;
+        box-shadow: 0 8px 16px -6px rgba(20,40,70,0.2) !important;
+    }
+
+    .modern-settings .nav-elegant .nav-link.active i {
+        color: white !important;
+    }
+
+    /* Card design */
+    .modern-settings .card-elegant {
+        background: rgba(255,255,255,0.85) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-radius: 2.5rem !important;
+        border: 1px solid rgba(255,255,255,0.9) !important;
+        box-shadow: 0 30px 60px -20px rgba(0,40,80,0.2), 0 6px 12px rgba(0,0,0,0.02) !important;
+        overflow: hidden !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .modern-settings .card-header-elegant {
+        background: transparent !important;
+        border-bottom: 1px solid rgba(0,0,0,0.03) !important;
+        padding: 1.5rem 2rem 0.5rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 1.2rem !important;
+        color: #1c2c3f !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .modern-settings .card-header-elegant i {
+        background: #eef2f7 !important;
+        padding: 0.4rem !important;
+        border-radius: 50% !important;
+        margin-right: 0.7rem !important;
+        font-size: 1.1rem !important;
+        color: #2e4b6e !important;
+    }
+
+    .modern-settings .card-body-elegant {
+        padding: 1.8rem 2rem 2.2rem 2rem !important;
+    }
+
+    /* Profile section */
+    .modern-settings .profile-image-large {
+        width: 180px !important;
+        height: 180px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        border: 5px solid white !important;
+        box-shadow: 0 25px 35px -12px rgba(30,60,90,0.3) !important;
+        margin: 0 auto 1.5rem auto !important;
+        display: block !important;
+    }
+
+    /* Info grid */
+    .modern-settings .info-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.8rem 2rem !important;
+    }
+
+    .modern-settings .info-item {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .modern-settings .info-label {
+        font-size: 0.75rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        color: #6b7c93 !important;
+        margin-bottom: 0.3rem !important;
+        font-weight: 600 !important;
+    }
+
+    .modern-settings .info-value {
+        font-size: 1rem !important;
+        color: #1e2b3c !important;
+        font-weight: 500 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+
+    .modern-settings .info-value i {
+        color: #5f7d9c !important;
+        font-size: 1rem !important;
+        width: 20px !important;
+    }
+
+    .modern-settings .badge-status {
+        padding: 0.3rem 1rem !important;
+        border-radius: 2rem !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.4rem !important;
+    }
+
+    .modern-settings .badge-success {
+        background: #e1f7e3 !important;
+        color: #0a6b2b !important;
+    }
+
+    .modern-settings .badge-warning {
+        background: #fff3d8 !important;
+        color: #9e5f00 !important;
+    }
+
+    .modern-settings .badge-danger {
+        background: #ffe8e8 !important;
+        color: #b32b2b !important;
+    }
+
+    /* Document links */
+    .modern-settings .doc-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 0.4rem 1rem !important;
+        background: #f0f5fb !important;
+        border-radius: 2rem !important;
+        text-decoration: none !important;
+        color: #2b4b77 !important;
+        font-size: 0.9rem !important;
+        transition: 0.2s !important;
+    }
+
+    .modern-settings .doc-link:hover {
+        background: #e2ebf5 !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Action buttons */
+    .modern-settings .btn-edit {
+        background: white !important;
+        border: 1px solid #d0ddee !important;
+        padding: 0.7rem 1.8rem !important;
+        border-radius: 3rem !important;
+        color: #2b4b77 !important;
+        font-weight: 600 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        text-decoration: none !important;
+        transition: 0.2s !important;
+    }
+
+    .modern-settings .btn-edit:hover {
+        background: #f5f9ff !important;
+        border-color: #9bb5d4 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 20px -10px rgba(30,60,90,0.2) !important;
+    }
+
+    .modern-settings .btn-glossy {
+        background: linear-gradient(115deg, #1f344b, #16304b) !important;
+        border: none !important;
+        padding: 0.8rem 2.2rem !important;
+        border-radius: 3rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        font-size: 0.95rem !important;
+        box-shadow: 0 15px 25px -12px #122b44 !important;
+        transition: 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+        text-decoration: none !important;
+    }
+
+    .modern-settings .btn-glossy:hover {
+        background: linear-gradient(115deg, #1f3c5c, #1a3455) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 24px 32px -14px #16324d !important;
+        color: white !important;
+    }
+
+    /* Divider */
+    .modern-settings .divider-light {
+        margin: 2rem 0 !important;
+        height: 1px !important;
+        background: linear-gradient(to right, transparent, #d9e2ef, transparent) !important;
+    }
+
+    /* Wrapper */
+    .modern-settings-wrapper {
+        background: linear-gradient(145deg, #f0f4fa 0%, #f8fafd 100%);
+        padding: 3rem 1.5rem;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .modern-settings .info-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1.2rem !important;
+        }
+        
+        .modern-settings .profile-image-large {
+            width: 140px !important;
+            height: 140px !important;
+        }
+    }
+</style>
+{% endblock extra_css %}
+
+{% block main %}
+<div class="modern-settings-wrapper">
+    <div class="modern-settings">
+        <!-- Navigation Tabs -->
+        <div class="nav-elegant">
+            <a href="#" class="nav-link active">
+                <i class="fas fa-user-circle"></i> Account Details
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row-elegant" style="display: flex; gap: 2rem; flex-wrap: wrap;">
+            <!-- Left Column - Profile Summary -->
+            <div style="flex: 1; min-width: 300px;">
+                <div class="card-elegant">
+                    <div class="card-body-elegant" style="text-align: center;">
+                        {% if aggregator.image %}
+                        <img class="profile-image-large" src="{{ aggregator.image.url }}" alt="{{ aggregator.name }}">
+                        {% else %}
+                        <img class="profile-image-large" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="Profile">
+                        {% endif %}
+                        
+                        <h2 style="font-size: 1.8rem; font-weight: 600; color: #1e2b3c; margin-bottom: 0.3rem;">
+                            {{ aggregator.name }}
+                        </h2>
+                        
+                        <p style="font-size: 1rem; color: #5f7d9c; margin-bottom: 0.5rem;">
+                            <i class="fas fa-briefcase"></i> {{ aggregator.designation|default:"Not specified" }}
+                        </p>
+                        
+                        <p style="font-size: 0.95rem; color: #4a5a6e; margin-bottom: 1.5rem;">
+                            <i class="fas fa-building"></i> {{ aggregator.company_name }}
+                        </p>
+                        
+                        <!-- Status Badge -->
+                        <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+                            {% if aggregator.is_aggregator == 'YES' %}
+                            <span class="badge-status badge-success">
+                                <i class="fas fa-check-circle"></i> Active Aggregator
+                            </span>
+                            {% elif aggregator.is_aggregator == 'PND' %}
+                            <span class="badge-status badge-warning">
+                                <i class="fas fa-clock"></i> Pending Approval
+                            </span>
+                            {% else %}
+                            <span class="badge-status badge-danger">
+                                <i class="fas fa-times-circle"></i> Inactive
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Member ID Card -->
+                        <div style="background: #f5f9ff; border-radius: 2rem; padding: 1.2rem; margin-bottom: 1.5rem;">
+                            <div style="font-size: 0.8rem; color: #6b7c93; margin-bottom: 0.3rem;">Member ID</div>
+                            <div style="font-size: 1.6rem; font-weight: 700; color: #1e2b3c; letter-spacing: 1px;">
+                                {{ aggregator.member_id }}
+                            </div>
+                            <div style="font-size: 0.75rem; color: #8a9bb0; margin-top: 0.3rem;">
+                                <i class="far fa-calendar-alt"></i> Joined: {{ aggregator.created_at|date:"F d, Y" }}
+                            </div>
+                        </div>
+                        
+                        <!-- Edit Button -->
+                        <a href="{% url 'edit_profile' %}" class="btn-edit" style="width: 100%; justify-content: center;">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - All Details -->
+            <div style="flex: 2.2; min-width: 400px;">
+                <!-- Personal Information Card -->
+                <div class="card-elegant">
+                    <div class="card-header-elegant">
+                        <i class="fas fa-user"></i> Personal Information
+                    </div>
+                    <div class="card-body-elegant">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Full Name</span>
+                                <span class="info-value">
+                                    <i class="fas fa-user"></i> {{ aggregator.name }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Designation</span>
+                                <span class="info-value">
+                                    <i class="fas fa-briefcase"></i> {{ aggregator.designation|default:"Not specified" }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Company Name</span>
+                                <span class="info-value">
+                                    <i class="fas fa-building"></i> {{ aggregator.company_name }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Member Since</span>
+                                <span class="info-value">
+                                    <i class="far fa-calendar-alt"></i> {{ aggregator.created_at|date:"F d, Y" }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Last Updated</span>
+                                <span class="info-value">
+                                    <i class="far fa-clock"></i> {{ aggregator.updated_at|date:"F d, Y" }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="info-value">
+                                    {% if aggregator.is_active %}
+                                    <i class="fas fa-circle" style="color: #22c55e; font-size: 0.6rem;"></i> Active
+                                    {% else %}
+                                    <i class="fas fa-circle" style="color: #ef4444; font-size: 0.6rem;"></i> Inactive
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information Card -->
+                <div class="card-elegant">
+                    <div class="card-header-elegant">
+                        <i class="fas fa-address-book"></i> Contact Information
+                    </div>
+                    <div class="card-body-elegant">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Mobile Number</span>
+                                <span class="info-value">
+                                    <i class="fas fa-mobile-alt"></i> {{ aggregator.mobile }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Alternate Phone</span>
+                                <span class="info-value">
+                                    <i class="fas fa-phone"></i> {{ aggregator.phone|default:"Not provided" }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Email Address</span>
+                                <span class="info-value">
+                                    <i class="far fa-envelope"></i> {{ aggregator.user.email|default:"Not provided" }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item" style="grid-column: span 2;">
+                                <span class="info-label">Full Address</span>
+                                <span class="info-value">
+                                    <i class="fas fa-map-marker-alt"></i> {{ aggregator.address|default:"No address provided" }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Identification Card -->
+                <div class="card-elegant">
+                    <div class="card-header-elegant">
+                        <i class="fas fa-id-card"></i> Identification & Documents
+                    </div>
+                    <div class="card-body-elegant">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">National ID (NID)</span>
+                                <span class="info-value">
+                                    <i class="fas fa-id-card"></i> {{ aggregator.n_id|default:"Not provided" }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">BRTC Licence No</span>
+                                <span class="info-value">
+                                    <i class="fas fa-certificate"></i> {{ aggregator.brtc_licence_no|default:"Not provided" }}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">CV/Resume</span>
+                                <span class="info-value">
+                                    {% if aggregator.cv %}
+                                    <a href="{{ aggregator.cv.url }}" class="doc-link" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> View Document
+                                    </a>
+                                    {% else %}
+                                    <span style="color: #94a3b8;"><i class="far fa-file"></i> Not uploaded</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="info-label">Appointment Letter</span>
+                                <span class="info-value">
+                                    {% if aggregator.appoinment_letter %}
+                                    <a href="{{ aggregator.appoinment_letter.url }}" class="doc-link" target="_blank">
+                                        <i class="fas fa-file-alt"></i> View Document
+                                    </a>
+                                    {% else %}
+                                    <span style="color: #94a3b8;"><i class="far fa-file"></i> Not uploaded</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Note -->
+        <div style="margin-top: 3rem; text-align: right; font-size: 0.75rem; color: #7d8b9f;">
+            <i class="far fa-clock"></i> Last updated: {{ aggregator.updated_at|date:"F d, Y - h:i A" }}
+        </div>
+    </div>
+</div>
+{% endblock main %}

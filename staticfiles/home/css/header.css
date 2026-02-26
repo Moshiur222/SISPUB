@@ -30,6 +30,11 @@ body {
     background-color: var(--light-color);
 }
 
+.sticky {
+    position: sticky;
+    top: 0;
+}
+
 .container {
     width: 100%;
     max-width: 1200px;
@@ -276,6 +281,7 @@ body {
     color: var(--dark-color);
     text-decoration: none;
     font-size: 14px;
+    height: 30px;
     transition: var(--transition);
 }
 

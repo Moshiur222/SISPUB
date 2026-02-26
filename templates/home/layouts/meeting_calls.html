@@ -131,7 +131,7 @@
     </div>
     <div class="history-grid">
         {% for meeting in previous_meetings %}
-        <a href="{% url 'meeting_call' meeting.id %}" class="history-card">
+        <a class="history-card">
             <div class="image-wrapper">
                 {% if meeting.image %}
                     <img src="{{ meeting.image.url }}" alt="{{ meeting.title }}">
