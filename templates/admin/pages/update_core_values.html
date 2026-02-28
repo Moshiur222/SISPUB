@@ -1,102 +1,724 @@
 {% extends "admin/base/base.html" %}
 
-{% block content %}
-
+{% block custom_css %}
+<!-- Quill CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<form method="post" enctype="multipart/form-data" class="mt-5">
-    {% csrf_token %}
+<style>
+  /* ==========================================================================
+     MINIMAL MODERN DESIGN SYSTEM - Clean & Professional
+     ========================================================================== */
+  :root {
+    /* Soft Color Palette */
+    --primary-50: #f8fafc;
+    --primary-100: #f1f5f9;
+    --primary-200: #e2e8f0;
+    --primary-300: #cbd5e1;
+    --primary-400: #94a3b8;
+    --primary-500: #64748b;
+    --primary-600: #475569;
+    --primary-700: #334155;
+    --primary-800: #1e293b;
+    --primary-900: #0f172a;
+    
+    /* Accent Colors - Soft Blue */
+    --accent-50: #eff6ff;
+    --accent-100: #dbeafe;
+    --accent-200: #bfdbfe;
+    --accent-300: #93c5fd;
+    --accent-400: #60a5fa;
+    --accent-500: #3b82f6;
+    --accent-600: #2563eb;
+    --accent-700: #1d4ed8;
+    
+    /* Success/Warning Colors */
+    --success-50: #f0fdf4;
+    --success-500: #22c55e;
+    --warning-50: #fffbeb;
+    --warning-500: #f59e0b;
+    
+    /* Shadows - Subtle */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.02);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.02);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.02);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.01);
+    
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    
+    /* Font */
+    --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
 
-    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
+  body {
+    font-family: var(--font-sans);
+    background: #f5f7fa;
+    color: var(--primary-800);
+    line-height: 1.5;
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Clean Card Design
+     ========================================================================== */
+  .clean-card {
+    max-width: 800px;
+    width: 100%;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+  }
+
+  /* ==========================================================================
+     Simple Header
+     ========================================================================== */
+  .clean-header {
+    padding: 2rem 2.5rem;
+    border-bottom: 1px solid #edf2f7;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-icon-box {
+    width: 48px;
+    height: 48px;
+    background: #f1f5f9;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-500);
+    font-size: 1.5rem;
+  }
+
+  .header-text h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-800);
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .header-text p {
+    font-size: 0.875rem;
+    color: var(--primary-500);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Minimal Alert
+     ========================================================================== */
+  .minimal-alert {
+    margin: 1.5rem 2.5rem 0;
+    padding: 1rem 1.5rem;
+    background: var(--success-50);
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .minimal-alert i {
+    color: var(--success-500);
+    font-size: 1.25rem;
+  }
+
+  .minimal-alert span {
+    flex: 1;
+    color: #166534;
+    font-size: 0.9375rem;
+  }
+
+  .minimal-alert button {
+    background: transparent;
+    border: none;
+    color: #86efac;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s;
+  }
+
+  .minimal-alert button:hover {
+    color: #166534;
+  }
+
+  /* ==========================================================================
+     Form Body
+     ========================================================================== */
+  .form-body {
+    padding: 2rem 2.5rem;
+  }
+
+  /* ==========================================================================
+     Form Groups
+     ========================================================================== */
+  .form-group {
+    margin-bottom: 2rem;
+  }
+
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--primary-600);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.01em;
+  }
+
+  .label-optional {
+    color: var(--primary-400);
+    font-weight: 400;
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* ==========================================================================
+     Input Fields - Clean Design
+     ========================================================================== */
+  .clean-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--primary-800);
+    background: #fafbfc;
+    border: 1px solid #edf2f7;
+    border-radius: var(--radius-lg);
+    transition: all 0.15s ease;
+  }
+
+  .clean-input:focus {
+    outline: none;
+    background: white;
+    border-color: var(--accent-300);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.05);
+  }
+
+  .clean-input::placeholder {
+    color: var(--primary-300);
+  }
+
+  /* ==========================================================================
+     Quill Editor - Clean Styling
+     ========================================================================== */
+  .editor-container {
+    background: #fafbfc;
+    border: 1px solid #edf2f7;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all 0.15s ease;
+  }
+
+  .editor-container:focus-within {
+    background: white;
+    border-color: var(--accent-300);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.05);
+  }
+
+  .ql-toolbar {
+    background: white;
+    border: none !important;
+    border-bottom: 1px solid #edf2f7 !important;
+    padding: 0.75rem !important;
+  }
+
+  .ql-container {
+    border: none !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.9375rem !important;
+    background: white;
+  }
+
+  .ql-editor {
+    min-height: 200px;
+    padding: 1rem !important;
+    color: var(--primary-700);
+  }
+
+  .ql-editor.ql-blank::before {
+    color: var(--primary-300);
+    font-style: normal;
+  }
+
+  .ql-toolbar button {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s;
+  }
+
+  .ql-toolbar button:hover {
+    background: #f1f5f9 !important;
+  }
+
+  /* ==========================================================================
+     Image Section - Minimal Design
+     ========================================================================== */
+  .image-container {
+    background: #fafbfc;
+    border: 1px solid #edf2f7;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+
+  .current-image-box {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #edf2f7;
+  }
+
+  .image-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  .image-meta h6 {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--primary-700);
+    margin-bottom: 0.25rem;
+  }
+
+  .image-meta p {
+    font-size: 0.8125rem;
+    color: var(--primary-400);
+    margin: 0;
+  }
+
+  /* File Upload - Minimal */
+  .file-upload-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .file-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: white;
+    border: 1px solid #edf2f7;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--primary-600);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .file-upload-btn:hover {
+    background: #f8fafc;
+    border-color: var(--accent-300);
+    color: var(--accent-600);
+  }
+
+  .file-upload-btn i {
+    color: var(--accent-500);
+  }
+
+  .file-upload-hint {
+    font-size: 0.8125rem;
+    color: var(--primary-400);
+  }
+
+  .hidden-input {
+    position: absolute;
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+  }
+
+  /* ==========================================================================
+     Form Footer - Simple
+     ========================================================================== */
+  .form-footer {
+    padding: 1.5rem 2.5rem;
+    background: #fafbfc;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  /* ==========================================================================
+     Buttons - Minimal
+     ========================================================================== */
+  .btn-minimal {
+    padding: 0.75rem 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border-radius: var(--radius-lg);
+    transition: all 0.15s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    font-family: var(--font-sans);
+  }
+
+  .btn-primary-minimal {
+    background: var(--accent-500);
+    color: white;
+  }
+
+  .btn-primary-minimal:hover {
+    background: var(--accent-600);
+  }
+
+  .btn-secondary-minimal {
+    background: white;
+    color: var(--primary-600);
+    border: 1px solid #edf2f7;
+  }
+
+  .btn-secondary-minimal:hover {
+    background: #f8fafc;
+    border-color: var(--primary-300);
+  }
+
+  /* Loading State */
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    top: 50%;
+    left: 50%;
+    margin-left: -0.625rem;
+    margin-top: -0.625rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================================================
+     Helper Text
+     ========================================================================== */
+  .field-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--primary-400);
+  }
+
+  .field-hint i {
+    color: var(--accent-400);
+    font-size: 0.875rem;
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 640px) {
+    .page-wrapper {
+      padding: 1rem;
+    }
+    
+    .clean-header {
+      padding: 1.5rem;
+    }
+    
+    .form-body {
+      padding: 1.5rem;
+    }
+    
+    .form-footer {
+      padding: 1.5rem;
+      flex-direction: column;
+    }
+    
+    .btn-minimal {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .current-image-box {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .file-upload-area {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="clean-card">
+        
+        <!-- Simple Header -->
+        <div class="clean-header">
+            <div class="header-content">
+                
+                <div class="header-text">
+                    <h2>Edit Core Value</h2>
+                    <p>Update your organization's core values</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Minimal Alerts -->
         {% if messages %}
             {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="minimal-alert">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ message }}</span>
+                <button type="button" data-bs-dismiss="alert">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
             {% endfor %}
         {% endif %}
 
-        <div class="card-header bg-warning text-dark text-center">
-            <h5 class="mb-0">Update Core Value</h5>
-        </div>
-
-        <div class="card-body">
-            <div class="row g-3">
-
-                <!-- Title -->
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">Title</label>
+        <!-- Form -->
+        <form method="post" enctype="multipart/form-data" id="updateForm">
+            {% csrf_token %}
+            
+            <div class="form-body">
+                
+                <!-- Title Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Value title
+                        <span class="label-optional">(required)</span>
+                    </label>
                     <input
                         name="title"
                         type="text"
-                        class="form-control rounded"
-                        placeholder="Enter Title"
+                        class="clean-input"
+                        placeholder="e.g., Innovation, Integrity, Excellence"
                         value="{{ core_value.title }}"
                         required
                     />
+                    <div class="field-hint">
+                        <i class="bi bi-info-circle"></i>
+                        Choose a clear, meaningful title
+                    </div>
                 </div>
 
-                <!-- Description -->
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">Description</label>
-                    <textarea
-                        id="description"
-                        name="descriptions"
-                        class="form-control rounded"
-                        rows="7"
-                        style="min-height:160px; display:none;"
-                    >{{ core_value.descriptions|safe }}</textarea>
-
-                    <div id="quill-editor" style="height: 220px;"></div>
+                <!-- Description Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Description
+                        <span class="label-optional">(optional)</span>
+                    </label>
+                    <div class="editor-container">
+                        <textarea
+                            id="description"
+                            name="descriptions"
+                            style="display:none;"
+                        >{{ core_value.descriptions|safe }}</textarea>
+                        <div id="quill-editor"></div>
+                    </div>
+                    <div class="field-hint">
+                        <i class="bi bi-pencil"></i>
+                        Describe what this value means to your organization
+                    </div>
                 </div>
 
-                <!-- Image -->
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">Image</label><br>
-                    {% if core_value.image %}
-                        <img src="{{ core_value.image.url }}" width="150" class="mb-2" alt="{{ core_value.title }}"><br>
-                    {% endif %}
-                    <input type="file" name="image" class="form-control">
-                </div>
+                <!-- Image Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Value image
+                        <span class="label-optional">(optional)</span>
+                    </label>
+                    
+                    <div class="image-container">
+                        {% if core_value.image %}
+                        <!-- Current Image Display -->
+                        <div class="current-image-box">
+                            <img 
+                                src="{{ core_value.image.url }}" 
+                                alt="{{ core_value.title }}"
+                                class="image-thumb"
+                            >
+                            <div class="image-meta">
+                                <h6>Current image</h6>
+                                <p>Upload a new image to replace this one</p>
+                            </div>
+                        </div>
+                        {% endif %}
 
+                        <!-- File Upload -->
+                        <div class="file-upload-area">
+                            <label for="imageUpload" class="file-upload-btn">
+                                <i class="bi bi-cloud-upload"></i>
+                                Choose file
+                            </label>
+                            <input 
+                                type="file" 
+                                name="image" 
+                                id="imageUpload"
+                                class="hidden-input"
+                                accept="image/*"
+                            >
+                            <span class="file-upload-hint" id="fileName">
+                                No file chosen
+                            </span>
+                        </div>
+                        
+                        <div class="field-hint" style="margin-top: 0.75rem;">
+                            <i class="bi bi-file-earmark-image"></i>
+                            SVG, PNG, JPG or GIF • Max 5MB • 500x500px recommended
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="card-footer d-flex justify-content-center gap-2">
-            <a href="{% url 'admin_core_values' %}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Update</button>
-        </div>
+            <!-- Form Footer -->
+            <div class="form-footer">
+                <a href="{% url 'admin_core_values' %}" class="btn-minimal btn-secondary-minimal">
+                    <i class="bi bi-x"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn-minimal btn-primary-minimal" id="submitBtn">
+                    <i class="bi bi-check"></i>
+                    Save Changes
+                </button>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
+<!-- Quill JS -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>
-    const textarea = document.getElementById("description");
+    (function() {
+        'use strict';
 
-    const quill = new Quill("#quill-editor", {
-        theme: "snow",
-        placeholder: "Enter Description...",
-        modules: {
-            toolbar: [
-                [{ header: [1, 2, 3, false] }],
-                ["bold", "italic", "underline"],
-                [{ list: "ordered" }, { list: "bullet" }],
-                ["link", "blockquote"],
-                ["clean"]
-            ]
+        // Initialize Quill Editor
+        const textarea = document.getElementById("description");
+        const quill = new Quill("#quill-editor", {
+            theme: "snow",
+            placeholder: "Write your description here...",
+            modules: {
+                toolbar: [
+                    [{ header: [2, 3, 4, false] }],
+                    ["bold", "italic", "underline"],
+                    [{ list: "ordered" }, { list: "bullet" }],
+                    ["link", "clean"]
+                ]
+            }
+        });
+
+        // Load existing description
+        if (textarea.value) {
+            quill.root.innerHTML = textarea.value;
         }
-    });
 
-    // Load existing description into Quill
-    quill.root.innerHTML = textarea.value;
+        // Form submission
+        const form = document.getElementById('updateForm');
+        const submitBtn = document.getElementById('submitBtn');
 
-    // Copy Quill content back to textarea on form submit
-    textarea.closest("form").addEventListener("submit", function () {
-        textarea.value = quill.root.innerHTML;
-    });
+        form.addEventListener('submit', function(e) {
+            textarea.value = quill.root.innerHTML;
+            submitBtn.classList.add('btn-loading');
+        });
+
+        // File input preview
+        const fileInput = document.getElementById('imageUpload');
+        const fileNameSpan = document.getElementById('fileName');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = this.files[0];
+                if (file) {
+                    // Validate file size
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        this.value = '';
+                        fileNameSpan.textContent = 'No file chosen';
+                        return;
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        alert('Please select a valid image file');
+                        this.value = '';
+                        fileNameSpan.textContent = 'No file chosen';
+                        return;
+                    }
+                    
+                    fileNameSpan.textContent = file.name;
+                } else {
+                    fileNameSpan.textContent = 'No file chosen';
+                }
+            });
+        }
+
+        // Auto-dismiss alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.minimal-alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.3s';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 4000);
+
+    })();
 </script>
-
 {% endblock content %}

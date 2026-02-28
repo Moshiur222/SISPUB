@@ -193,6 +193,10 @@ urlpatterns = [
     path('admin_member_registration_list_details/<int:id>/', admin_member_registration_list_details, name = 'admin_member_registration_list_details'), 
     path('accept/<int:id>/', accept, name = 'accept'),
     path('reject/<int:id>/', reject, name = 'reject'),
+
+    path('seo/', seo, name = 'seo'),
+    path('add_seo/', add_seo, name = 'add_seo'),
+    path('edit_seo/<int:id>/', edit_seo, name = 'edit_seo'),
     #admin_url end
 
 

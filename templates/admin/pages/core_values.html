@@ -1,45 +1,743 @@
 {% extends "admin/base/base.html" %}
 
+{% block custom_css %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ==========================================================================
+     DESIGN SYSTEM - Core Values Page
+     ========================================================================== */
+  :root {
+    --primary-50: #f0f5ff;
+    --primary-100: #e6edff;
+    --primary-200: #cddbfe;
+    --primary-300: #9ab5fb;
+    --primary-400: #6791f7;
+    --primary-500: #3469f0;
+    --primary-600: #1e4fd9;
+    --primary-700: #1a3fa8;
+    
+    --gray-50: #f9fafc;
+    --gray-100: #f1f4f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    
+    --success-500: #22c55e;
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+    
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
+    
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .core-values-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ==========================================================================
+     Page Header
+     ========================================================================== */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary-50), white);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.75rem;
+    border: 1px solid var(--primary-200);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-title h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .header-title p {
+    font-size: 0.9375rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .btn-refresh {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .btn-refresh:hover {
+    background: var(--gray-50);
+    color: var(--primary-600);
+    transform: rotate(180deg);
+  }
+
+  .btn-edit {
+    padding: 0.75rem 1.75rem;
+    background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+  }
+
+  .btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(245, 158, 11, 0.3);
+    color: white;
+  }
+
+  /* ==========================================================================
+     Stats Cards
+     ========================================================================== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-200);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-50);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.5rem;
+  }
+
+  .stat-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+    line-height: 1;
+  }
+
+  .stat-content p {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Main Card
+     ========================================================================== */
+  .values-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .card-header-modern {
+    padding: 1.5rem 2rem;
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .card-title i {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-50);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.25rem;
+  }
+
+  .card-title h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0;
+  }
+
+  .card-badge {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-badge i {
+    font-size: 0.875rem;
+  }
+
+  /* ==========================================================================
+     Table - Modern Design
+     ========================================================================== */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table-modern thead th {
+    background: var(--gray-50);
+    padding: 1rem 1.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+  }
+
+  .table-modern thead th:first-child {
+    border-top-left-radius: 12px;
+  }
+
+  .table-modern thead th:last-child {
+    border-top-right-radius: 12px;
+  }
+
+  .table-modern tbody tr {
+    transition: all 0.2s;
+  }
+
+  .table-modern tbody tr:hover {
+    background: var(--gray-50);
+  }
+
+  .table-modern tbody td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    color: var(--gray-700);
+    font-size: 0.9375rem;
+    vertical-align: middle;
+  }
+
+  /* Counter Column */
+  .counter-cell {
+    font-weight: 600;
+    color: var(--primary-600);
+    background: var(--primary-50);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Title Column */
+  .title-cell {
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+
+  /* Image Column */
+  .image-cell {
+    width: 100px;
+  }
+
+  .value-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+  }
+
+  .value-image:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+  }
+
+  .no-image {
+    width: 70px;
+    height: 70px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    font-size: 0.75rem;
+    text-align: center;
+    border: 1px dashed var(--gray-300);
+  }
+
+  /* Description Column */
+  .description-cell {
+    max-width: 300px;
+    color: var(--gray-600);
+    line-height: 1.6;
+  }
+
+  .description-cell p {
+    margin: 0;
+  }
+
+  /* Empty State */
+  .empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--gray-400);
+    font-size: 3rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    color: var(--gray-500);
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    background: var(--primary-600);
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .btn-add:hover {
+    background: var(--primary-700);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+    background: white;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-action:hover {
+    border-color: var(--primary-300);
+    background: var(--primary-50);
+    color: var(--primary-600);
+    transform: translateY(-2px);
+  }
+
+  .btn-action.delete:hover {
+    border-color: var(--error-300);
+    background: var(--error-50);
+    color: var(--error-600);
+  }
+
+  /* ==========================================================================
+     Footer
+     ========================================================================== */
+  .table-footer {
+    padding: 1.25rem 2rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+  }
+
+  .info-item i {
+    color: var(--primary-500);
+  }
+
+  .pagination {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .page-item {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .page-item.active {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: white;
+  }
+
+  .page-item:hover:not(.active) {
+    border-color: var(--primary-300);
+    color: var(--primary-600);
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .core-values-container {
+      padding: 1rem;
+    }
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card-header-modern {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .table-footer {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .footer-info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
 {% block content %}
-<div class="card mt-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Core Values</h5>
-        {% if core_values %}
-            <a href="{% url 'update_core_values' core_values.first.id %}" class="btn btn-sm btn-warning">Edit</a>
-        {% endif %}
+<div class="core-values-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <div class="header-icon">
+                <i class="bi bi-heart-fill"></i>
+            </div>
+            <div class="header-title">
+                <h1>Core Values</h1>
+                <p>Manage your organization's core values and principles</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-refresh" onclick="location.reload()" title="Refresh">
+                <i class="bi bi-arrow-repeat"></i>
+            </button>
+            {% if core_values %}
+                <a href="{% url 'update_core_values' core_values.first.id %}" class="btn-edit">
+                    <i class="bi bi-pencil-square"></i>
+                    Edit Values
+                </a>
+            {% endif %}
+        </div>
     </div>
 
-    <div class="card-body">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Image</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in core_values %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ c.title }}</td>
-                    <td>
-                        {% if c.image %}
-                            <img src="{{ c.image.url }}" width="80" alt="{{ c.title }}">
-                        {% else %}
-                            No Image
-                        {% endif %}
-                    </td>
-                    <td>{{ c.descriptions|truncatewords:20|safe }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center text-muted">No core values</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-heart"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ core_values|length }}</h3>
+                <p>Total Values</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-image"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ core_values_with_images|default:core_values|length }}</h3>
+                <p>With Images</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-file-text"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ core_values_with_descriptions|default:core_values|length }}</h3>
+                <p>With Descriptions</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-calendar"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{% now "M d, Y" %}</h3>
+                <p>Last Updated</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="values-card">
+        <div class="card-header-modern">
+            <div class="card-title">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <h2>Core Values List</h2>
+            </div>
+            <div class="card-badge">
+                <i class="bi bi-shield-check"></i>
+                <span>{{ core_values|length }} Active {{ core_values|pluralize:"Value,Values" }}</span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            {% if core_values %}
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Image</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in core_values %}
+                    <tr>
+                        <td>
+                            <div class="counter-cell">{{ forloop.counter }}</div>
+                        </td>
+                        <td>
+                            <span class="title-cell">{{ c.title }}</span>
+                        </td>
+                        <td class="image-cell">
+                            {% if c.image %}
+                                <img src="{{ c.image.url }}" class="value-image" alt="{{ c.title }}" title="{{ c.title }}">
+                            {% else %}
+                                <div class="no-image">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="description-cell">
+                                {% if c.descriptions %}
+                                    {{ c.descriptions|truncatewords:15|safe }}
+                                {% else %}
+                                    <span class="text-muted fst-italic">No description</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <h3>No Core Values Found</h3>
+                <p>Start by adding your organization's core values and principles.</p>
+                <a href="{% url 'add_core_values' %}" class="btn-add">
+                    <i class="bi bi-plus-lg"></i>
+                    Add Core Value
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if core_values %}
+        <!-- Table Footer -->
+        <div class="table-footer">
+            <div class="footer-info">
+                <div class="info-item">
+                    <i class="bi bi-grid"></i>
+                    <span>Showing {{ core_values|length }} entries</span>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Last updated {% now "g:i A" %}</span>
+                </div>
+            </div>
+            <div class="pagination">
+                <a href="#" class="page-item">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <a href="#" class="page-item active">1</a>
+                <a href="#" class="page-item">2</a>
+                <a href="#" class="page-item">3</a>
+                <a href="#" class="page-item">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

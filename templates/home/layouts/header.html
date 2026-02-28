@@ -281,9 +281,9 @@
                             {% comment %} <a href="{% url 'benefit_od_member' %}" class="dropdown-item {% active 'benefit_od_member' %}" style="margin-left: 20px; height: 30px">Benefit of Members</a>
                             <a href="{% url 'advisory_council' %}" class="dropdown-item {% active 'advisory_council' %}" style="margin-left: 20px; height: 30px">Advisory Council</a> {% endcomment %}
                             <a href="{% url 'membership_list' %}" class="dropdown-item {% active 'membership_list' %}" style="margin-left: 20px; height: 30px">Membership List</a>
-                            {% if user.is_authenticated %}
+                            {% comment %} {% if user.is_authenticated %}
                             <a href="{% url 'member_resistation' %}" class="dropdown-item {% active 'member_resistation' %}" style="margin-left: 20px; height: 30px">Membership Form</a>
-                            {% endif %}
+                            {% endif %} {% endcomment %}
                             <a href="{% url 'membership_rules' %}" class="dropdown-item {% active 'membership_rules' %}" style="margin-left: 20px; height: 30px">Membership Rules</a>
                         </div>
                     </li>

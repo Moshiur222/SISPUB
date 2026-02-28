@@ -519,15 +519,6 @@
                                                placeholder="Enter company name"
                                                required>
                                     </div>
-                                    
-                                    <div class="col-elegant input-floating">
-                                        <label for="id_is_aggregator">Aggregator Status</label>
-                                        <select class="form-control-elegant" id="id_is_aggregator" name="is_aggregator">
-                                            <option value="YES" {% if aggregator.is_aggregator == 'YES' %}selected{% endif %}>Yes</option>
-                                            <option value="NO" {% if aggregator.is_aggregator == 'NO' %}selected{% endif %}>No</option>
-                                            <option value="PND" {% if aggregator.is_aggregator == 'PND' %}selected{% endif %}>Pending</option>
-                                        </select>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -611,6 +602,15 @@
                                                value="{{ aggregator.brtc_licence_no|default:'' }}" 
                                                placeholder="Enter licence number">
                                     </div>
+                                    <div class="col-elegant input-floating">
+                                        <label for="id_brtc_licence_no">Tread Licence No</label>
+                                        <input class="form-control-elegant" 
+                                               type="text" 
+                                               id="id_brtc_licence_no" 
+                                               name="tread_licence_no" 
+                                               value="{{ aggregator.tread_licence_no|default:'' }}" 
+                                               placeholder="Enter licence number">
+                                    </div>
                                 </div>
 
                                 <!-- CV Upload -->
@@ -620,7 +620,7 @@
                                             <i class="fas fa-file-pdf"></i>
                                         </div>
                                         <div class="document-details">
-                                            <div class="document-name">CV / Resume</div>
+                                            <div class="document-name">CV</div>
                                             <div class="document-meta">PDF, DOC, DOCX (Max 10MB)</div>
                                         </div>
                                         {% if aggregator.cv %}

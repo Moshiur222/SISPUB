@@ -398,6 +398,7 @@ class Aggregator(models.Model):
     mobile = models.CharField(max_length=15,validators=[bd_phone_validator],blank=True,unique=True)
     phone = models.CharField(max_length=20,blank=True, null=True)
     brtc_licence_no = models.CharField(max_length=50, blank=True)
+    tread_licence_no = models.CharField(max_length=50, blank=True, null=True)
     n_id = models.CharField(max_length=22,null=True, unique=True)
     appoinment_letter = models.FileField(upload_to="letter/", blank=True, null=True)
     cv = models.FileField(upload_to="cv/", blank=True, null=True)
@@ -469,3 +470,17 @@ class MeetingCall(models.Model):
 
     def __str__(self):
         return f"{self.title.title} - {self.name}"
+    
+
+class Seo(models.Model):
+    page_name = models.CharField(max_length=100, unique=True)
+
+    meta_title = models.CharField(max_length=255)
+    meta_description = models.TextField()
+    meta_keywords = models.TextField(blank=True)
+
+    meta_image = models.ImageField(upload_to="seo/", blank=True, null=True)
+    meta_url = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return self.page_name

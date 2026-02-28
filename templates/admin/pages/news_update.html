@@ -1,91 +1,702 @@
 {% extends "admin/base/base.html" %}
 
 {% block custom_css %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <!-- Quill Editor CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <!-- Flatpickr Date Picker CSS -->
 <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+
+<style>
+  /* ==========================================================================
+     CLEAN PROFESSIONAL DESIGN - Update News
+     ========================================================================== */
+  :root {
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+    --success-50: #ecfdf5;
+    --success-500: #10b981;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Form Card
+     ========================================================================== */
+  .form-card {
+    max-width: 700px;
+    width: 100%;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+
+  /* ==========================================================================
+     Header with Gradient
+     ========================================================================== */
+  .form-header {
+    background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-icon {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--warning-600);
+    font-size: 1.5rem;
+  }
+
+  .header-text h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.25rem;
+  }
+
+  .header-text p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Alert
+     ========================================================================== */
+  .alert-modern {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--success-50);
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .alert-modern i {
+    color: var(--success-500);
+    font-size: 1.25rem;
+  }
+
+  .alert-modern span {
+    flex: 1;
+    color: #166534;
+    font-size: 0.9375rem;
+  }
+
+  .alert-modern button {
+    background: transparent;
+    border: none;
+    color: #86efac;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .alert-modern button:hover {
+    background: rgba(255,255,255,0.5);
+    color: #166534;
+  }
+
+  /* ==========================================================================
+     Form Body
+     ========================================================================== */
+  .form-body {
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Form Groups
+     ========================================================================== */
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .required-star {
+    color: var(--warning-500);
+    margin-left: 0.25rem;
+  }
+
+  .label-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--primary-50);
+    border-radius: 6px;
+    color: var(--primary-600);
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* ==========================================================================
+     Input Fields
+     ========================================================================== */
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .form-input:hover {
+    border-color: var(--gray-400);
+  }
+
+  .form-input::placeholder {
+    color: var(--gray-400);
+  }
+
+  /* ==========================================================================
+     File Input
+     ========================================================================== */
+  .file-input-wrapper {
+    position: relative;
+  }
+
+  .file-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .file-input:hover {
+    border-color: var(--primary-500);
+    background: var(--gray-50);
+  }
+
+  .file-input::-webkit-file-upload-button {
+    background: var(--primary-600);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .file-input::-webkit-file-upload-button:hover {
+    background: var(--primary-700);
+  }
+
+  /* Current Image */
+  .current-image {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .current-image img {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    border: 2px solid white;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .current-image-info h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+  }
+
+  .current-image-info p {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Flatpickr Customization
+     ========================================================================== */
+  .flatpickr-input {
+    background: white;
+    cursor: pointer;
+  }
+
+  .flatpickr-calendar {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    font-family: var(--font-sans);
+  }
+
+  .flatpickr-day.selected {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+  }
+
+  .flatpickr-day.selected:hover {
+    background: var(--primary-700);
+  }
+
+  .flatpickr-day.today {
+    border-color: var(--primary-500);
+  }
+
+  .flatpickr-day:hover {
+    background: var(--primary-50);
+  }
+
+  .flatpickr-months .flatpickr-month {
+    background: var(--primary-600);
+    color: white;
+    fill: white;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+
+  .flatpickr-current-month .flatpickr-monthDropdown-months {
+    background: var(--primary-600);
+    color: white;
+  }
+
+  .flatpickr-weekdays {
+    background: var(--gray-50);
+  }
+
+  .flatpickr-weekday {
+    color: var(--primary-700);
+    font-weight: 600;
+  }
+
+  /* ==========================================================================
+     Quill Editor Customization
+     ========================================================================== */
+  .quill-wrapper {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.2s;
+    background: white;
+  }
+
+  .quill-wrapper:focus-within {
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .ql-toolbar {
+    background: var(--gray-50);
+    border: none !important;
+    border-bottom: 1px solid var(--gray-300) !important;
+    padding: 0.5rem !important;
+  }
+
+  .ql-container {
+    border: none !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.9375rem !important;
+  }
+
+  .ql-editor {
+    min-height: 200px;
+    padding: 1rem !important;
+  }
+
+  .ql-editor.ql-blank::before {
+    color: var(--gray-400);
+    font-style: normal;
+  }
+
+  .ql-toolbar button {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+  }
+
+  .ql-toolbar button:hover {
+    background: var(--primary-100) !important;
+  }
+
+  .ql-toolbar button.ql-active {
+    background: var(--primary-500) !important;
+    color: white !important;
+  }
+
+  /* ==========================================================================
+     Helper Text
+     ========================================================================== */
+  .helper-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+  }
+
+  .helper-text i {
+    color: var(--primary-500);
+  }
+
+  /* ==========================================================================
+     Form Footer
+     ========================================================================== */
+  .form-footer {
+    padding: 1.5rem 2rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  /* ==========================================================================
+     Buttons
+     ========================================================================== */
+  .btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    font-family: var(--font-sans);
+  }
+
+  .btn-primary {
+    background: var(--primary-600);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-700);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+  }
+
+  .btn-secondary:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+  }
+
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    top: 50%;
+    left: 50%;
+    margin-left: -0.5rem;
+    margin-top: -0.5rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 640px) {
+    .page-wrapper {
+      padding: 1rem;
+    }
+
+    .form-header {
+      padding: 1.25rem;
+    }
+
+    .form-body {
+      padding: 1.25rem;
+    }
+
+    .form-footer {
+      padding: 1.25rem;
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+
+    .current-image {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
 {% endblock custom_css %}
 
 {% block content %}
-<div class="card mt-5 shadow-sm mx-auto" style="max-width: 700px;">
-    <div class="card-header bg-warning text-dark text-center">
-        <h5 class="mb-0">Update News</h5>
-    </div>
-
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="card-body">
-
-            {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>{{ message }}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            {% endif %}
-
-            <!-- News Title -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">News Title</label>
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control rounded"
-                    placeholder="Enter news title"
-                    value="{{ newses.title }}"
-                    required
-                />
+<div class="page-wrapper">
+    <div class="form-card">
+        
+        <!-- Header with Gradient -->
+        <div class="form-header">
+            <div class="header-icon">
+                <i class="bi bi-pencil-square"></i>
             </div>
+            <div class="header-text">
+                <h2>Update News</h2>
+                <p>Edit news article information</p>
+            </div>
+        </div>
 
-            <!-- Upload Image -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">Upload Screenshot</label>
-                <input
-                    type="file"
-                    name="image"
-                    class="form-control"
-                    accept="image/*"
-                />
-                {% if newses.image %}
-                    <img src="{{ newses.image.url }}" class="img-fluid mt-2 rounded" style="max-height: 150px;">
+        <!-- Form -->
+        <form method="post" enctype="multipart/form-data" id="newsForm">
+            {% csrf_token %}
+            
+            <div class="form-body">
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert-modern">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>{{ message }}</span>
+                        <button type="button" data-bs-dismiss="alert">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
                 {% endif %}
-            </div>
 
-            <!-- Date Picker (NO DEFAULT DATE) -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">Date</label>
-                <input
-                    type="text"
-                    name="date"
-                    id="date-picker"
-                    class="form-control rounded"
-                    placeholder="Select date"
-                    required
-                />
-            </div>
-
-            <!-- Description -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">Description</label>
-
-                <!-- Hidden textarea -->
-                <textarea id="description" name="description" hidden></textarea>
-
-                <!-- Quill Editor -->
-                <div id="editor" style="height: 200px;">
-                    {{ newses.description|safe }}
+                <!-- News Title -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-type-h1"></i>
+                        </span>
+                        News Title
+                        <span class="required-star">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="title"
+                        class="form-input"
+                        placeholder="e.g., Company Anniversary Celebration"
+                        value="{{ newses.title }}"
+                        required
+                    />
+                    <div class="helper-text">
+                        <i class="bi bi-info-circle"></i>
+                        Enter a clear, descriptive title for the news
+                    </div>
                 </div>
+
+                <!-- Upload Image -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-image"></i>
+                        </span>
+                        Upload Screenshot
+                    </label>
+                    
+                    <input
+                        type="file"
+                        name="image"
+                        class="file-input"
+                        accept="image/*"
+                    />
+                    
+                    {% if newses.image %}
+                    <div class="current-image">
+                        <img src="{{ newses.image.url }}" alt="{{ newses.title }}">
+                        <div class="current-image-info">
+                            <h6>Current Image</h6>
+                            <p>Upload a new image to replace this one</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="helper-text">
+                        <i class="bi bi-info-circle"></i>
+                        PNG, JPG, GIF • Max 5MB • Recommended size: 1200x630px
+                    </div>
+                </div>
+
+                <!-- Date Picker -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-calendar"></i>
+                        </span>
+                        Publication Date
+                        <span class="required-star">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="date"
+                        id="date-picker"
+                        class="form-input flatpickr-input"
+                        placeholder="Select publication date"
+                        required
+                    />
+                    <div class="helper-text">
+                        <i class="bi bi-calendar"></i>
+                        Select the date for this news article
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-card-text"></i>
+                        </span>
+                        Description
+                    </label>
+
+                    <!-- Hidden textarea -->
+                    <textarea id="description" name="description" hidden></textarea>
+
+                    <!-- Quill Editor -->
+                    <div class="quill-wrapper">
+                        <div id="editor" style="height: 200px;">
+                            {{ newses.description|safe }}
+                        </div>
+                    </div>
+
+                    <div class="helper-text">
+                        <i class="bi bi-pencil"></i>
+                        Write the full news article content (optional)
+                    </div>
+                </div>
+
             </div>
 
-        </div>
-
-        <div class="card-footer d-flex justify-content-end gap-2">
-            <a href="{% url 'AdminNews' %}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Update</button>
-        </div>
-    </form>
+            <!-- Footer -->
+            <div class="form-footer">
+                <a href="{% url 'AdminNews' %}" class="btn btn-secondary">
+                    <i class="bi bi-x"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="bi bi-check"></i>
+                    Update News
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock content %}
 
@@ -96,22 +707,52 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-    // Initialize Quill
+    // Initialize Quill with full toolbar
     const quill = new Quill('#editor', {
-        theme: 'snow'
+        theme: 'snow',
+        placeholder: 'Write your news article content here...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['link', 'blockquote', 'code-block'],
+                ['clean']
+            ]
+        }
     });
 
-    // Copy Quill HTML into textarea on submit
-    document.querySelector("form").addEventListener("submit", function () {
-        document.getElementById("description").value = quill.root.innerHTML;
-    });
-
-    // Initialize Flatpickr (NO DEFAULT DATE)
+    // Initialize Flatpickr - NO DEFAULT DATE
     flatpickr("#date-picker", {
         dateFormat: "Y-m-d",
         altInput: true,
         altFormat: "F j, Y",
-        allowInput: true
+        allowInput: true,
+        disableMobile: true,
+        theme: "material_blue"
     });
+
+    // Form submission
+    const form = document.getElementById('newsForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', function(e) {
+        // Copy Quill content to hidden textarea
+        document.getElementById('description').value = quill.root.innerHTML;
+        
+        // Show loading state
+        submitBtn.classList.add('btn-loading');
+    });
+
+    // Auto-dismiss alerts
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert-modern');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.3s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        });
+    }, 5000);
 </script>
 {% endblock custom_js %}

@@ -1,100 +1,1235 @@
 {% extends "admin/base/base.html" %}
 
-{% block content %}
+{% block custom_css %}
 <!-- Quill CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts - Professional Font Stack -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<form method="post" enctype="multipart/form-data" class="mt-5">
-    {% csrf_token %}
+<style>
+  /* ==========================================================================
+     DESIGN SYSTEM - Professional Admin Interface
+     ========================================================================== */
+  :root {
+    /* Primary Colors - Modern Indigo matching company page */
+    --primary-50: #f0f5ff;
+    --primary-100: #e6edff;
+    --primary-200: #cddbfe;
+    --primary-300: #9ab5fb;
+    --primary-400: #6791f7;
+    --primary-500: #3469f0;
+    --primary-600: #1e4fd9;
+    --primary-700: #1a3fa8;
+    --primary-800: #142e7a;
+    --primary-900: #0d1d4c;
+    
+    /* Neutral Colors - Refined Grays */
+    --gray-50: #f9fafc;
+    --gray-100: #f1f4f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    
+    /* Semantic Colors */
+    --success-50: #f0fdf4;
+    --success-100: #dcfce7;
+    --success-500: #22c55e;
+    --success-600: #16a34a;
+    --success-700: #15803d;
+    
+    --warning-50: #fffbeb;
+    --warning-100: #fef3c7;
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+    
+    --error-50: #fef2f2;
+    --error-100: #fee2e2;
+    --error-500: #ef4444;
+    --error-600: #dc2626;
+    
+    /* Typography */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.02);
+    --shadow-focus: 0 0 0 4px var(--primary-100);
+    
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    
+    /* Transitions */
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  /* ==========================================================================
+     Base Styles - Matching company page background
+     ========================================================================== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ==========================================================================
+     Layout Container - Matching company page
+     ========================================================================== */
+  .form-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ==========================================================================
+     Page Header with Breadcrumb - Matching company page
+     ========================================================================== */
+  .page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .header-left-content {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .header-icon-circle {
+    width: 56px;
+    height: 56px;
+    background: rgba(52, 105, 240, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+  }
+
+  .header-icon-circle i {
+    font-size: 1.75rem;
+    color: var(--primary-600);
+  }
+
+  .breadcrumb-nav {
+    margin-bottom: 0.25rem;
+  }
+
+  .breadcrumb-custom {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+  }
+
+  .breadcrumb-custom .breadcrumb-item a {
+    color: var(--primary-600);
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+
+  .breadcrumb-custom .breadcrumb-item.active {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .header-badge-modern {
+    background: white;
+    color: var(--gray-700);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-badge-modern i {
+    color: var(--primary-500);
+  }
+
+  /* ==========================================================================
+     Progress Bar - Matching company page
+     ========================================================================== */
+  .progress-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-modern {
+    flex-grow: 1;
+    height: 8px;
+    background-color: var(--gray-200);
+    border-radius: 10px;
+  }
+
+  .progress-bar-modern {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
+    border-radius: 10px;
+  }
+
+  .progress-text {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+  }
+
+  /* ==========================================================================
+     Main Card - Matching company page
+     ========================================================================== */
+  .admin-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: var(--transition);
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-card:hover {
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* ==========================================================================
+     Card Header - Matching company page
+     ========================================================================== */
+  .card-header-modern {
+    padding: 1.5rem 2rem;
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+  }
+
+  .card-header-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(52, 105, 240, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+  }
+
+  .card-header-icon i {
+    color: var(--primary-600);
+    font-size: 1.25rem;
+  }
+
+  .card-header-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+  }
+
+  .card-header-subtitle {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Card Body
+     ========================================================================== */
+  .card-body-modern {
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Form Grid & Groups - Matching company page
+     ========================================================================== */
+  .row-custom {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.5rem;
+    margin-left: -0.5rem;
+  }
+
+  .col-custom {
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+  }
+
+  .form-group-modern {
+    margin-bottom: 1.5rem;
+  }
+
+  /* ==========================================================================
+     Form Labels - Matching company page
+     ========================================================================== */
+  .form-label-modern {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+  }
+
+  .label-required::after {
+    content: "*";
+    color: var(--error-500);
+    margin-left: 4px;
+  }
+
+  .label-hint-modern {
+    color: var(--gray-400);
+    font-weight: 400;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+
+  /* ==========================================================================
+     Input Fields - Matching company page
+     ========================================================================== */
+  .input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .input-group-text-modern {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: var(--gray-500);
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .form-input-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    transition: var(--transition);
+  }
+
+  .form-input-modern:focus {
+    outline: none;
+    border-color: var(--primary-400);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .form-input-modern:hover {
+    border-color: var(--gray-300);
+  }
+
+  .form-input-modern::placeholder {
+    color: var(--gray-400);
+  }
+
+  /* Full width input without icon */
+  .form-input-full {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    transition: var(--transition);
+  }
+
+  .form-input-full:focus {
+    outline: none;
+    border-color: var(--primary-400);
+    box-shadow: var(--shadow-focus);
+  }
+
+  /* ==========================================================================
+     Character Counter - Matching company page style
+     ========================================================================== */
+  .counter-modern {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+
+  .counter-text-modern {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+  }
+
+  /* ==========================================================================
+     Quill Editor - Styled to match
+     ========================================================================== */
+  .editor-wrapper-modern {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: var(--transition);
+  }
+
+  .editor-wrapper-modern:focus-within {
+    border-color: var(--primary-400);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .ql-toolbar {
+    background: var(--gray-50);
+    border: none !important;
+    border-bottom: 1px solid var(--gray-200) !important;
+    padding: 0.75rem !important;
+  }
+
+  .ql-container {
+    border: none !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.95rem !important;
+  }
+
+  .ql-editor {
+    min-height: 180px;
+    padding: 1rem !important;
+  }
+
+  /* ==========================================================================
+     Separator - Matching company page
+     ========================================================================== */
+  .separator-modern {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .separator-line-modern {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gray-300), transparent);
+  }
+
+  .separator-text-modern {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ==========================================================================
+     Upload Area - Matching company page style
+     ========================================================================== */
+  .upload-zone-modern {
+    position: relative;
+    background: var(--gray-50);
+    border: 2px dashed var(--gray-300);
+    border-radius: 10px;
+    padding: 2rem;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+
+  .upload-zone-modern:hover {
+    background: white;
+    border-color: var(--primary-400);
+  }
+
+  .upload-content-modern {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .upload-icon-modern {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-500);
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .upload-title-modern {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+
+  .upload-hint-modern {
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+  }
+
+  .file-input-modern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* ==========================================================================
+     Preview Gallery - Matching company page style
+     ========================================================================== */
+  .preview-gallery-modern {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .preview-card-modern {
+    position: relative;
+    width: 140px;
+  }
+
+  .preview-media-modern {
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .preview-badge-modern {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .badge-current-modern {
+    background: var(--primary-600);
+    color: white;
+  }
+
+  .badge-preview-modern {
+    background: var(--gray-800);
+    color: white;
+  }
+
+  .preview-actions-modern {
+    position: absolute;
+    bottom: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .preview-btn-modern {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 50px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--error-600);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .preview-btn-modern:hover {
+    background: var(--error-50);
+    border-color: var(--error-300);
+  }
+
+  /* ==========================================================================
+     Helper Text
+     ========================================================================== */
+  .helper-text-modern {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+  }
+
+  .helper-text-modern i {
+    color: var(--primary-500);
+  }
+
+  /* ==========================================================================
+     Form Footer - Matching company page
+     ========================================================================== */
+  .form-footer-modern {
+    padding: 1.5rem 2rem;
+    background: white;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .footer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .footer-info-text {
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+  }
+
+  .footer-info-text i {
+    margin-right: 0.25rem;
+    color: var(--primary-500);
+  }
+
+  .footer-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--gray-300);
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  /* ==========================================================================
+     Buttons - Matching company page
+     ========================================================================== */
+  .btn-modern {
+    padding: 0.75rem 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: var(--transition);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    font-family: var(--font-sans);
+  }
+
+  .btn-primary-modern {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
+    color: white;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(52, 105, 240, 0.3);
+  }
+
+  .btn-secondary-modern {
+    background: white;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+  }
+
+  .btn-secondary-modern:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+  }
+
+  /* Loading State */
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    top: 50%;
+    left: 50%;
+    margin-left: -0.625rem;
+    margin-top: -0.625rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================================================
+     Alerts - Matching company page
+     ========================================================================== */
+  .alert-modern-custom {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-left: 4px solid var(--success-500);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+  }
+
+  .alert-icon-custom {
+    width: 32px;
+    height: 32px;
+    background: var(--success-50);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--success-600);
+  }
+
+  .alert-content-custom {
+    flex: 1;
+    color: var(--gray-700);
+    font-size: 0.9375rem;
+  }
+
+  .alert-close-custom {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--gray-400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .alert-close-custom:hover {
+    background: var(--gray-100);
+    color: var(--gray-600);
+  }
+
+  /* ==========================================================================
+     Responsive - Matching company page
+     ========================================================================== */
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 1rem;
+    }
+
+    .header-left-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .footer-info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .footer-divider {
+      display: none;
+    }
+
+    .footer-actions {
+      width: 100%;
+      flex-direction: column-reverse;
+    }
+
+    .btn-modern {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .preview-gallery-modern {
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="form-container">
+    <!-- Page Header with Breadcrumb - Matching company page -->
+    <div class="page-header">
+        <div class="header-left-content">
+            <div class="header-icon-circle">
+                <i class="bi bi-images"></i>
             </div>
-            {% endfor %}
-        {% endif %}
+            <div>
+                <nav class="breadcrumb-nav" aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Hero Section</li>
+                    </ol>
+                </nav>
+                <h2 class="page-title">Hero Section Configuration</h2>
+            </div>
+        </div>
+        <div class="header-badge-modern">
+            <i class="bi bi-shield-check"></i>
+            <span>Content Manager</span>
+        </div>
+    </div>
+
+    <!-- Progress Bar - Matching company page -->
+    <div class="progress-container">
+        <div class="progress progress-modern">
+            <div class="progress-bar progress-bar-modern" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <span class="progress-text">Step 3/3</span>
+    </div>
+
+    <!-- Alerts -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert-modern-custom">
+            <div class="alert-icon-custom">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <div class="alert-content-custom">
+                {{ message }}
+            </div>
+            <button type="button" class="alert-close-custom" data-bs-dismiss="alert">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Main Form -->
+    <form method="post" enctype="multipart/form-data" id="heroForm">
+        {% csrf_token %}
         
-        <!-- Card Header -->
-        <div class="card-header bg-warning text-dark text-center">
-            <h5 class="mb-0">Hero Area Input</h5>
+        <!-- Main Card -->
+        <div class="admin-card">
+            <div class="card-header-modern">
+                <div class="card-header-icon">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+                <div>
+                    <h5 class="card-header-title">Basic Information</h5>
+                    <p class="card-header-subtitle">Update your hero section core details</p>
+                </div>
+            </div>
+            
+            <div class="card-body-modern">
+                <!-- Title Field -->
+                <div class="form-group-modern">
+                    <label class="form-label-modern label-required">
+                        <i class="bi bi-type-h1 me-1"></i>
+                        Section Title
+                        <span class="label-hint-modern">(max 100 characters)</span>
+                    </label>
+                    <div class="input-group-modern">
+                        <span class="input-group-text-modern">
+                            <i class="bi bi-pencil"></i>
+                        </span>
+                        <input
+                            type="text"
+                            name="tittle"
+                            class="form-input-modern"
+                            placeholder="e.g., Transform Your Digital Experience"
+                            value="{{ hero.tittle|default:'' }}"
+                            maxlength="100"
+                            id="titleInput"
+                            required
+                        />
+                    </div>
+                    <div class="counter-modern">
+                        <span class="counter-text-modern" id="titleCount">0/100 characters</span>
+                    </div>
+                    <div class="helper-text-modern">
+                        <i class="bi bi-lightbulb"></i>
+                        <span>Pro tip: Keep it under 70 characters for optimal display</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="card-body">
-            <div class="row g-3">
-
-                <!-- Title -->
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">Title</label>
-                    <input
-                        name="tittle"
-                        type="text"
-                        class="form-control rounded"
-                        placeholder="Enter Hero Area Title"
-                        value="{{ hero.tittle|default:'' }}"
-                    />
+        <!-- Content Card -->
+        <div class="admin-card">
+            <div class="card-header-modern">
+                <div class="card-header-icon">
+                    <i class="bi bi-card-text"></i>
+                </div>
+                <div>
+                    <h5 class="card-header-title">Content & Description</h5>
+                    <p class="card-header-subtitle">Add rich text content to your hero section</p>
+                </div>
+            </div>
+            
+            <div class="card-body-modern">
+                <!-- Description Editor -->
+                <div class="form-group-modern">
+                    <label class="form-label-modern">
+                        <i class="bi bi-text-paragraph me-1"></i>
+                        Hero Description
+                        <span class="label-hint-modern">(rich text supported)</span>
+                    </label>
+                    <div class="editor-wrapper-modern">
+                        <textarea id="descriptions" name="descriptions" style="display:none;">
+                            {{ hero.descriptions|default:'' }}
+                        </textarea>
+                        <div id="quill_editor"></div>
+                    </div>
+                    <div class="counter-modern">
+                        <span class="counter-text-modern" id="descCount">0 characters</span>
+                    </div>
                 </div>
 
-                <!-- Description (Quill) -->
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">Description</label>
-
-                    <!-- Hidden textarea -->
-                    <textarea id="descriptions" name="descriptions" style="display:none;">
-                        {{ hero.descriptions|default:'' }}
-                    </textarea>
-
-                    <!-- Quill editor -->
-                    <div id="quill_editor" style="height:200px;"></div>
+                <!-- Separator -->
+                <div class="separator-modern">
+                    <span class="separator-line-modern"></span>
+                    <span class="separator-text-modern">Media Assets</span>
+                    <span class="separator-line-modern"></span>
                 </div>
 
                 <!-- Image Upload -->
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">Hero Image</label>
-                    <input type="file" name="image" class="form-control">
+                <div class="form-group-modern">
+                    <label class="form-label-modern">
+                        <i class="bi bi-image me-1"></i>
+                        Hero Image
+                        <span class="label-hint-modern">(primary visual)</span>
+                    </label>
+                    
+                    <div class="upload-zone-modern" id="uploadArea">
+                        <input type="file" name="image" class="file-input-modern" accept="image/*" id="imageInput">
+                        <div class="upload-content-modern">
+                            <div class="upload-icon-modern">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                            </div>
+                            <div>
+                                <div class="upload-title-modern">Upload Hero Image</div>
+                                <div class="upload-hint-modern">
+                                    <i class="bi bi-file-earmark-image"></i>
+                                    SVG, PNG, JPG or GIF • Max 5MB
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    {% if hero.image %}
-                        <img src="{{ hero.image.url }}" width="120" class="mt-2 rounded">
-                    {% endif %}
+                    <!-- Preview Gallery -->
+                    <div class="preview-gallery-modern" id="previewContainer">
+                        {% if hero.image %}
+                        <div class="preview-card-modern" id="currentImageContainer">
+                            <img src="{{ hero.image.url }}" alt="Current Image" class="preview-media-modern">
+                            <span class="preview-badge-modern badge-current-modern">
+                                <i class="bi bi-check-circle"></i> Current
+                            </span>
+                            <div class="preview-actions-modern">
+                                <button type="button" class="preview-btn-modern" onclick="removeCurrentImage()">
+                                    <i class="bi bi-x"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- New Preview Container -->
+                        <div id="newPreview"></div>
+                    </div>
+
+                    <div class="helper-text-modern">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Recommended: 1920x1080px (16:9 ratio) for optimal display</span>
+                    </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="card-footer d-flex justify-content-center gap-2">
-            <a href="{% url 'home_details' %}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Submit</button>
+        <!-- Form Footer - Matching company page -->
+        <div class="form-footer-modern">
+            <div class="footer-info">
+                <span class="footer-info-text">
+                    <i class="bi bi-info-circle"></i>
+                    Fields marked with <span class="text-danger">*</span> are required
+                </span>
+                <span class="footer-divider"></span>
+                <span class="footer-info-text">
+                    <i class="bi bi-clock"></i>
+                    Auto-saves every 30 seconds
+                </span>
+            </div>
+            <div class="footer-actions">
+                <a href="{% url 'home_details' %}" class="btn-modern btn-secondary-modern">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn-modern btn-primary-modern" id="submitBtn">
+                    <i class="bi bi-check-circle"></i>
+                    Publish Hero Section
+                </button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
-<!-- Quill JS -->
+<!-- JavaScript -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
 <script>
-    // Initialize Quill
-    const quill = new Quill('#quill_editor', {
+  (function() {
+    'use strict';
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeEditor();
+      initializeCounters();
+      initializeUploader();
+      initializeTooltips();
+    });
+
+    /**
+     * Initialize Quill Editor
+     */
+    function initializeEditor() {
+      const quill = new Quill('#quill_editor', {
         theme: 'snow',
-        placeholder: 'Enter Description...',
-        modules: { 
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link', 'clean']
-            ] 
+        placeholder: 'Craft your compelling hero section description...',
+        modules: {
+          toolbar: [
+            [{ 'header': [2, 3, 4, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'color': [] }, { 'background': [] }],
+            ['link', 'clean']
+          ]
         }
-    });
+      });
 
-    // Load existing content
-    quill.root.innerHTML = document.getElementById('descriptions').value;
+      // Load saved content
+      const savedContent = document.getElementById('descriptions').value;
+      if (savedContent) {
+        quill.root.innerHTML = savedContent;
+      }
 
-    // On submit → store HTML in textarea
-    document.querySelector('form').addEventListener('submit', function() {
+      // Store quill instance globally
+      window.quillInstance = quill;
+
+      // Update hidden textarea on submit
+      document.getElementById('heroForm').addEventListener('submit', function() {
         document.getElementById('descriptions').value = quill.root.innerHTML;
-    });
-</script>
+      });
 
+      // Description counter
+      const descCount = document.getElementById('descCount');
+
+      quill.on('text-change', function() {
+        const text = quill.getText().trim();
+        const count = text.length;
+        descCount.textContent = `${count} characters`;
+      });
+
+      // Initial count
+      quill.update();
+    }
+
+    /**
+     * Initialize Character Counters
+     */
+    function initializeCounters() {
+      const titleInput = document.getElementById('titleInput');
+      const titleCount = document.getElementById('titleCount');
+
+      function updateTitleCounter() {
+        const count = titleInput.value.length;
+        const max = 100;
+        titleCount.textContent = `${count}/${max} characters`;
+      }
+
+      titleInput.addEventListener('input', updateTitleCounter);
+      updateTitleCounter();
+    }
+
+    /**
+     * Initialize Image Upload
+     */
+    function initializeUploader() {
+      const imageInput = document.getElementById('imageInput');
+      const uploadArea = document.getElementById('uploadArea');
+      const newPreview = document.getElementById('newPreview');
+
+      // Drag & drop effects
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+      });
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+          uploadArea.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+          uploadArea.classList.remove('dragover');
+        });
+      });
+
+      // Handle file selection
+      uploadArea.addEventListener('drop', handleDrop, false);
+      imageInput.addEventListener('change', handleFileSelect, false);
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const file = dt.files[0];
+        handleFile(file);
+      }
+
+      function handleFileSelect(e) {
+        const file = e.target.files[0];
+        handleFile(file);
+      }
+
+      function handleFile(file) {
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select a valid image file');
+          return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File size must be less than 5MB');
+          return;
+        }
+
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          newPreview.innerHTML = `
+            <div class="preview-card-modern">
+              <img src="${e.target.result}" alt="Preview" class="preview-media-modern">
+              <span class="preview-badge-modern badge-preview-modern">
+                <i class="bi bi-eye"></i> Preview
+              </span>
+              <div class="preview-actions-modern">
+                <button type="button" class="preview-btn-modern" onclick="removePreview()">
+                  <i class="bi bi-x"></i> Remove
+                </button>
+              </div>
+            </div>
+          `;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    /**
+     * Initialize Bootstrap Tooltips
+     */
+    function initializeTooltips() {
+      if (typeof bootstrap !== 'undefined') {
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+      }
+    }
+
+    /**
+     * Form Submission Handling
+     */
+    document.getElementById('heroForm').addEventListener('submit', function(e) {
+      const submitBtn = document.getElementById('submitBtn');
+      const title = document.getElementById('titleInput').value.trim();
+      
+      // Validate required fields
+      if (!title) {
+        e.preventDefault();
+        alert('Please enter a section title');
+        return;
+      }
+
+      // Show loading state
+      submitBtn.classList.add('btn-loading');
+    });
+
+  })();
+
+  /**
+   * Global helper functions
+   */
+  function removeCurrentImage() {
+    const container = document.getElementById('currentImageContainer');
+    if (container) {
+      container.remove();
+      // Add hidden input to mark deletion
+      const form = document.getElementById('heroForm');
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'remove_image';
+      input.value = 'true';
+      form.appendChild(input);
+    }
+  }
+
+  function removePreview() {
+    const newPreview = document.getElementById('newPreview');
+    newPreview.innerHTML = '';
+    document.getElementById('imageInput').value = '';
+  }
+</script>
 {% endblock content %}

@@ -3,8 +3,37 @@
 <html lang="en-US" class="js">
 {% load static %}
 <head>
-	{% include "home/layouts/head.html" %}	
-	{% block extra_css %}{% endblock extra_css %}
+
+    <title>{{ meta_title|default:"SiSPUB" }}</title>
+
+    {% for s in seos %}
+	<meta name="description" content="{{ s.meta_description|default:'' }}">
+    <meta name="keywords" content="{{ s.meta_keywords|default:'' }}">
+    <meta name="robots" content="index, follow">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo.jpg' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/logo.jpg' %}">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ s.meta_url }}">
+    <meta property="og:title" content="{{ s.meta_title }}">
+    <meta property="og:description" content="{{ s.meta_description }}">
+    <meta property="og:image" content="{{ s.meta_image }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ s.meta_title }}">
+    <meta name="twitter:description" content="{{ s.meta_description }}">
+    <meta name="twitter:image" content="{{ s.meta_image }}">
+	{% endfor %}
+
+    {% include "home/layouts/head.html" %}
+    {% block extra_css %}{% endblock extra_css %}
+
 </head>
 
 <body class="home wp-singular page-template-default page page-id-30 wp-theme-Divi et-tb-has-template et-tb-has-footer et_pb_button_helper_class et_fixed_nav et_show_nav et_primary_nav_dropdown_animation_fade et_secondary_nav_dropdown_animation_fade et_header_style_left et_cover_background et_pb_gutter windows et_pb_gutters3 et_pb_pagebuilder_layout et_no_sidebar et_divi_theme et-db chrome" style="overflow-x: hidden;">

@@ -1,45 +1,564 @@
 {% extends "admin/base/base.html" %}
 
+{% block custom_css %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ==========================================================================
+     CLEAN PROFESSIONAL DESIGN - No Fluff, Just Function
+     ========================================================================== */
+  :root {
+    /* Professional Color Palette */
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    --success-500: #10b981;
+    --warning-500: #f59e0b;
+    --error-500: #ef4444;
+    
+    /* Shadows - Subtle */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    
+    /* Border Radius - Consistent */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    /* Font */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.5;
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .container-clean {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ==========================================================================
+     Header Section - Clean & Simple
+     ========================================================================== */
+  .header-clean {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .header-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-100);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.25rem;
+  }
+
+  .header-text h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+  }
+
+  .header-text p {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0.25rem 0 0;
+  }
+
+  .btn-edit {
+    padding: 0.5rem 1rem;
+    background: var(--primary-600);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-edit:hover {
+    background: var(--primary-700);
+    color: white;
+  }
+
+  /* ==========================================================================
+     Stats Row - Minimal
+     ========================================================================== */
+  .stats-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-50);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.25rem;
+  }
+
+  .stat-info h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .stat-info p {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  /* ==========================================================================
+     Main Card
+     ========================================================================== */
+  .card-clean {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .card-header-clean {
+    padding: 1rem 1.5rem;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-header-clean h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .card-header-clean span {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    background: var(--gray-200);
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+  }
+
+  /* ==========================================================================
+     Table - Clean & Functional
+     ========================================================================== */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .table-clean {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table-clean th {
+    text-align: left;
+    padding: 1rem 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--gray-500);
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .table-clean td {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+  }
+
+  .table-clean tr:last-child td {
+    border-bottom: none;
+  }
+
+  .table-clean tr:hover td {
+    background: var(--gray-50);
+  }
+
+  /* Counter */
+  .counter {
+    font-weight: 500;
+    color: var(--gray-500);
+  }
+
+  /* Title */
+  .title {
+    font-weight: 500;
+    color: var(--gray-900);
+  }
+
+  /* Image */
+  .image-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--gray-200);
+  }
+
+  .no-image {
+    width: 50px;
+    height: 50px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    font-size: 1rem;
+  }
+
+  /* Description */
+  .description {
+    max-width: 300px;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-500);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .action-btn:hover {
+    background: var(--primary-100);
+    color: var(--primary-600);
+  }
+
+  .action-btn.delete:hover {
+    background: #fee2e2;
+    color: var(--error-500);
+  }
+
+  /* ==========================================================================
+     Empty State - Simple
+     ========================================================================== */
+  .empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+
+  .empty-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--gray-400);
+    font-size: 1.75rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 0.25rem;
+  }
+
+  .empty-state p {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--primary-600);
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+  }
+
+  .btn-add:hover {
+    background: var(--primary-700);
+    color: white;
+  }
+
+  /* ==========================================================================
+     Footer
+     ========================================================================== */
+  .table-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+  }
+
+  .footer-info {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .footer-info i {
+    color: var(--primary-500);
+    margin-right: 0.25rem;
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 768px) {
+    .container-clean {
+      padding: 1rem;
+    }
+
+    .header-clean {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .stats-row {
+      flex-direction: column;
+    }
+
+    .table-footer {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .footer-info {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
 {% block content %}
-<div class="card mt-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Mission</h5>
+<div class="container-clean">
+    <!-- Simple Header -->
+    <div class="header-clean">
+        <div class="header-left">
+            <div class="header-icon">
+                <i class="bi bi-bullseye"></i>
+            </div>
+            <div class="header-text">
+                <h1>Mission</h1>
+                <p>Manage your organization's mission statements</p>
+            </div>
+        </div>
         {% if mission %}
-            <a href="{% url 'update_mission' mission.first.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'update_mission' mission.first.id %}" class="btn-edit">
+                <i class="bi bi-pencil"></i>
+                Edit Mission
+            </a>
         {% endif %}
     </div>
 
-    <div class="card-body">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Image</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in mission %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ c.title }}</td>
-                    <td>
-                        {% if c.image %}
-                            <img src="{{ c.image.url }}" width="80" alt="{{ c.title }}">
-                        {% else %}
-                            No Image
-                        {% endif %}
-                    </td>
-                    <td>{{ c.descriptions|truncatewords:20|safe }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center text-muted">No core values</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Quick Stats -->
+    <div class="stats-row">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="bi bi-bullseye"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ mission|length }}</h3>
+                <p>Total</p>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="bi bi-image"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ mission_with_images|default:mission|length }}</h3>
+                <p>With Images</p>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="bi bi-card-text"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ mission_with_descriptions|default:mission|length }}</h3>
+                <p>Descriptions</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card-clean">
+        <div class="card-header-clean">
+            <h2>Mission Statements</h2>
+            <span>{{ mission|length }} entries</span>
+        </div>
+
+        <div class="table-responsive">
+            {% if mission %}
+            <table class="table-clean">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Image</th>
+                        <th>Description</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in mission %}
+                    <tr>
+                        <td class="counter">{{ forloop.counter }}</td>
+                        <td class="title">{{ c.title }}</td>
+                        <td>
+                            {% if c.image %}
+                                <img src="{{ c.image.url }}" class="image-preview" alt="{{ c.title }}">
+                            {% else %}
+                                <div class="no-image">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="description">
+                                {% if c.descriptions %}
+                                    {{ c.descriptions|truncatewords:12|safe }}
+                                {% else %}
+                                    <span style="color: var(--gray-400);">—</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <!-- Simple Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-bullseye"></i>
+                </div>
+                <h3>No mission statements</h3>
+                <p>Add your first mission statement to get started.</p>
+                <a href="{% url 'add_mission' %}" class="btn-add">
+                    <i class="bi bi-plus"></i>
+                    Add Mission
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if mission %}
+        <!-- Simple Footer -->
+        <div class="table-footer">
+            <div class="footer-info">
+                <span><i class="bi bi-list"></i> {{ mission|length }} entries</span>
+                <span><i class="bi bi-clock"></i> {% now "M j, Y" %}</span>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

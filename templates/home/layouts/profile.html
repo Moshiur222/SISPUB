@@ -314,31 +314,12 @@
                             <i class="fas fa-building"></i> {{ aggregator.company_name }}
                         </p>
                         
-                        <!-- Status Badge -->
-                        <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
-                            {% if aggregator.is_aggregator == 'YES' %}
-                            <span class="badge-status badge-success">
-                                <i class="fas fa-check-circle"></i> Active Aggregator
-                            </span>
-                            {% elif aggregator.is_aggregator == 'PND' %}
-                            <span class="badge-status badge-warning">
-                                <i class="fas fa-clock"></i> Pending Approval
-                            </span>
-                            {% else %}
-                            <span class="badge-status badge-danger">
-                                <i class="fas fa-times-circle"></i> Inactive
-                            </span>
-                            {% endif %}
-                        </div>
                         
                         <!-- Member ID Card -->
                         <div style="background: #f5f9ff; border-radius: 2rem; padding: 1.2rem; margin-bottom: 1.5rem;">
                             <div style="font-size: 0.8rem; color: #6b7c93; margin-bottom: 0.3rem;">Member ID</div>
-                            <div style="font-size: 1.6rem; font-weight: 700; color: #1e2b3c; letter-spacing: 1px;">
+                            <div style="font-size: 1.1rem; font-weight: 700; color: #1e2b3c; letter-spacing: 1px;">
                                 {{ aggregator.member_id }}
-                            </div>
-                            <div style="font-size: 0.75rem; color: #8a9bb0; margin-top: 0.3rem;">
-                                <i class="far fa-calendar-alt"></i> Joined: {{ aggregator.created_at|date:"F d, Y" }}
                             </div>
                         </div>
                         
@@ -379,31 +360,6 @@
                                     <i class="fas fa-building"></i> {{ aggregator.company_name }}
                                 </span>
                             </div>
-                            
-                            <div class="info-item">
-                                <span class="info-label">Member Since</span>
-                                <span class="info-value">
-                                    <i class="far fa-calendar-alt"></i> {{ aggregator.created_at|date:"F d, Y" }}
-                                </span>
-                            </div>
-                            
-                            <div class="info-item">
-                                <span class="info-label">Last Updated</span>
-                                <span class="info-value">
-                                    <i class="far fa-clock"></i> {{ aggregator.updated_at|date:"F d, Y" }}
-                                </span>
-                            </div>
-                            
-                            <div class="info-item">
-                                <span class="info-label">Status</span>
-                                <span class="info-value">
-                                    {% if aggregator.is_active %}
-                                    <i class="fas fa-circle" style="color: #22c55e; font-size: 0.6rem;"></i> Active
-                                    {% else %}
-                                    <i class="fas fa-circle" style="color: #ef4444; font-size: 0.6rem;"></i> Inactive
-                                    {% endif %}
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -436,7 +392,7 @@
                                 </span>
                             </div>
                             
-                            <div class="info-item" style="grid-column: span 2;">
+                            <div class="info-item">
                                 <span class="info-label">Full Address</span>
                                 <span class="info-value">
                                     <i class="fas fa-map-marker-alt"></i> {{ aggregator.address|default:"No address provided" }}
@@ -467,6 +423,13 @@
                                 </span>
                             </div>
                             
+                            <div class="info-item">
+                                <span class="info-label">Tread Licence No</span>
+                                <span class="info-value">
+                                    <i class="fas fa-certificate"></i> {{ aggregator.tread_licence_no|default:"Not provided" }}
+                                </span>
+                            </div>
+
                             <div class="info-item">
                                 <span class="info-label">CV/Resume</span>
                                 <span class="info-value">

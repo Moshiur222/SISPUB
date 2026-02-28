@@ -136,11 +136,8 @@ def logout_view(request):
 
 @login_required
 def profile(request):
-    """Display aggregator profile"""
-    # Get the aggregator profile for the logged-in user
     aggregator = Aggregator.objects.filter(user=request.user).first()
-    
-    # Prepare context
+
     context = {
         'aggregator': aggregator,
     }
@@ -150,18 +147,41 @@ def profile(request):
 
 @login_required
 def edit_profile(request):
-    """Edit aggregator profile"""
-    # Get the aggregator profile
     aggregator = Aggregator.objects.filter(user=request.user).first()
-    
+
     if not aggregator:
         messages.warning(request, "Profile not found.")
         return redirect('profile')
-    
+
+    if request.method == "POST":
+        aggregator.name = request.POST.get("name")
+        aggregator.company_name = request.POST.get("company_name")
+        aggregator.designation = request.POST.get("designation")
+        aggregator.mobile = request.POST.get("mobile")
+        aggregator.phone = request.POST.get("phone")
+        aggregator.brtc_licence_no = request.POST.get("brtc_licence_no")
+        aggregator.tread_licence_no = request.POST.get("tread_licence_no")
+        aggregator.n_id = request.POST.get("n_id")
+        aggregator.address = request.POST.get("address")
+
+        if request.FILES.get("image"):
+            aggregator.image = request.FILES.get("image")
+
+        if request.FILES.get("appoinment_letter"):
+            aggregator.appoinment_letter = request.FILES.get("appoinment_letter")
+
+        # Handle CV upload
+        if request.FILES.get("cv"):
+            aggregator.cv = request.FILES.get("cv")
+
+        aggregator.save()
+        messages.success(request, "Profile updated successfully.")
+        return redirect("profile")
+
     context = {
-        'aggregator': aggregator,
+        "aggregator": aggregator
     }
-    
+
     return render(request, "home/layouts/edit_profile.html", context)
 
 
@@ -1911,6 +1931,65 @@ def admin_member_registration_list_details(request, id):
     }
     return render(request, "admin/pages/admin_member_registration_list_details.html", context)
 
+
+@login_required
+def seo(request):
+    seos = Seo.objects.all() 
+    context = {
+        'seos': seos
+    }
+    return render(request, "admin/pages/seo.html", context)
+
+@login_required
+def edit_seo(request, id):
+    seo = get_object_or_404(Seo, id=id)
+
+    if request.method == "POST":
+        seo.page_name = request.POST.get("page_name")
+        seo.meta_title = request.POST.get("meta_title")
+        seo.meta_description = request.POST.get("meta_description")
+        seo.meta_keywords = request.POST.get("meta_keywords")
+        seo.meta_url = request.POST.get("meta_url")
+
+        # Handle image upload
+        if request.FILES.get("meta_image"):
+            seo.meta_image = request.FILES.get("meta_image")
+
+        seo.save()
+        messages.success(request, "SEO updated successfully")
+        return redirect("edit_seo", seo.id)  
+    context = {
+        "seo": seo
+    }
+    return render(request, "admin/pages/edit_seo.html", context)
+
+
+@login_required
+def add_seo(request):
+
+    if request.method == "POST":
+        page_name = request.POST.get("page_name")
+
+        # Prevent duplicate page
+        if Seo.objects.filter(page_name=page_name).exists():
+            messages.error(request, "Page already exists")
+            return redirect("add_seo")
+
+        seo = Seo(
+            page_name=page_name,
+            meta_title=request.POST.get("meta_title"),
+            meta_description=request.POST.get("meta_description"),
+            meta_keywords=request.POST.get("meta_keywords"),
+            meta_url=request.POST.get("meta_url"),
+            meta_image=request.FILES.get("meta_image")
+        )
+
+        seo.save()
+
+        messages.success(request, "SEO added successfully")
+        return redirect("add_seo")  
+
+    return render(request, "admin/pages/add_seo.html")
 
 @login_required
 def accept(request, id):

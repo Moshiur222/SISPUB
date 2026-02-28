@@ -79,7 +79,8 @@
 .news-image {
     width: 100%;
     height: 220px;
-    object-fit: cover;
+    object-fit: contain; /* <-- changed from cover */
+    background: #f0f0f0; /* optional: light background for empty space */
     border-bottom: 3px solid #3498db;
 }
 
@@ -156,7 +157,7 @@
     {% for member in members %}
         <div class="news-card" data-aggregator="{{ member.is_aggregator }}">
             {% if member.image %}
-                <img src="" data-src="{{ member.image.url }}" class="news-image" alt="{{ member.company_name }}">
+            <img src="" data-src="{{ member.image.url }}" class="news-image" alt="{{ member.company_name }}">
             {% else %}
                 <img src="{% static 'home/images/PP.jpg' %}" class="news-image">
             {% endif %}

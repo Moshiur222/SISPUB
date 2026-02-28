@@ -1,0 +1,61 @@
+{% extends "admin/base/base.html" %}
+
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Add SEO</h5>
+    </div>
+
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row">
+
+                <!-- Page Name -->
+                <div class="col-md-6 mb-3">
+                    <label>Page Name</label>
+                    <input type="text" name="page_name" class="form-control" placeholder="e.g. home, about" required>
+                </div>
+
+                <!-- Meta Title -->
+                <div class="col-md-6 mb-3">
+                    <label>Meta Title</label>
+                    <input type="text" name="meta_title" class="form-control" placeholder="Enter meta title" required>
+                </div>
+
+                <!-- Meta Description -->
+                <div class="col-md-12 mb-3">
+                    <label>Meta Description</label>
+                    <textarea name="meta_description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                </div>
+
+                <!-- Meta Keywords -->
+                <div class="col-md-12 mb-3">
+                    <label>Meta Keywords</label>
+                    <textarea name="meta_keywords" class="form-control" rows="2" placeholder="keyword1, keyword2"></textarea>
+                </div>
+
+                <!-- Meta URL -->
+                <div class="col-md-6 mb-3">
+                    <label>Meta URL</label>
+                    <input type="text" name="meta_url" class="form-control" placeholder="https://example.com/page">
+                </div>
+
+                <!-- Meta Image -->
+                <div class="col-md-6 mb-3">
+                    <label>Meta Image</label>
+                    <input type="file" name="meta_image" class="form-control">
+                </div>
+
+            </div>
+
+            <div class="text-end">
+                <a href="{% url 'seo' %}" class="btn btn-secondary">Back</a>
+                <button type="submit" class="btn btn-primary">Add SEO</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -77,7 +77,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'accounts.context_procesor.company_info',
-                'accounts.context_procesor.global_search_data',
+                'accounts.context_procesor.global_seo',
             ],
         },
     },

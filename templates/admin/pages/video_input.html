@@ -1,65 +1,561 @@
 {% extends "admin/base/base.html" %}
 
 {% block content %}
-<form method="post" class="mt-5">
-    {% csrf_token %}
-
-    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>{{message}}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        <!-- Card Header -->
-        <div class="card-header bg-warning text-dark text-center">
-            <h5 class="mb-0"> Upload Video</h5>
-        </div>
-
-        <!-- Card Body -->
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label fw-bold">Video Title</label>
-                <input
-                    name="title"
-                    type="text"
-                    value = "{{video.title}}"
-                    class="form-control rounded"
-                    placeholder="Enter Video Title"
-                />
+<div class="container-fluid py-4 px-4" style="max-width: 1400px; margin: 0 auto;">
+    <!-- Page Header with Breadcrumb -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center mb-3 mb-sm-0">
+            <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                <i class="bi bi-camera-reels fs-4 text-primary"></i>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold">Video URL</label>
-                <input
-                    name="url"
-                    type="url"
-                    class="form-control rounded"
-                    value = "{{video.url}}"
-                    placeholder="Enter Video URL"
-                    required
-                />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold">Video Description</label>
-                <textarea
-                    name="description"
-                    value = "{{video.descriptions}}"
-                    class="form-control rounded"
-                    placeholder="Enter Video Description"
-                    rows="3"
-                ></textarea>
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'home_details' %}" class="text-decoration-none">Home Details</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Upload Video</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bold mb-0">Upload Video</h2>
             </div>
         </div>
-
-        <!-- Card Footer -->
-        <div class="card-footer d-flex justify-content-center gap-2">
-            <a href="{% url 'home_details' %}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="d-flex gap-2">
+            <span class="badge bg-light text-dark p-3 px-4 rounded-pill border">
+                <i class="bi bi-clock-history me-2 text-primary"></i>Last updated: {% now "F j, Y" %}
+            </span>
         </div>
     </div>
-</form>
+
+    <!-- Progress Steps -->
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <div class="progress flex-grow-1" style="height: 8px;">
+            <div class="progress-bar bg-primary" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <span class="text-muted small">Step 3/3</span>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-success bg-opacity-10 p-2 me-3">
+                    <i class="bi bi-check-circle text-success"></i>
+                </div>
+                <strong class="me-auto">{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <!-- Main Grid Layout -->
+        <div class="row g-4">
+            <!-- Left Column - Main Form -->
+            <div class="col-lg-8">
+                <!-- Video Information Card -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="feature-icon bg-primary bg-opacity-10 rounded-3 p-2 me-3">
+                                <i class="bi bi-info-circle text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1 fw-bold">Video Information</h5>
+                                <p class="text-muted small mb-0">Enter the details of your video</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <!-- Video Title -->
+                            <div class="col-12">
+                                <label class="form-label fw-medium text-secondary">
+                                    Video Title <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-end-0">
+                                        <i class="bi bi-camera-video text-primary"></i>
+                                    </span>
+                                    <input name="title" type="text" value="{{ video.title }}" 
+                                           class="form-control border-start-0 ps-0" 
+                                           placeholder="e.g., Company Introduction 2024"
+                                           maxlength="100"
+                                           id="titleInput"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">Please enter video title.</div>
+                                <div class="d-flex justify-content-end mt-2">
+                                    <small class="text-muted"><span id="titleCount">0</span>/100 characters</small>
+                                </div>
+                            </div>
+
+                            <!-- Video URL -->
+                            <div class="col-12">
+                                <label class="form-label fw-medium text-secondary">
+                                    Video URL <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-end-0">
+                                        <i class="bi bi-link-45deg text-primary"></i>
+                                    </span>
+                                    <input name="url" type="url" value="{{ video.url }}" 
+                                           class="form-control border-start-0 ps-0" 
+                                           placeholder="https://www.youtube.com/watch?v=..."
+                                           id="urlInput"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">Please enter a valid video URL.</div>
+                                
+                                <!-- URL Preview (shown when valid URL entered) -->
+                                <div class="mt-3 p-3 bg-light rounded-3" id="urlPreview" style="display: none;">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-white p-2 me-3">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <small class="text-muted d-block">Preview:</small>
+                                            <a href="#" target="_blank" id="previewLink" class="text-decoration-none text-truncate d-block"></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Supported Platforms -->
+                                <div class="mt-3 d-flex flex-wrap gap-2">
+                                    <span class="badge bg-light text-dark p-2 px-3 rounded-pill border">
+                                        <i class="bi bi-youtube text-danger me-1"></i> YouTube
+                                    </span>
+                                    <span class="badge bg-light text-dark p-2 px-3 rounded-pill border">
+                                        <i class="bi bi-vimeo text-primary me-1"></i> Vimeo
+                                    </span>
+                                    <span class="badge bg-light text-dark p-2 px-3 rounded-pill border">
+                                        <i class="bi bi-camera-reels text-warning me-1"></i> Dailymotion
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Card -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="feature-icon bg-primary bg-opacity-10 rounded-3 p-2 me-3">
+                                <i class="bi bi-card-text text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1 fw-bold">Video Description</h5>
+                                <p class="text-muted small mb-0">Describe your video content</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <!-- Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-medium text-secondary">
+                                    Description
+                                </label>
+                                <textarea name="description" 
+                                          class="form-control" 
+                                          placeholder="Tell viewers what this video is about..."
+                                          rows="5"
+                                          maxlength="500"
+                                          id="descInput">{{ video.descriptions }}</textarea>
+                                <div class="d-flex justify-content-end mt-2">
+                                    <small class="text-muted"><span id="descCount">0</span>/500 characters</small>
+                                </div>
+                                <small class="text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    A good description helps viewers understand your content better
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Additional Info -->
+            <div class="col-lg-4">
+                <!-- Video Settings Card -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="feature-icon bg-primary bg-opacity-10 rounded-3 p-2 me-3">
+                                <i class="bi bi-gear text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1 fw-bold">Video Settings</h5>
+                                <p class="text-muted small mb-0">Configure video options</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="vstack gap-4">
+                            <!-- Video Quality -->
+                            <div>
+                                <label class="form-label fw-medium text-secondary d-flex align-items-center">
+                                    <i class="bi bi-hd me-2 text-primary small"></i>
+                                    Video Quality
+                                </label>
+                                <select class="form-select" name="quality">
+                                    <option value="auto" selected>Auto (Recommended)</option>
+                                    <option value="4k">4K Ultra HD</option>
+                                    <option value="1080p">1080p Full HD</option>
+                                    <option value="720p">720p HD</option>
+                                    <option value="480p">480p SD</option>
+                                </select>
+                                <small class="text-muted d-block mt-1">Auto quality based on user connection</small>
+                            </div>
+
+                            <!-- Auto-play Toggle -->
+                            <div>
+                                <label class="form-label fw-medium text-secondary d-flex align-items-center">
+                                    <i class="bi bi-play-circle me-2 text-primary small"></i>
+                                    Playback Options
+                                </label>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="autoplay" name="autoplay" checked>
+                                    <label class="form-check-label text-secondary" for="autoplay">Auto-play video</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="controls" name="controls" checked>
+                                    <label class="form-check-label text-secondary" for="controls">Show video controls</label>
+                                </div>
+                            </div>
+
+                            <!-- Privacy -->
+                            <div>
+                                <label class="form-label fw-medium text-secondary d-flex align-items-center">
+                                    <i class="bi bi-shield-lock me-2 text-primary small"></i>
+                                    Privacy
+                                </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="privacy" id="public" value="public" checked>
+                                    <label class="form-check-label text-secondary" for="public">
+                                        <i class="bi bi-globe2 me-1"></i> Public
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="privacy" id="private" value="private">
+                                    <label class="form-check-label text-secondary" for="private">
+                                        <i class="bi bi-lock me-1"></i> Private
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Card -->
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-info bg-opacity-10 p-2 me-3">
+                                <i class="bi bi-question-circle text-info"></i>
+                            </div>
+                            <h6 class="fw-bold mb-0">Need Help?</h6>
+                        </div>
+                        <p class="small text-muted mb-3">
+                            Make sure your video URL is from a supported platform. 
+                            Supported platforms: YouTube, Vimeo, Dailymotion.
+                        </p>
+                        <a href="#" class="btn btn-light btn-sm w-100 rounded-3 border">
+                            <i class="bi bi-book me-2"></i>Video Upload Guide
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions Footer -->
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Fields marked with <span class="text-danger">*</span> are required
+                        </span>
+                        <span class="vr"></span>
+                        <span class="text-muted small">
+                            <i class="bi bi-cloud-check me-1"></i>
+                            Auto-saved as draft
+                        </span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'home_details' %}" class="btn btn-light btn-lg px-4 rounded-3 border">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg px-5 rounded-3 shadow-sm" id="submitBtn">
+                            <i class="bi bi-cloud-arrow-up me-2"></i>Upload Video
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Enhanced Styles - Matching the Company Information Page -->
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #858796;
+        --success-color: #1cc88a;
+    }
+
+    body {
+        background-color: #f8f9fc;
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Form Elements */
+    .form-control, .form-select {
+        border: 1px solid #e3e6f0;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.1);
+    }
+
+    .input-group-text {
+        background: transparent;
+        border: 1px solid #e3e6f0;
+        border-right: none;
+        color: #6c757d;
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:focus {
+        border-left: none;
+    }
+
+    /* Cards */
+    .card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,.05);
+    }
+
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.08) !important;
+    }
+
+    .feature-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-color);
+    }
+
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+
+    /* Badge */
+    .badge.bg-light {
+        background-color: #f8f9fc !important;
+        color: #5a5c69;
+    }
+
+    /* Progress Bar */
+    .progress {
+        background-color: #eaecf4;
+        border-radius: 10px;
+    }
+
+    .progress-bar {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border-radius: 10px;
+    }
+
+    /* Custom Background Opacity */
+    .bg-opacity-10 {
+        --bs-bg-opacity: 0.1;
+    }
+
+    .bg-primary.bg-opacity-10 {
+        background-color: rgba(78, 115, 223, 0.1) !important;
+    }
+
+    .bg-success.bg-opacity-10 {
+        background-color: rgba(28, 200, 138, 0.1) !important;
+    }
+
+    .bg-info.bg-opacity-10 {
+        background-color: rgba(54, 185, 204, 0.1) !important;
+    }
+
+    /* Buttons */
+    .btn-light {
+        background-color: #f8f9fc;
+        border-color: #e3e6f0;
+    }
+
+    .btn-light:hover {
+        background-color: #eaecf4;
+        border-color: #d1d3e2;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.3) !important;
+    }
+
+    /* Form Check */
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-switch .form-check-input:checked {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+    }
+
+    /* Alert */
+    .alert-success {
+        background-color: #f8f9fc;
+        border-left: 4px solid var(--success-color);
+        border-top: 1px solid #e3e6f0;
+        border-right: 1px solid #e3e6f0;
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    /* Animations */
+    .btn, .card, .form-control, .form-select {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 1rem !important;
+        }
+        
+        .btn-lg {
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+        }
+    }
+
+    /* Platform Badges */
+    .badge.bg-light {
+        transition: all 0.2s ease;
+    }
+
+    .badge.bg-light:hover {
+        background-color: #e9ecef !important;
+        transform: translateY(-1px);
+    }
+</style>
+
+<!-- Add Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Add Nunito Font (matching the admin theme) -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Form Validation and Counters Script -->
+<script>
+    (function() {
+        'use strict';
+        
+        // Fetch all forms that need validation
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    // Show loading state on submit button
+                    document.getElementById('submitBtn').innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Uploading...';
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Character counters
+        const titleInput = document.getElementById('titleInput');
+        const descInput = document.getElementById('descInput');
+        const titleCount = document.getElementById('titleCount');
+        const descCount = document.getElementById('descCount');
+
+        if (titleInput) {
+            titleCount.textContent = titleInput.value.length;
+            titleInput.addEventListener('input', function() {
+                titleCount.textContent = this.value.length;
+            });
+        }
+
+        if (descInput) {
+            descCount.textContent = descInput.value.length;
+            descInput.addEventListener('input', function() {
+                descCount.textContent = this.value.length;
+            });
+        }
+
+        // URL Preview
+        const urlInput = document.getElementById('urlInput');
+        const urlPreview = document.getElementById('urlPreview');
+        const previewLink = document.getElementById('previewLink');
+
+        if (urlInput) {
+            urlInput.addEventListener('input', function() {
+                const url = this.value.trim();
+                
+                try {
+                    new URL(url);
+                    previewLink.href = url;
+                    previewLink.textContent = url.length > 50 ? url.substring(0, 50) + '...' : url;
+                    urlPreview.style.display = 'block';
+                } catch {
+                    urlPreview.style.display = 'none';
+                }
+            });
+        }
+
+        // Auto-save indicator (simulated)
+        let autoSaveIndicator = document.querySelector('.fa-cloud-check me-1').parentNode;
+        setInterval(() => {
+            autoSaveIndicator.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i> Saved just now';
+            setTimeout(() => {
+                autoSaveIndicator.innerHTML = '<i class="bi bi-cloud-check me-1"></i> Auto-saved as draft';
+            }, 3000);
+        }, 30000);
+    })();
+</script>
 {% endblock content %}
