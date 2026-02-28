@@ -3,121 +3,30 @@
 {% load static %}
 {% block extra_css %}
 <style>
+/* --- Header --- */
+.news-header {
+    text-align: center;
+    padding: 350px 20px 50px;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("{% static 'home/images/banner4.png' %}");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    margin-bottom: 50px;
+    border-radius: 10px;
+}
 
-    .news-header {
-            text-align: center;
-            padding: 350px 20px 50px;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                        url("{% static 'home/images/banner4.png' %}");
-            background-size: cover;
-            background-position: center;
-            color: white;
-            margin-bottom: 50px;
-            border-radius: 10px;
-        }
+.news-header h1 {
+    color: #fff;
+    font-size: 35px;
+}
 
-        .news-header h1 {
-            color: #fff;
-            font-size: 35px;
-        }
-
-
-    .job-content-box {
-        max-width: 100%;
-        padding-top: 0.5rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid #e5e7eb;
-        transition: all 0.3s ease;
-    }
-
-    /* Title */
-    .job-title-modern {
-        font-weight: 700;
-        font-size: 1.6rem;
-        color: #0f172a;
-        margin-bottom: 1rem;
-        letter-spacing: -0.02em;
-        line-height: 1.3;
-        transition: all 0.3s ease;
-    }
-
-    /* Description container */
-    .job-description-modern {
-        font-weight: 400;
-        font-size: 1.05rem;
-        line-height: 1.8;
-        color: #475569;
-    }
-
-    /* ✨ Quill rich text styling */
-    .job-description-modern p {
-        margin-bottom: 12px;
-    }
-
-    .job-description-modern h1,
-    .job-description-modern h2,
-    .job-description-modern h3 {
-        font-weight: 600;
-        margin-top: 15px;
-        margin-bottom: 10px;
-        color: #0f172a;
-    }
-
-    .job-description-modern ul {
-        padding-left: 20px;
-        margin-bottom: 12px;
-    }
-
-    .job-description-modern ul li {
-        margin-bottom: 6px;
-        list-style-type: disc;
-    }
-
-    .job-description-modern strong {
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    .job-description-modern a {
-        color: #4f46e5;
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    .job-description-modern a:hover {
-        text-decoration: underline;
-    }
-
-    /* Hover effect */
-    .job-content-box:hover {
-        transform: translateY(-5px);
-    }
-
-    .job-content-box:hover .job-title-modern {
-        color: #4f46e5;
-    }
-
-    /* Optional: spacing between jobs */
-    .job-content-box:not(:last-child) {
-        margin-bottom: 20px;
-    }
-
-    /* Mobile */
-    @media (max-width: 768px) {
-        .job-title-modern {
-            font-size: 1.3rem;
-        }
-        .job-content-box {
-            padding-top: 3rem;
-        }
-    }
-
-    /* Card Container */
+/* --- Job Card --- */
 .job-card {
     background: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
-    height: 100%; /* Keeps all cards same height in a row */
+    height: 100%;
     display: flex;
     flex-direction: column;
     transition: all 0.3s ease;
@@ -127,10 +36,9 @@
 .job-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-    border-color: #007bff; /* Optional accent color */
+    border-color: #007bff;
 }
 
-/* Content Area */
 .job-card-body {
     padding: 25px;
     flex-grow: 1;
@@ -149,22 +57,43 @@
     line-height: 1.5;
 }
 
-/* Action Area */
-.job-card-footer {
-    padding: 15px 25px;
-    background: #f8f9fa;
-    border-top: 1px solid #eee;
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0;
 }
 
-.btn-apply {
-    color: #007bff;
+.pagination a, .pagination span {
+    padding: 8px 14px;
+    border-radius: 5px;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
+    color: #333;
+    background: #fff;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    font-weight: 500;
 }
 
-.btn-apply:hover {
-    text-decoration: underline;
+.pagination a:hover {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination .current {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+    font-weight: 600;
+}
+
+.pagination .disabled {
+    color: #999;
+    cursor: not-allowed;
+    background: #f5f5f5;
 }
 </style>
 {% endblock %}
@@ -172,28 +101,56 @@
 {% block main %}
 
 <!-- Header -->
- {% for career in career %}
-<div class="news-header ">
+<div class="news-header">
     <h1>Career</h1>
 </div>
 
-<section class="career-section pt-5 pb-5"> 
+<section class="career-section pt-5 pb-5">
     <div class="container">
-        <div class="row"> 
-            <div class="col-md-6 col-lg-4 mb-4"> <div class="job-card">
+        <div class="row">
+            {% for career in page_obj %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="job-card">
                     <div class="job-card-body">
-                        <h3 class="job-title-modern">
-                            {{ career.title }}
-                        </h3>
+                        <h3 class="job-title-modern">{{ career.title }}</h3>
                         <div class="job-description-modern">
                             {{ career.description|safe }}
                         </div>
                     </div>
                 </div>
             </div>
+            {% empty %}
+            <p class="text-center w-100">No careers available at the moment.</p>
             {% endfor %}
         </div>
     </div>
 </section>
+
+<!-- Pagination -->
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">← Prev</a>
+    {% else %}
+        <span class="disabled">« First</span>
+        <span class="disabled">← Prev</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="current">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+    {% else %}
+        <span class="disabled">Next →</span>
+        <span class="disabled">Last »</span>
+    {% endif %}
+</div>
 
 {% endblock %}

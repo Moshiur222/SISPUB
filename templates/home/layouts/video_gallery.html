@@ -3,8 +3,6 @@
 
 {% block extra_css %}
 <style>
-
-/* --- Header Section --- */
 .news-header {
     text-align: center;
     padding: 250px 20px 50px;
@@ -16,98 +14,78 @@
     margin-bottom: 50px;
     border-radius: 10px;
 }
+.news-header h1 { font-size: 35px; color: #fff; }
 
-.news-header h1 {
-    color: #fff;
-    font-size: 35px;
-}
+.video-card { max-width: 1400px; margin: 0 auto 60px; background: #fff; border-radius: 12px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+.video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.video-wrapper { position: relative; padding-top: 56.25%; }
+.video-wrapper iframe { position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; }
 
-/* --- Single Card --- */
-.video-card {
-    max-width: 1400px;
-    margin: 0 auto 60px;
+.pagination { display: flex; justify-content: center; gap: 10px; margin: 30px 0; }
+.pagination a, .pagination span {
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
     background: #fff;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    border: 1px solid #ddd;
+    color: #333;
+    font-weight: 500;
+    transition: 0.3s;
 }
-
-/* --- Video Grid inside ONE card --- */
-.video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-/* --- Video Wrapper --- */
-.video-wrapper {
-    position: relative;
-    padding-top: 56.25%;
-}
-
-.video-wrapper iframe {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border: none;
-}
-
-/* --- Title --- */
-.main-title {
-    text-align: center;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-
+.pagination a:hover { background: #2ea3f2; color: #fff; border-color: #2ea3f2; }
+.pagination .current { background: #2ea3f2; color: #fff; border-color: #2ea3f2; font-weight: 600; }
+.pagination .disabled { color: #999; cursor: not-allowed; background: #f5f5f5; }
 </style>
 {% endblock %}
 
 {% block main %}
-
-<!-- Header -->
-<div class="news-header ">
+<div class="news-header">
     <h1>Video Gallery</h1>
 </div>
 
 <div class="container">
-
-    {% if events %}
-
-        <!-- ONE SINGLE CARD -->
+    {% if page_obj %}
         <div class="video-card">
             <div class="video-grid">
-
-                {% for event in events %}
-
-                    {% if event.embed_url_1 %}
-                    <div class="video-wrapper">
-                        <iframe title="{{ event.title }}" src="{{ event.embed_url_1 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    </div>
-                    {% endif %}
-
-                    {% if event.embed_url_2 %}
-                    <div class="video-wrapper">
-                        <iframe title="{{ event.title }}" src="{{ event.embed_url_2 }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    </div>
-                    {% endif %}
-
+                {% for video in page_obj %}
+                <div class="video-wrapper">
+                    <iframe title="{{ video.title }}" src="{{ video.url }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
                 {% endfor %}
-
             </div>
+        </div>
 
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">« First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% else %}
+                <span class="disabled">« First</span>
+                <span class="disabled">Previous</span>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                    <a href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+            {% else %}
+                <span class="disabled">Next</span>
+                <span class="disabled">Last »</span>
+            {% endif %}
         </div>
 
     {% else %}
-
         <div style="text-align:center; padding: 80px;">
             <h3>No videos available</h3>
         </div>
-
     {% endif %}
-
 </div>
-
 {% endblock %}

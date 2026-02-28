@@ -271,7 +271,10 @@ textarea {
           <select name="aggregator" required onchange="this.setAttribute('value', this.value);">
             <option value="" disabled selected></option>
             {% for aggregator in aggregators %}
-              <option value="{{ aggregator.id }}">{{ aggregator.name }}</option>
+            {% if aggregator.is_aggregator == "Yes" %}
+            <option value="{{ aggregator.id }}">{{ aggregator.name }}</option>
+            {% else %}
+            {% endif %}
             {% endfor %}
           </select>
           <label>Aggregator Name</label>

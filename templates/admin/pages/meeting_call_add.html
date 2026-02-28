@@ -1,155 +1,733 @@
 {% extends "admin/base/base.html" %}
 
 {% block custom_css %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <style>
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+  /* ==========================================================================
+     CLEAN PROFESSIONAL DESIGN - Add Meeting Call
+     ========================================================================== */
+  :root {
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    --success-500: #10b981;
+    --success-600: #059669;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+
+  /* Hide number input spinners */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Form Card
+     ========================================================================== */
+  .form-card {
+    max-width: 650px;
+    width: 100%;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+
+  /* ==========================================================================
+     Header
+     ========================================================================== */
+  .form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-icon {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 1.5rem;
+  }
+
+  .header-text h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.25rem;
+  }
+
+  .header-text p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Alert
+     ========================================================================== */
+  .alert-modern {
+    margin: 1.5rem 2rem 0;
+    padding: 1rem 1.25rem;
+    background: var(--success-50);
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .alert-modern i {
+    color: var(--success-500);
+    font-size: 1.25rem;
+  }
+
+  .alert-modern span {
+    flex: 1;
+    color: #166534;
+    font-size: 0.9375rem;
+  }
+
+  .alert-modern button {
+    background: transparent;
+    border: none;
+    color: #86efac;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .alert-modern button:hover {
+    background: rgba(255,255,255,0.5);
+    color: #166534;
+  }
+
+  /* ==========================================================================
+     Form Body
+     ========================================================================== */
+  .form-body {
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Form Groups
+     ========================================================================== */
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .required-star {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .label-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--primary-50);
+    border-radius: 6px;
+    color: var(--primary-600);
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* ==========================================================================
+     Input Fields
+     ========================================================================== */
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .form-input:hover {
+    border-color: var(--gray-400);
+  }
+
+  .form-input::placeholder {
+    color: var(--gray-400);
+  }
+
+  /* ==========================================================================
+     Date & Time Row
+     ========================================================================== */
+  .row-custom {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.5rem;
+  }
+
+  .col-custom {
+    flex: 1;
+    padding: 0 0.5rem;
+    min-width: 200px;
+  }
+
+  /* ==========================================================================
+     File Input
+     ========================================================================== */
+  .file-input-wrapper {
+    position: relative;
+  }
+
+  .file-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .file-input:hover {
+    border-color: var(--primary-500);
+    background: var(--gray-50);
+  }
+
+  .file-input::-webkit-file-upload-button {
+    background: var(--primary-600);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .file-input::-webkit-file-upload-button:hover {
+    background: var(--primary-700);
+  }
+
+  /* Image Preview */
+  .preview-container {
+    margin-top: 1rem;
+    display: none;
+    width: 200px;
+    height: 300px;
+    border: 2px solid var(--primary-300);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .size-note {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .size-note i {
+    color: var(--primary-500);
+  }
+
+  .size-error {
+    color: #e67e22;
+    font-size: 0.75rem;
+    margin-top: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .size-error i {
+    color: #e67e22;
+  }
+
+  /* ==========================================================================
+     Quill Editor Customization
+     ========================================================================== */
+  .quill-wrapper {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.2s;
+    background: white;
+  }
+
+  .quill-wrapper:focus-within {
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .ql-toolbar {
+    background: var(--gray-50);
+    border: none !important;
+    border-bottom: 1px solid var(--gray-300) !important;
+    padding: 0.75rem !important;
+  }
+
+  .ql-container {
+    border: none !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.9375rem !important;
+  }
+
+  .ql-editor {
+    min-height: 200px;
+    padding: 1rem !important;
+  }
+
+  .ql-editor.ql-blank::before {
+    color: var(--gray-400);
+    font-style: normal;
+  }
+
+  .ql-toolbar button {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .ql-toolbar button:hover {
+    background: var(--primary-100) !important;
+  }
+
+  .ql-toolbar button.ql-active {
+    background: var(--primary-500) !important;
+    color: white !important;
+  }
+
+  /* ==========================================================================
+     Helper Text
+     ========================================================================== */
+  .helper-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+  }
+
+  .helper-text i {
+    color: var(--primary-500);
+  }
+
+  /* ==========================================================================
+     Form Footer
+     ========================================================================== */
+  .form-footer {
+    padding: 1.5rem 2rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  /* ==========================================================================
+     Buttons
+     ========================================================================== */
+  .btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    font-family: var(--font-sans);
+  }
+
+  .btn-primary {
+    background: var(--success-500);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--success-600);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+  }
+
+  .btn-secondary:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+  }
+
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    top: 50%;
+    left: 50%;
+    margin-left: -0.5rem;
+    margin-top: -0.5rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 640px) {
+    .page-wrapper {
+      padding: 1rem;
     }
 
-    input[type=number] {
-        -moz-appearance: textfield;
+    .form-header {
+      padding: 1.25rem;
     }
+
+    .form-body {
+      padding: 1.25rem;
+    }
+
+    .form-footer {
+      padding: 1.25rem;
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+
+    .col-custom {
+      min-width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .col-custom:last-child {
+      margin-bottom: 0;
+    }
+  }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
+<div class="page-wrapper">
+    <div class="form-card">
+        
+        <!-- Header -->
+        <div class="form-header">
+            <div class="header-icon">
+                <i class="bi bi-calendar-plus"></i>
+            </div>
+            <div class="header-text">
+                <h2>Add Meeting Call</h2>
+                <p>Create a new meeting schedule</p>
+            </div>
+        </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-<div class="card mt-4" style="max-width: 600px; margin:auto;">
-
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Add Meeting Call</h5>
-    </div>
-
-    <div class="card-body">
-
+        <!-- Messages -->
         {% if messages %}
             {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert-modern">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ message }}</span>
+                <button type="button" data-bs-dismiss="alert">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
             {% endfor %}
         {% endif %}
 
-        <form method="POST" enctype="multipart/form-data"> 
+        <!-- Form -->
+        <form method="POST" enctype="multipart/form-data" id="meetingForm">
             {% csrf_token %}
-
-            <div class="mb-3">
-                <label class="form-label">Title</label>
-                <input type="text" name="title" class="form-control" placeholder="Enter meeting title..." required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Amount</label>
-                <input type="number" name="amount" class="form-control" placeholder="Enter meeting amount..." required>
-            </div>
             
-            <!-- ✅ Date + Time Side by Side -->
-            <div class="mb-3">
-                <div class="row">
-                    <!-- Date -->
-                    <div class="col-md-6">
-                         <label class="form-label">Expiry Date </label>
-                        <input type="text" name="expire_date_date" id="expiry-date"
-                               class="form-control bg-white"
-                               placeholder="Select Date"
-                               required>
-                    </div>
-
-                    <!-- Time -->
-                    <div class="col-md-6">
-                         <label class="form-label">Expiry Time</label>
-                        <input type="text" name="expire_date_time" id="expiry-time"
-                               class="form-control bg-white"
-                               placeholder="Select Time"
-                               required>
+            <div class="form-body">
+                
+                <!-- Title Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-type-h1"></i>
+                        </span>
+                        Meeting Title
+                        <span class="required-star">*</span>
+                    </label>
+                    <input type="text" name="title" class="form-input" placeholder="e.g., Quarterly Business Review" required>
+                    <div class="helper-text">
+                        <i class="bi bi-info-circle"></i>
+                        Enter a clear, descriptive title for the meeting
                     </div>
                 </div>
 
-                <!-- Hidden combined -->
-                <input type="hidden" name="expire_date" id="expiry-datetime">
-            </div>
+                <!-- Amount Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="fw-bold">৳</i>
+                        </span>
+                        Amount
+                        <span class="required-star">*</span>
+                    </label>
+                    <input type="number" name="amount" class="form-input" placeholder="e.g., 1000" required>
+                    <div class="helper-text">
+                        <i class="bi bi-info-circle"></i>
+                        Enter the meeting amount/cost
+                    </div>
+                </div>
+                
+                <!-- Date + Time Row -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-clock"></i>
+                        </span>
+                        Expiry Date & Time
+                        <span class="required-star">*</span>
+                    </label>
+                    
+                    <div class="row-custom">
+                        <!-- Date -->
+                        <div class="col-custom">
+                            <input type="text" name="expire_date_date" id="expiry-date"
+                                   class="form-input bg-white"
+                                   placeholder="Select Date"
+                                   required>
+                        </div>
 
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <div id="quill-editor" style="height: 200px; background: #fff;"></div>
-                <input type="hidden" name="description" id="description-input">
-            </div>
+                        <!-- Time -->
+                        <div class="col-custom">
+                            <input type="text" name="expire_date_time" id="expiry-time"
+                                   class="form-input bg-white"
+                                   placeholder="Select Time"
+                                   required>
+                        </div>
+                    </div>
 
-           <div class="mb-3">
-                <label class="form-label">Image</label>
-                <input type="file" name="image" class="form-control" accept="image/*" id="image-input">
-                <p id="size-error" style="color: #e67e22; font-size: 0.85rem; margin-top: 5px; display: block;">
-                    <strong>Note:</strong> Photo size must be exactly 200x300 pixels.
-                </p>
-                <div id="preview-container" style="margin-top:10px; display:none; width: 200px; height: 300px; border: 1px solid #ddd; overflow: hidden; border-radius: 4px;">
-                    <img id="image-preview" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                    <!-- Hidden combined -->
+                    <input type="hidden" name="expire_date" id="expiry-datetime">
+                    
+                    <div class="helper-text">
+                        <i class="bi bi-calendar"></i>
+                        Select the expiry date and time for this meeting
+                    </div>
+                </div>
+
+                <!-- Description Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-card-text"></i>
+                        </span>
+                        Description
+                    </label>
+                    
+                    <!-- Quill Editor -->
+                    <div class="quill-wrapper">
+                        <div id="quill-editor" style="height: 200px;"></div>
+                    </div>
+                    
+                    <input type="hidden" name="description" id="description-input">
+                    
+                    <div class="helper-text">
+                        <i class="bi bi-pencil"></i>
+                        Add meeting details, agenda, or notes (optional)
+                    </div>
+                </div>
+
+                <!-- Image Field -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-image"></i>
+                        </span>
+                        Meeting Image
+                    </label>
+                    
+                    <input type="file" name="image" class="file-input" accept="image/*" id="image-input">
+                    
+                    <div class="size-note">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Note:</strong> Image size must be exactly <strong>200x300 pixels</strong>
+                    </div>
+                    
+                    <div id="size-error" class="size-error" style="display: none;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span id="error-message"></span>
+                    </div>
+                    
+                    <!-- Preview Container -->
+                    <div id="preview-container" class="preview-container">
+                        <img id="image-preview" src="" alt="Preview">
+                    </div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-2">
-                <a href="{% url 'admin_meeting_call' %}" class="btn btn-sm btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-success">Save</button>
+            <!-- Footer -->
+            <div class="form-footer">
+                <a href="{% url 'admin_meeting_call' %}" class="btn btn-secondary">
+                    <i class="bi bi-x"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="bi bi-check"></i>
+                    Save Meeting
+                </button>
             </div>
-
         </form>
     </div>
 </div>
 
-<!-- Quill -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-<!-- Flatpickr -->
+<!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
 <script>
-// ✅ Date Picker
-flatpickr("#expiry-date", {
-    dateFormat: "Y-m-d",
-    minDate: "today"
-});
-
-// ✅ Time Picker
-flatpickr("#expiry-time", {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: "H:i",
-    time_24hr: false
-});
-
-// ✅ Combine Date + Time before submit
-document.querySelector('form').addEventListener('submit', function () {
-    const date = document.getElementById('expiry-date').value;
-    const time = document.getElementById('expiry-time').value;
-
-    if (date && time) {
-        document.getElementById('expiry-datetime').value = date + " " + time;
-    }
-});
-
-// Image Preview
-document.getElementById('image-input').addEventListener('change', function(event){
-    const file = event.target.files[0];
-    if(file){
-        const reader = new FileReader();
-        reader.onload = function(e){
-            const preview = document.getElementById('image-preview');
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-        }
-        reader.readAsDataURL(file);
-    }
-});
-
-// Quill
 document.addEventListener("DOMContentLoaded", function() {
+    
+    // ✅ Date Picker
+    flatpickr("#expiry-date", {
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        altInput: true,
+        altFormat: "F j, Y"
+    });
+
+    // ✅ Time Picker
+    flatpickr("#expiry-time", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: false,
+        altInput: true,
+        altFormat: "h:i K"
+    });
+
+    // ✅ Initialize Quill Editor
     var quill = new Quill('#quill-editor', {
         theme: 'snow',
+        placeholder: 'Enter meeting description, agenda, and details...',
         modules: {
             toolbar: [
                 [{ 'header': [1, 2, 3, false] }],
@@ -161,61 +739,78 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    var form = document.querySelector('form');
-    form.onsubmit = function() {
-        document.getElementById('description-input').value = quill.root.innerHTML;
-    };
-});
-
-// Image Preview
-document.getElementById('image-input').addEventListener('change', function(event){
-    const file = event.target.files[0];
-    if(file){
-        const reader = new FileReader();
-        reader.onload = function(e){
-            const preview = document.getElementById('image-preview');
-            const container = document.getElementById('preview-container');
-            
-            preview.src = e.target.result;
-            container.style.display = 'block'; // Show the container
-        }
-        reader.readAsDataURL(file);
-    }
-});
-
-// ✅ Image Preview & Dimension Validation (Strict 200x300)
-document.getElementById('image-input').addEventListener('change', function(event){
-    const file = event.target.files[0];
-    const input = event.target;
+    // ✅ Image Preview & Dimension Validation (Strict 200x300)
+    const imageInput = document.getElementById('image-input');
     const preview = document.getElementById('image-preview');
     const container = document.getElementById('preview-container');
+    const sizeError = document.getElementById('size-error');
+    const errorMessage = document.getElementById('error-message');
 
-    if(file){
-        const img = new Image();
-        const objectUrl = URL.createObjectURL(file);
+    imageInput.addEventListener('change', function(event){
+        const file = event.target.files[0];
+        
+        if(file){
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
 
-        img.onload = function() {
-           
-            if (this.width !== 200 || this.height !== 300) {
-                alert("Invalid image dimensions! Please upload an image that is exactly 200x300 pixels.\n\nYour image: " + this.width + "x" + this.height);
-                
-                // Reset input and hide preview
-                input.value = ""; 
-                container.style.display = 'none';
-            } else {
-                // ✅ Correct size: Show preview
-                preview.src = objectUrl;
-                container.style.display = 'block';
-            }
-            // Free memory
-            URL.revokeObjectURL(objectUrl);
-        };
+            img.onload = function() {
+                // Check dimensions
+                if (this.width !== 200 || this.height !== 300) {
+                    // Show error message
+                    errorMessage.innerHTML = `Invalid image dimensions! Please upload an image that is exactly 200x300 pixels.<br>Your image: ${this.width}x${this.height}`;
+                    sizeError.style.display = 'flex';
+                    
+                    // Reset input and hide preview
+                    imageInput.value = ""; 
+                    container.style.display = 'none';
+                } else {
+                    // ✅ Correct size: Show preview and hide error
+                    preview.src = objectUrl;
+                    container.style.display = 'block';
+                    sizeError.style.display = 'none';
+                }
+                // Free memory
+                URL.revokeObjectURL(objectUrl);
+            };
 
-        img.src = objectUrl;
-    }
+            img.src = objectUrl;
+        } else {
+            // No file selected
+            container.style.display = 'none';
+            sizeError.style.display = 'none';
+        }
+    });
+
+    // ✅ Form Submission
+    const form = document.getElementById('meetingForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', function(e) {
+        // Combine Date + Time
+        const date = document.getElementById('expiry-date').value;
+        const time = document.getElementById('expiry-time').value;
+
+        if (date && time) {
+            document.getElementById('expiry-datetime').value = date + " " + time;
+        }
+
+        // Save Quill content
+        document.getElementById('description-input').value = quill.root.innerHTML;
+
+        // Show loading state
+        submitBtn.classList.add('btn-loading');
+    });
+
+    // Auto-dismiss alerts
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert-modern');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.3s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        });
+    }, 5000);
 });
-
 </script>
-
 
 {% endblock content %}

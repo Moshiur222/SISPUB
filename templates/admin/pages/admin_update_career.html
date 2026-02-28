@@ -1,60 +1,514 @@
 {% extends "admin/base/base.html" %}
 
+{% block custom_css %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+  /* ==========================================================================
+     CLEAN PROFESSIONAL DESIGN - Edit Career
+     ========================================================================== */
+  :root {
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    --success-500: #10b981;
+    --success-600: #059669;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Form Card
+     ========================================================================== */
+  .form-card {
+    max-width: 800px;
+    width: 100%;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+
+  /* ==========================================================================
+     Header
+     ========================================================================== */
+  .form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-icon {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 1.5rem;
+  }
+
+  .header-text h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.25rem;
+  }
+
+  .header-text p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Form Body
+     ========================================================================== */
+  .form-body {
+    padding: 2rem;
+  }
+
+  /* ==========================================================================
+     Form Groups
+     ========================================================================== */
+  .form-group {
+    margin-bottom: 2rem;
+  }
+
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .required-star {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .label-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--primary-50);
+    border-radius: 6px;
+    color: var(--primary-600);
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* ==========================================================================
+     Input Fields
+     ========================================================================== */
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .form-input:hover {
+    border-color: var(--gray-400);
+  }
+
+  .form-input::placeholder {
+    color: var(--gray-400);
+  }
+
+  /* ==========================================================================
+     Quill Editor Customization
+     ========================================================================== */
+  .quill-wrapper {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.2s;
+    background: white;
+  }
+
+  .quill-wrapper:focus-within {
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .ql-toolbar {
+    background: var(--gray-50);
+    border: none !important;
+    border-bottom: 1px solid var(--gray-300) !important;
+    padding: 0.75rem !important;
+  }
+
+  .ql-container {
+    border: none !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.9375rem !important;
+  }
+
+  .ql-editor {
+    min-height: 200px;
+    padding: 1rem !important;
+    line-height: 1.6;
+  }
+
+  .ql-editor.ql-blank::before {
+    color: var(--gray-400);
+    font-style: normal;
+  }
+
+  .ql-toolbar button {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .ql-toolbar button:hover {
+    background: var(--primary-100) !important;
+  }
+
+  .ql-toolbar button.ql-active {
+    background: var(--primary-500) !important;
+    color: white !important;
+  }
+
+  /* ==========================================================================
+     Helper Text
+     ========================================================================== */
+  .helper-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+  }
+
+  .helper-text i {
+    color: var(--primary-500);
+  }
+
+  /* ==========================================================================
+     Form Footer
+     ========================================================================== */
+  .form-footer {
+    padding: 1.5rem 2rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  /* ==========================================================================
+     Buttons
+     ========================================================================== */
+  .btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    font-family: var(--font-sans);
+  }
+
+  .btn-primary {
+    background: var(--success-500);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--success-600);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+  }
+
+  .btn-secondary:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+  }
+
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    top: 50%;
+    left: 50%;
+    margin-left: -0.5rem;
+    margin-top: -0.5rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 640px) {
+    .page-wrapper {
+      padding: 1rem;
+    }
+
+    .form-header {
+      padding: 1.25rem;
+    }
+
+    .form-body {
+      padding: 1.25rem;
+    }
+
+    .form-footer {
+      padding: 1.25rem;
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
 {% block content %}
+<div class="page-wrapper">
+    <div class="form-card">
+        
+        <!-- Header -->
+        <div class="form-header">
+            <div class="header-icon">
+                <i class="bi bi-pencil-square"></i>
+            </div>
+            <div class="header-text">
+                <h2>Edit Career Position</h2>
+                <p>Update job opportunity details</p>
+            </div>
+        </div>
 
-<div class="card mt-4">
-    <div class="card-header">
-        <h5 class="mb-0">Edit Career</h5>
-    </div>
-
-    <div class="card-body">
-       
-        <form method="POST" action="">
+        <!-- Form -->
+        <form method="POST" action="" id="careerForm">
             {% csrf_token %}
             
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="title" value="{{ career.title }}" placeholder="Enter career title" required>
+            <div class="form-body">
+                
+                <!-- Title Field -->
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-briefcase"></i>
+                        </span>
+                        Job Title
+                        <span class="required-star">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        class="form-input"
+                        id="title"
+                        name="title"
+                        value="{{ career.title }}"
+                        placeholder="e.g., Senior Software Engineer"
+                        required
+                    />
+                    <div class="helper-text">
+                        <i class="bi bi-info-circle"></i>
+                        Enter a clear, descriptive job title
+                    </div>
+                </div>
+
+                <!-- Description Field with Quill -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">
+                            <i class="bi bi-card-text"></i>
+                        </span>
+                        Job Description
+                        <span class="required-star">*</span>
+                    </label>
+                    
+                    <!-- Quill editor -->
+                    <div class="quill-wrapper">
+                        <div id="quill-editor" style="height: 200px;"></div>
+                    </div>
+                    
+                    <!-- Hidden textarea to submit content -->
+                    <textarea name="description" id="description" style="display:none;"></textarea>
+                    
+                    <div class="helper-text">
+                        <i class="bi bi-pencil"></i>
+                        Describe the role, responsibilities, qualifications, and benefits
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <div id="quill-editor" style="height: 200px;"></div>
-                <textarea name="description" id="description" style="display:none;"></textarea>
+            <!-- Footer -->
+            <div class="form-footer">
+                <a href="{% url 'admin_career' %}" class="btn btn-secondary">
+                    <i class="bi bi-x"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="bi bi-check"></i>
+                    Update Career
+                </button>
             </div>
-
-            <button type="submit" class="btn btn-success">Update Career</button>
-            <a href="{% url 'admin_career' %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>
 
-<!-- Include Quill CSS & JS -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<!-- Quill JS -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Quill editor
+    // Initialize Quill editor with full toolbar
     var quill = new Quill('#quill-editor', {
-        theme: 'snow'
-    });
-
-    // Load existing description into Quill
-    quill.root.innerHTML = `{{ career.description|safe }}`;
-
-    // On form submit, copy HTML content to hidden textarea
-    var form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        var descriptionInput = document.querySelector('#description');
-        descriptionInput.value = quill.root.innerHTML.trim();
-
-        if(quill.getText().trim().length === 0){
-            alert("Description is required.");
-            e.preventDefault();  // prevent submission if empty
+        theme: 'snow',
+        placeholder: 'Describe the job role, responsibilities, qualifications, and benefits...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['link', 'blockquote', 'code-block'],
+                ['clean']
+            ]
         }
     });
+
+    // Safely set existing description content into Quill
+    // Using a more robust approach for Django template variables
+    var existingContent = `{{ career.description|safe }}`;
+    if (existingContent && existingContent !== 'None' && existingContent !== '') {
+        quill.root.innerHTML = existingContent;
+    }
+
+    // Form submission handling
+    var form = document.getElementById('careerForm');
+    var submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', function(e) {
+        var descriptionInput = document.getElementById('description');
+        descriptionInput.value = quill.root.innerHTML.trim();
+
+        // Check if description is empty
+        if(quill.getText().trim().length === 0){
+            alert("Description is required.");
+            e.preventDefault();
+            return;
+        }
+
+        // Show loading state
+        submitBtn.classList.add('btn-loading');
+    });
+
+    // Auto-dismiss any alerts if they exist
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.3s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        });
+    }, 5000);
 });
 </script>
-
-{% endblock %}
+{% endblock content %}

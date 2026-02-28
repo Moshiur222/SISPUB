@@ -481,21 +481,6 @@
                 <div class="info-value phone">{{ members.mobile|default:"—" }}</div>
             </div>
 
-            <!-- Is Aggregator -->
-            <div class="info-item">
-                <div class="info-label">
-                    <i class="bi bi-building"></i>
-                    Aggregator Status
-                </div>
-                <div class="info-value">
-                    {% if members.is_aggregator %}
-                        <span class="aggregator-badge yes">Yes</span>
-                    {% else %}
-                        <span class="aggregator-badge no">No</span>
-                    {% endif %}
-                </div>
-            </div>
-
             <!-- BTRC Licence No -->
             <div class="info-item">
                 <div class="info-label">
@@ -503,6 +488,15 @@
                     BTRC Licence No
                 </div>
                 <div class="info-value">{{ members.brtc_licence_no|default:"—" }}</div>
+            </div>
+
+            <!-- BTRC Licence No -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-file-earmark-text"></i>
+                    TREAD Licence No
+                </div>
+                <div class="info-value">{{ members.tread_licence_no|default:"—" }}</div>
             </div>
 
             <!-- Address -->

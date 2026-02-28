@@ -1,110 +1,621 @@
 {% extends "admin/base/base.html" %}
-{% block content %}
-<div class="card mt-4">
 
+{% block custom_css %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css"/>
+
+<style>
+  /* ==========================================================================
+     CLEAN PROFESSIONAL DESIGN - Member Registration Details
+     ========================================================================== */
+  :root {
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    --success-50: #ecfdf5;
+    --success-500: #10b981;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .details-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ==========================================================================
+     Page Header with Back Button
+     ========================================================================== */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--primary-100);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.75rem;
+  }
+
+  .header-text h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+  }
+
+  .header-text p {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .btn-back:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    color: var(--gray-900);
+  }
+
+  .btn-back i {
+    font-size: 1rem;
+  }
+
+  /* ==========================================================================
+     Alert
+     ========================================================================== */
+  .alert-modern {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--success-50);
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .alert-modern i {
+    color: var(--success-500);
+    font-size: 1.25rem;
+  }
+
+  .alert-modern span {
+    flex: 1;
+    color: #166534;
+    font-size: 0.9375rem;
+  }
+
+  .alert-modern button {
+    background: transparent;
+    border: none;
+    color: #86efac;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .alert-modern button:hover {
+    background: rgba(255,255,255,0.5);
+    color: #166534;
+  }
+
+  /* ==========================================================================
+     Main Card
+     ========================================================================== */
+  .main-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+  }
+
+  .card-header h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-header h5 i {
+    color: var(--primary-500);
+  }
+
+  /* ==========================================================================
+     Member Info Grid
+     ========================================================================== */
+  .member-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .info-item {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    transition: all 0.2s;
+  }
+
+  .info-item:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--primary-300);
+  }
+
+  .info-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--gray-500);
+    margin-bottom: 0.75rem;
+  }
+
+  .info-label i {
+    color: var(--primary-500);
+    font-size: 1rem;
+  }
+
+  .info-value {
+    font-size: 1rem;
+    color: var(--gray-800);
+    font-weight: 500;
+    word-break: break-word;
+  }
+
+  .info-value.email {
+    color: var(--primary-600);
+  }
+
+  .info-value.nid {
+    font-family: monospace;
+    font-size: 1.125rem;
+  }
+
+  .info-value.phone {
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value.address {
+    line-height: 1.6;
+  }
+
+  /* Aggregator Badge */
+  .aggregator-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .aggregator-badge.yes {
+    background: var(--success-50);
+    color: var(--success-500);
+    border: 1px solid #bbf7d0;
+  }
+
+  .aggregator-badge.no {
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: 1px solid var(--gray-200);
+  }
+
+  /* BTRC Licence */
+  .licence-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    background: var(--primary-50);
+    color: var(--primary-700);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* DataTables Customization */
+  .dataTables_wrapper {
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .dataTables_length select,
+  .dataTables_filter input {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .dataTables_length select:focus,
+  .dataTables_filter input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .dataTables_info {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    padding: 1rem;
+  }
+
+  .dataTables_paginate {
+    padding: 1rem;
+  }
+
+  .paginate_button {
+    padding: 0.375rem 0.75rem;
+    margin: 0 0.25rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .paginate_button:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-400);
+    color: var(--primary-600);
+  }
+
+  .paginate_button.current {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: white;
+  }
+
+  .dt-buttons {
+    margin-bottom: 1rem;
+  }
+
+  .dt-button {
+    padding: 0.5rem 1rem !important;
+    background: white !important;
+    border: 1px solid var(--gray-300) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--gray-700) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    margin-right: 0.5rem !important;
+    transition: all 0.2s !important;
+  }
+
+  .dt-button:hover {
+    background: var(--primary-50) !important;
+    border-color: var(--primary-400) !important;
+    color: var(--primary-600) !important;
+  }
+
+  .dt-button i {
+    margin-right: 0.25rem;
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 768px) {
+    .details-container {
+      padding: 1rem;
+    }
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .member-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dt-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="details-container">
+    <!-- Page Header with Back Button -->
+    <div class="page-header">
+        <div class="header-left">
+            <div class="header-icon">
+                <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="header-text">
+                <h1>Member Details</h1>
+                <p>View complete member registration information</p>
+            </div>
+        </div>
+        <button class="btn-back" onclick="window.history.back()">
+            <i class="bi bi-arrow-left"></i>
+            Back to List
+        </button>
+    </div>
+
+    <!-- Messages -->
     {% if messages %}
         {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>{{ message }}</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-modern">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ message }}</span>
+            <button type="button" data-bs-dismiss="alert">
+                <i class="bi bi-x"></i>
+            </button>
         </div>
         {% endfor %}
     {% endif %}
 
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <button class="btn btn-secondary btn-sm" onclick="window.history.back()">
-            &larr; Back
-        </button>
-    </div>
+    <!-- Main Card -->
+    <div class="main-card">
+        <div class="card-header">
+            <h5>
+                <i class="bi bi-info-circle"></i>
+                Registration Information
+            </h5>
+        </div>
 
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="example" class="table table-striped table-bordered table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>email_address</th>
-                        <th>NID</th>
-                        <th>phone</th>
-                        <th>is_aggregator</th>
-                        <th>brtc_licence_no</th>
-                        <th>address</th>
-                    </tr>
-                </thead>
+        <!-- Member Info Grid -->
+        <div class="member-info-grid">
+            <!-- Email -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-envelope"></i>
+                    Email Address
+                </div>
+                <div class="info-value email">{{ registrations.email|default:"—" }}</div>
+            </div>
 
-                <tbody>
-                    <tr>
-                        <td>{{ registrations.email }}</td>
-                        <td>{{ registrations.n_id }}</td>
-                        <td>{{ registrations.phone }}</td>
-                        <td>{{ registrations.is_aggregator }}</td>
-                        <td>{{ registrations.brtc_licence_no }}</td>
-                        <td>{{ registrations.address }}</td>
-                        <td>
-                    </tr>
-                </tbody>
+            <!-- NID -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-card-text"></i>
+                    National ID (NID)
+                </div>
+                <div class="info-value nid">{{ registrations.n_id|default:"—" }}</div>
+            </div>
 
-            </table>
+            <!-- Phone -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-telephone"></i>
+                    Phone Number
+                </div>
+                <div class="info-value phone">{{ registrations.phone|default:"—" }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-telephone"></i>
+                    Mobile Number
+                </div>
+                <div class="info-value phone">{{ registrations.mobile|default:"—" }}</div>
+            </div>
+
+            <!-- Is Aggregator -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-building"></i>
+                    Aggregator Status
+                </div>
+                <div class="info-value">
+                    {% if registrations.is_aggregator == "Yes" %}
+                        <span class="aggregator-badge yes">Yes</span>
+                    {% else %}
+                        <span class="aggregator-badge no">No</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- BTRC Licence No -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-file-earmark-text"></i>
+                    BTRC Licence No
+                </div>
+                <div class="info-value">
+                    {% if registrations.brtc_licence_no %}
+                        <span class="licence-badge">{{ registrations.brtc_licence_no }}</span>
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="bi bi-geo-alt"></i>
+                    Address
+                </div>
+                <div class="info-value address">{{ registrations.address|default:"—" }}</div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ✅ DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
-
-<!-- ✅ jQuery -->
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-<!-- ✅ DataTables -->
+<!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- ✅ Buttons -->
+<!-- Buttons -->
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-<!-- ✅ Export dependencies -->
+<!-- Export dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <script>
 $(document).ready(function() {
-    $('#example').DataTable({
-        dom: 'Bfrtip',
-        buttons: ['copy', 'excel', 'pdf', 'print'],
-        pageLength: 10,
-        responsive: true
-    });
+    // Initialize DataTable (if there's a table to display)
+    if ($('#example').length) {
+        $('#example').DataTable({
+            dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
+                 '<"row"<"col-sm-12"tr>>' +
+                 '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="bi bi-files"></i> Copy',
+                    className: 'dt-button',
+                    title: 'Member Details'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="bi bi-file-excel"></i> Excel',
+                    className: 'dt-button',
+                    title: 'Member Details'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="bi bi-file-pdf"></i> PDF',
+                    className: 'dt-button',
+                    title: 'Member Details',
+                    orientation: 'portrait',
+                    pageSize: 'A4'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="bi bi-printer"></i> Print',
+                    className: 'dt-button'
+                }
+            ],
+            pageLength: 10,
+            responsive: true,
+            language: {
+                search: "Search:",
+                searchPlaceholder: "Search records...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries",
+                infoFiltered: "(filtered from _MAX_ total entries)",
+                zeroRecords: "No matching records found",
+                paginate: {
+                    first: '<i class="bi bi-chevron-double-left"></i>',
+                    last: '<i class="bi bi-chevron-double-right"></i>',
+                    next: '<i class="bi bi-chevron-right"></i>',
+                    previous: '<i class="bi bi-chevron-left"></i>'
+                }
+            }
+        });
+    }
 });
 
-// ✅ Countdown Function
-function updateCountdowns() {
-    const elements = document.querySelectorAll('.countdown');
-
-    elements.forEach(el => {
-        const expireTime = new Date(el.getAttribute('data-expire')).getTime();
-        const now = new Date().getTime();
-
-        const distance = expireTime - now;
-
-        if (distance <= 0) {
-            el.innerHTML = "<span style='color:red; font-weight:bold;'>Expired</span>";
-            return;
-        }
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((distance / (1000 * 60)) % 60);
-        const seconds = Math.floor((distance / 1000) % 60);
-
-        el.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+// Auto-dismiss alerts
+setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert-modern');
+    alerts.forEach(alert => {
+        alert.style.transition = 'opacity 0.3s';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 300);
     });
-}
-
-// Run every second
-setInterval(updateCountdowns, 1000);
-updateCountdowns();
+}, 5000);
 </script>
 
 {% endblock content %}

@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from collections import defaultdict
 from django.contrib import messages
@@ -53,24 +54,46 @@ def mission(request):
     }
     return render(request, "home/layouts/mission.html", context)
 
+
+
 def founder_view(request):
-    founders = FoundersInfo.objects.all()
+    founders_list = FoundersInfo.objects.all().order_by('id')
+
+    paginator = Paginator(founders_list, 6)
+
+    page_number = request.GET.get('page')  # may be None or ''
+    founders = paginator.get_page(page_number)  # ✅ SAFE
+
     context = {
-        'founders' : founders
+        'founders': founders,
+        'page_obj': founders
     }
     return render(request, "home/layouts/founder.html", context)
 
+
 def current_executive_commitee(request):
-    commitees = SispabExecutiveCom.objects.all()
+    commitees_list = SispabExecutiveCom.objects.all().order_by('id')  # QuerySet
+    paginator = Paginator(commitees_list, 6)  # 6 cards per page
+
+    page_number = request.GET.get('page')
+    commitees = paginator.get_page(page_number)  # SAFE (no crash)
+
     context = {
-        'commitees': commitees
+        'commitees': commitees,  # for template loop
+        'page_obj': commitees    # for pagination buttons
     }
     return render(request, "home/layouts/current_executive_commitee.html", context)
 
 def previous_committee(request):
-    commitees = PreviousExecutiveCommittee.objects.all()
+    commitees_list = PreviousExecutiveCommittee.objects.all().order_by('id')  # QuerySet
+    paginator = Paginator(commitees_list, 6)  # 6 members per page
+
+    page_number = request.GET.get('page')
+    commitees = paginator.get_page(page_number)  # safe
+
     context = {
-        'commitees' : commitees
+        'commitees': commitees,  # for looping through
+        'page_obj': commitees    # for pagination controls
     }
     return render(request, "home/layouts/previous_committee.html", context)
 
@@ -313,11 +336,24 @@ def search(request):
 
 def meeting_calls(request):
     now = timezone.localtime()
-    upcoming_meetings = MeetingTitle.objects.filter(expire_date__gt=now).order_by('expire_date')
-    previous_meetings = MeetingTitle.objects.filter(expire_date__lte=now).order_by('-expire_date')
 
-    return render(request, "home/layouts/meeting_calls.html", {'upcoming_meetings': upcoming_meetings, 'previous_meetings': previous_meetings})
+    upcoming_list = MeetingTitle.objects.filter(expire_date__gt=now).order_by('expire_date')
+    previous_list = MeetingTitle.objects.filter(expire_date__lte=now).order_by('-expire_date')
 
+    # Pagination: 6 meetings per page
+    upcoming_page_number = request.GET.get('upcoming_page')
+    previous_page_number = request.GET.get('previous_page')
+
+    upcoming_paginator = Paginator(upcoming_list, 6)
+    previous_paginator = Paginator(previous_list, 6)
+
+    upcoming_meetings = upcoming_paginator.get_page(upcoming_page_number)
+    previous_meetings = previous_paginator.get_page(previous_page_number)
+
+    return render(request, "home/layouts/meeting_calls.html", {
+        'upcoming_meetings': upcoming_meetings,
+        'previous_meetings': previous_meetings
+    })
 
 User = get_user_model()
 
@@ -405,7 +441,14 @@ def blog_view(request):
     
 def news_view(request):
     newses = News.objects.all().order_by('-date')
-    return render(request, "home/layouts/news.html", { "newses": newses })
+
+    paginator = Paginator(newses, 9)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "home/layouts/news.html", {
+        "page_obj": page_obj
+    })
 
 def news_detail_view(request, id):
     news = get_object_or_404(News, id=id)
@@ -461,23 +504,46 @@ def media_view(request):
 
 def photo_gallery(request, id):
     album = get_object_or_404(PhotoAlbum, id=id)
-    all_photos = album.photos.all()
-    return render(request, "home/layouts/photo_gallery.html", {'all_photos': all_photos, 'album': album})
+    all_photos_list = album.photos.all().order_by('-id')  # latest first
 
-def photos(request):
-    albums = PhotoAlbum.objects.all()
+    paginator = Paginator(all_photos_list, 9)  # 9 photos per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'albums': albums
+        'album': album,
+        'page_obj': page_obj
+    }
+    return render(request, "home/layouts/photo_gallery.html", context)
+
+
+def photos(request):
+  
+    albums_list = PhotoAlbum.objects.all() 
+
+    paginator = Paginator(albums_list, 9)  # Show 9 albums per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj
     }
     return render(request, "home/layouts/gallery.html", context)
+
+
 
 
 def membership_list(request):
     members = Aggregator.objects.all().order_by('company_name')
     
+    # Add pagination - 12 items per page
+    paginator = Paginator(members, 12)  # Show 12 members per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        "members": members,
+        "members": members, 
+        "page_obj": page_obj, 
     }
     
     return render(request, "home/layouts/membership_lists.html", context)
@@ -494,11 +560,30 @@ def events_view(request):
 
 
 def video_gallery(request):
-    events = Events.objects.all()
-    events_meetings = Events_Meetings.objects.all()
+    # Fetch events and meetings
+    events = Events.objects.all().order_by('-id')
+    events_meetings = Events_Meetings.objects.all().order_by('-id')
+
+    # Combine videos into a single list with a uniform structure
+    videos = []
+
+    for event in events:
+        if getattr(event, 'embed_url_1', None):
+            videos.append({'title': event.title, 'url': event.embed_url_1})
+        if getattr(event, 'embed_url_2', None):
+            videos.append({'title': event.title, 'url': event.embed_url_2})
+
+    for meeting in events_meetings:
+        if getattr(meeting, 'video_link', None):  # Replace with your actual field in Events_Meetings
+            videos.append({'title': meeting.title, 'url': meeting.video_link})
+
+    # Pagination
+    paginator = Paginator(videos, 6)  # 6 videos per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "events": events,
-        "events_meetings": events_meetings
+        'page_obj': page_obj
     }
     return render(request, "home/layouts/video_gallery.html", context)
 
@@ -522,9 +607,13 @@ def meetings(request):
 
 
 def career(request):
-    career = Career.objects.all()
+    career_list = Career.objects.all().order_by('-id')  # newest first
+    paginator = Paginator(career_list, 6)  # show 6 careers per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context  = {
-        'career': career
+        'page_obj': page_obj
     }
     return render(request, "home/layouts/career.html", context)
 

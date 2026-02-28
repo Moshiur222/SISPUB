@@ -1,50 +1,764 @@
 {% extends "admin/base/base.html" %}
 
+{% block custom_css %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css"/>
+
+<style>
+  /* ==========================================================================
+     CLEAN PROFESSIONAL DESIGN - SEO Management
+     ========================================================================== */
+  :root {
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+
+  /* ==========================================================================
+     Main Container
+     ========================================================================== */
+  .seo-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ==========================================================================
+     Page Header
+     ========================================================================== */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--primary-100);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.75rem;
+  }
+
+  .header-text h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+  }
+
+  .header-text p {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  .btn-edit {
+    padding: 0.625rem 1.5rem;
+    background: var(--warning-500);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-edit:hover {
+    background: var(--warning-600);
+    color: white;
+  }
+
+  .btn-edit i {
+    font-size: 1rem;
+  }
+
+  /* ==========================================================================
+     Stats Cards
+     ========================================================================== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+  }
+
+  .stat-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-300);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-50);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-600);
+    font-size: 1.5rem;
+  }
+
+  .stat-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+  }
+
+  .stat-content p {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  /* ==========================================================================
+     Main Card
+     ========================================================================== */
+  .main-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-header h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-header h5 i {
+    color: var(--primary-500);
+  }
+
+  .header-badge {
+    background: white;
+    padding: 0.25rem 1rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    border: 1px solid var(--gray-200);
+  }
+
+  /* ==========================================================================
+     Table
+     ========================================================================== */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .table-clean {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table-clean thead th {
+    background: var(--gray-50);
+    padding: 1rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .table-clean tbody td {
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+  }
+
+  .table-clean tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .table-clean tbody tr:hover td {
+    background: var(--gray-50);
+  }
+
+  /* Counter */
+  .counter {
+    font-weight: 500;
+    color: var(--gray-500);
+    width: 40px;
+  }
+
+  /* Meta Title */
+  .meta-title {
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+
+  /* Meta Description */
+  .meta-description {
+    max-width: 300px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--gray-600);
+    background: var(--gray-50);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--primary-400);
+  }
+
+  .meta-description p {
+    margin-bottom: 0;
+  }
+
+  /* Meta Keywords */
+  .meta-keywords {
+    max-width: 250px;
+    font-size: 0.8125rem;
+    color: var(--gray-600);
+    background: var(--gray-50);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--warning-400);
+  }
+
+  /* Image */
+  .seo-image {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    border: 2px solid white;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+  }
+
+  .seo-image:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-300);
+  }
+
+  .no-image {
+    width: 80px;
+    height: 80px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    font-size: 1.5rem;
+  }
+
+  /* URL */
+  .meta-url {
+    color: var(--primary-600);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    word-break: break-all;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .meta-url:hover {
+    text-decoration: underline;
+  }
+
+  /* Empty State */
+  .empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+
+  .empty-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--gray-400);
+    font-size: 2.25rem;
+  }
+
+  .empty-state h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Table Footer */
+  .table-footer {
+    padding: 1rem 1.5rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+  }
+
+  .footer-info {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer-info i {
+    color: var(--primary-500);
+    margin-right: 0.25rem;
+  }
+
+  /* ==========================================================================
+     DataTables Customization
+     ========================================================================== */
+  .dataTables_wrapper {
+    padding: 1rem;
+  }
+
+  .dataTables_length select,
+  .dataTables_filter input {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .dataTables_length select:focus,
+  .dataTables_filter input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .dataTables_info {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    padding: 1rem;
+  }
+
+  .dataTables_paginate {
+    padding: 1rem;
+  }
+
+  .paginate_button {
+    padding: 0.375rem 0.75rem;
+    margin: 0 0.25rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .paginate_button:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-400);
+    color: var(--primary-600);
+  }
+
+  .paginate_button.current {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: white;
+  }
+
+  .dt-buttons {
+    margin-bottom: 1rem;
+  }
+
+  .dt-button {
+    padding: 0.5rem 1rem !important;
+    background: white !important;
+    border: 1px solid var(--gray-300) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--gray-700) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    margin-right: 0.5rem !important;
+    transition: all 0.2s !important;
+  }
+
+  .dt-button:hover {
+    background: var(--primary-50) !important;
+    border-color: var(--primary-400) !important;
+    color: var(--primary-600) !important;
+  }
+
+  .dt-button i {
+    margin-right: 0.25rem;
+  }
+
+  /* ==========================================================================
+     Responsive
+     ========================================================================== */
+  @media (max-width: 992px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .seo-container {
+      padding: 1rem;
+    }
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dt-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  }
+</style>
+{% endblock custom_css %}
+
 {% block content %}
-<div class="card mt-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">SEO</h5>
-        {% comment %} <a href="{% url 'add_seo' %}" class="btn btn-sm btn-success">Add</a> {% endcomment %}
+<div class="seo-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <div class="header-icon">
+                <i class="bi bi-search-heart"></i>
+            </div>
+            <div class="header-text">
+                <h1>SEO Management</h1>
+                <p>Manage search engine optimization settings</p>
+            </div>
+        </div>
         {% for c in seos %}
-            <a href="{% url 'edit_seo' c.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'edit_seo' c.id %}" class="btn-edit">
+                <i class="bi bi-pencil-square"></i>
+                Edit SEO 
+            </a>
         {% endfor %}
     </div>
 
-    <div class="card-body">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>meta_title</th>
-                    <th>meta_description</th>
-                    <th>meta_keywords</th>
-                    <th>meta_image</th>
-                    <th>meta_url</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in seos %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ c.meta_title }}</td>
-                    <td>{{ c.meta_description|truncatewords:20|safe }}</td>
-                    <td>{{ c.meta_keywords|truncatewords:20|safe }}</td>
-                    <td>
-                        {% if c.meta_image %}
-                        <img src="{{ c.meta_image.url }}" width="80" alt="{{ c.meta_title }}">
-                        {% else %}
-                        No Image
-                        {% endif %}
-                    </td>
-                    <td>{{ c.meta_url }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center text-muted">No Seo Data</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ seos|length }}</h3>
+                <p>SEO Entries</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-image"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ seos_with_images|default:seos|length }}</h3>
+                <p>With Images</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-link-45deg"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ seos_with_urls|default:seos|length }}</h3>
+                <p>With URLs</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="main-card">
+        <div class="card-header">
+            <h5>
+                <i class="bi bi-list-ul"></i>
+                SEO Settings
+            </h5>
+            <span class="header-badge">{{ seos|length }} entries</span>
+        </div>
+
+        <div class="table-responsive">
+            {% if seos %}
+            <table id="seoTable" class="table-clean">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Meta Title</th>
+                        <th>Meta Description</th>
+                        <th>Meta Keywords</th>
+                        <th>Meta Image</th>
+                        <th>Meta URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in seos %}
+                    <tr>
+                        <td class="counter">{{ forloop.counter }}</td>
+                        <td>
+                            <span class="meta-title">{{ c.meta_title|default:"—" }}</span>
+                        </td>
+                        <td>
+                            {% if c.meta_description %}
+                                <div class="meta-description">
+                                    {{ c.meta_description|truncatewords:20|safe }}
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if c.meta_keywords %}
+                                <div class="meta-keywords">
+                                    {{ c.meta_keywords|truncatewords:12 }}
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if c.meta_image %}
+                                <img src="{{ c.meta_image.url }}" alt="{{ c.meta_title }}" class="seo-image">
+                            {% else %}
+                                <div class="no-image">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if c.meta_url %}
+                                <a href="{{ c.meta_url }}" target="_blank" class="meta-url">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                    {{ c.meta_url|truncatechars:40 }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-search-heart"></i>
+                </div>
+                <h4>No SEO Data Found</h4>
+                <p>Add your first SEO settings to optimize your site for search engines.</p>
+                <a href="{% url 'add_seo' %}" class="btn-edit">
+                    <i class="bi bi-plus-lg"></i>
+                    Add SEO Settings
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if seos %}
+        <!-- Table Footer -->
+        <div class="table-footer">
+            <div class="footer-info">
+                <span><i class="bi bi-list"></i> Showing {{ seos|length }} entries</span>
+                <span><i class="bi bi-clock"></i> Last updated {% now "M j, Y" %}</span>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
-{% endblock %}
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Buttons -->
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<!-- Export dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#seoTable').DataTable({
+        dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
+             '<"row"<"col-sm-12"tr>>' +
+             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                text: '<i class="bi bi-files"></i> Copy',
+                className: 'dt-button',
+                title: 'SEO Settings'
+            },
+            {
+                extend: 'excelHtml5',
+                text: '<i class="bi bi-file-excel"></i> Excel',
+                className: 'dt-button',
+                title: 'SEO Settings'
+            },
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="bi bi-file-pdf"></i> PDF',
+                className: 'dt-button',
+                title: 'SEO Settings',
+                orientation: 'landscape',
+                pageSize: 'A4'
+            },
+            {
+                extend: 'print',
+                text: '<i class="bi bi-printer"></i> Print',
+                className: 'dt-button'
+            }
+        ],
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50, 100],
+        order: [[0, 'asc']],
+        language: {
+            search: "Search:",
+            searchPlaceholder: "Search SEO settings...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            infoEmpty: "Showing 0 to 0 of 0 entries",
+            infoFiltered: "(filtered from _MAX_ total entries)",
+            zeroRecords: "No matching SEO settings found",
+            paginate: {
+                first: '<i class="bi bi-chevron-double-left"></i>',
+                last: '<i class="bi bi-chevron-double-right"></i>',
+                next: '<i class="bi bi-chevron-right"></i>',
+                previous: '<i class="bi bi-chevron-left"></i>'
+            }
+        }
+    });
+});
+
+// Auto-dismiss any alerts if they exist
+setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert-modern');
+    alerts.forEach(alert => {
+        alert.style.transition = 'opacity 0.3s';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 300);
+    });
+}, 5000);
+</script>
+
+{% endblock content %}

@@ -3,19 +3,15 @@
 
 {% block extra_css %}
 <style>
-
-/* --- Header Section (UPDATED WITH BACKGROUND IMAGE) --- */
+/* --- Header Section --- */
 .news-header {
     text-align: center;
     padding: 310px 20px 50px;
-
     background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
                 url("{% static 'home/images/banner4.png' %}");
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
     color: white;
     margin-bottom: 50px;
     border-radius: 10px;
@@ -26,7 +22,7 @@
     font-size: 3rem;
     font-weight: 400;
     margin-bottom: 15px;
-    color: #ffff
+    color: #fff;
 }
 
 .news-header p {
@@ -63,7 +59,6 @@
     box-shadow: 0 15px 35px rgba(0,0,0,0.12);
 }
 
-/* --- Image --- */
 .news-image {
     width: 100%;
     height: 220px;
@@ -71,7 +66,6 @@
     border-bottom: 3px solid #3498db;
 }
 
-/* --- Content --- */
 .news-title {
     font-size: 1.4rem;
     margin: 15px 20px 8px;
@@ -85,19 +79,15 @@
     margin: 0 20px 15px;
 }
 
-/* --- No News (BACKGROUND IMAGE FIXED) --- */
 .no-news {
     grid-column: 1 / -1;
     border-radius: 8px;
     overflow: hidden;
-
     background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
                 url("{% static 'home/images/banner2.png' %}");
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
     color: #fff;
     text-align: center;
     padding: 80px 20px;
@@ -107,30 +97,43 @@
     color: #fff;
 }
 
-/* --- Modal --- */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
+/* --- Pagination --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 60px;
 }
 
-.modal-content {
+.pagination a, .pagination span {
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
     background: #fff;
-    border-radius: 10px;
-    max-width: 800px;
-    margin: 80px auto;
-    padding: 30px;
-    position: relative;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    font-weight: 500;
 }
 
-.modal-close {
-    position: absolute;
-    top: 15px; right: 20px;
-    font-size: 1.5rem;
-    cursor: pointer;
+.pagination a:hover {
+    background: #3498db;
+    color: #fff;
+    border-color: #3498db;
+}
+
+.pagination .current {
+    background: #3498db;
+    color: #fff;
+    border-color: #3498db;
+    font-weight: 600;
+}
+
+.pagination .disabled {
+    color: #999;
+    cursor: not-allowed;
+    background: #f5f5f5;
 }
 
 </style>
@@ -145,28 +148,23 @@
 
 <div class="news-grid">
 
-    {% for news in newses %}
+    {% for news in page_obj %}
     <a href="{% url 'news_detail_view' news.id %}" class="news-card">
-
         {% if news.image %}
-        <!-- FIXED (lazy safe) -->
-        <img src="{{ news.image.url }}" data-src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
+            <img src="{{ news.image.url }}" data-src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
         {% else %}
-        <div class="news-image" style="background:#eee;display:flex;align-items:center;justify-content:center;">
-            No Image
-        </div>
+            <div class="news-image" style="background:#eee; display:flex; align-items:center; justify-content:center;">
+                No Image
+            </div>
         {% endif %}
 
         <h3 class="news-title">{{ news.title }}</h3>
 
         {% if news.date %}
-        <span class="news-date">{{ news.date|date:"F d, Y" }}</span>
+            <span class="news-date">{{ news.date|date:"F d, Y" }}</span>
         {% endif %}
-
     </a>
-
     {% empty %}
-    <!-- ✅ BACKGROUND IMAGE WORKING -->
     <div class="no-news">
         <h3>No News Available</h3>
         <p>Check back later for updates</p>
@@ -175,15 +173,31 @@
 
 </div>
 
-<!-- Modal -->
-<div id="news-modal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <img id="modal-image" src="" style="width:100%;margin-bottom:15px;">
-        <h2 id="modal-title"></h2>
-        <p id="modal-date"></p>
-        <div id="modal-description"></div>
-    </div>
+<!-- Pagination -->
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">← Previous</a>
+    {% else %}
+        <span class="disabled">« First</span>
+        <span class="disabled">← Previous</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="current">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+    {% else %}
+        <span class="disabled">Next →</span>
+        <span class="disabled">Last »</span>
+    {% endif %}
 </div>
 
 {% endblock %}
@@ -191,7 +205,6 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
     // Lazy load
     const images = document.querySelectorAll('.news-image');
     const observer = new IntersectionObserver((entries, obs) => {
@@ -205,21 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
     images.forEach(img => observer.observe(img));
-
-    // Modal close
-    const modal = document.getElementById('news-modal');
-    const closeBtn = document.querySelector('.modal-close');
-
-    closeBtn.onclick = () => modal.style.display = "none";
-
-    window.onclick = (e) => {
-        if(e.target === modal){
-            modal.style.display = "none";
-        }
-    };
-
 });
 </script>
 {% endblock %}
