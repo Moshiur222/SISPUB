@@ -553,46 +553,57 @@
                 </div>
 
                 <button type="submit" class="reg-btn" id="submitBtn">Submit</button>
+{% else %}
+<div class="otp-verification-box">
+    <div id="otpDisplayState">
+        <h2>Verify OTP</h2>
+        <p>Code sent to your phone: <br>
+            <strong id="currentMobileDisplay">{{ mobile }}</strong>
+            <button type="button" onclick="showEditPhone()" class="change-number-link" style="background:none; border:none; cursor:pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                </svg>
+                Change Number
+            </button>
+        </p>
+    </div>
 
-            {% else %}
-                
-                <div class="otp-verification-box">
-                    <h2>{% if otp_sent %}Verify OTP{% else %}Create Account{% endif %}</h2>
-                    <input type="hidden" name="mobile" value="{{ mobile }}">
-                    {% if otp_sent %}
-                 <p>Code sent to your phone <strong>{{ mobile }}
-                 <a href="{% url 'registration' %}" class="change-number-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                            </svg>
-                            Change Number
-                        </a>
-            </strong></p>
-        {% else %}
-            <p>Join us today! It only takes a minute.</p>
-        {% endif %}
-                    <input type="text" name="otp_code" maxlength="6" required
-                           class="otp-styled-input"
-                           placeholder="000000" autocomplete="one-time-code">
+    <div id="otpEditState" style="display: none; margin-bottom: 20px;">
+        <h2 style="font-size: 1.2rem;">Update Mobile Number</h2>
+        <div class="form-group" style="margin-top: 15px;">
+            <input type="text" id="newMobileInput" class="form-control" 
+                   value="{{ mobile }}" 
+                   style="width: 80%; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; text-align: center;">
+            <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+                <button type="button" onclick="cancelEditPhone()" style="background:#64748b; color:white; border:none; padding: 5px 15px; border-radius: 4px; font-size: 0.8rem;">Cancel</button>
+                <button type="button" onclick="submitNewPhone()" style="background:#28a745; color:white; border:none; padding: 5px 15px; border-radius: 4px; font-size: 0.8rem;">Update & Resend</button>
+            </div>
+        </div>
+    </div>
 
-                    <button type="submit" class="reg-btn verify-btn">Verify OTP</button>
+    <input type="hidden" name="mobile" id="mobileHiddenField" value="{{ mobile }}">
+    
+    <input type="text" name="otp_code" maxlength="6" required
+           class="otp-styled-input"
+           placeholder="000000" autocomplete="one-time-code">
 
-                    <div class="otp-footer">
-                        <div class="timer-badge" id="otpTimer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                              <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
-                              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
-                            </svg>
-                            <span id="timerText">Resend OTP in 01:00</span>
-                        </div>
-                        
-                        <div id="resendSection" style="display:none; text-align:center;">
-                            <button type="button" id="resendBtn" onclick="resendOTP()">↻ Resend OTP</button>
-                        </div>
-                    </div>
-                </div>
+    <button type="submit" class="reg-btn verify-btn">Verify OTP</button>
 
-            {% endif %} 
+    <div class="otp-footer">
+        <div class="timer-badge" id="otpTimer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
+            </svg>
+            <span id="timerText">Resend OTP in 01:00</span>
+        </div>
+        
+        <div id="resendSection" style="display:none; text-align:center;">
+            <button type="button" id="resendBtn" onclick="resendOTP()">↻ Resend OTP</button>
+        </div>
+    </div>
+</div>
+{% endif %}
         </form>
     </div>
 </div>
@@ -604,15 +615,14 @@
 </form>
 
 <script>
-// Logic for OTP Timeout and Resend
+// ================= OTP TIMER =================
 (function() {
     const timerText = document.getElementById('timerText');
     const timerEl = document.getElementById('otpTimer');
     const resendSection = document.getElementById('resendSection');
 
-    // Updated exactly to point to the new timerText span so your JS continues to work without removing the SVG
     if (timerEl && timerText) {
-        let timeLeft = 60; // seconds
+        let timeLeft = 60;
         const countdown = setInterval(() => {
             const minutes = String(Math.floor(timeLeft / 60)).padStart(2,'0');
             const seconds = String(timeLeft % 60).padStart(2,'0');
@@ -620,7 +630,7 @@
 
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                timerEl.style.display = 'none';
+                timerText.textContent = "You can now resend OTP";
                 resendSection.style.display = 'block';
             }
             timeLeft--;
@@ -632,15 +642,19 @@ function resendOTP() {
     document.getElementById('hiddenResendForm').submit();
 }
 
-  // Restrict phone input to numbers only
+
+// ================= PHONE NUMBER RESTRICTION =================
 const phoneInputField = document.getElementById('phoneInput');
 if (phoneInputField) {
     phoneInputField.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9+]/g, '');
     });
-}  
+}
 
+
+// ================= EMAIL + PHONE CHECK (DEBOUNCE) =================
 (function() {
+
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -657,6 +671,7 @@ if (phoneInputField) {
         emailInput.addEventListener('input', debounce(function() {
             const email = this.value.trim();
             if (email.length < 3) return;
+
             fetch(`/check_email?email=${encodeURIComponent(email)}`)
                 .then(res => res.json())
                 .then(data => {
@@ -683,6 +698,7 @@ if (phoneInputField) {
         phoneInput.addEventListener('input', debounce(function() {
             const phone = this.value.trim();
             if (phone.length < 5) return;
+
             fetch(`/check_phone?phone=${encodeURIComponent(phone)}`)
                 .then(res => res.json())
                 .then(data => {
@@ -700,12 +716,16 @@ if (phoneInputField) {
                 });
         }, 500));
     }
+
 })();
 
+
+// ================= PASSWORD MATCH =================
 (function() {
     const pass1 = document.getElementById('pass1');
     const pass2 = document.getElementById('pass2');
     const matchError = document.getElementById('matchError');
+
     if (pass1 && pass2) {
         function checkMatch() {
             if (pass2.value.length > 0 && pass1.value !== pass2.value) {
@@ -719,16 +739,23 @@ if (phoneInputField) {
         pass1.addEventListener('input', checkMatch);
         pass2.addEventListener('input', checkMatch);
     }
+})();
 
+
+// ================= AGGREGATOR TOGGLE =================
+(function() {
     const toggleBtn = document.getElementById('aggregatorToggle');
     const aggregatorValue = document.getElementById('aggregatorValue');
     const brtcInput = document.getElementById('brtcLicenceInput');
+
     if (toggleBtn && aggregatorValue && brtcInput) {
+
         toggleBtn.classList.add('no');
         aggregatorValue.value = 'no';
         brtcInput.disabled = true;
 
         toggleBtn.addEventListener('click', function() {
+
             if (this.classList.contains('no')) {
                 this.classList.remove('no');
                 this.classList.add('yes');
@@ -744,90 +771,105 @@ if (phoneInputField) {
                 brtcInput.required = false;
                 brtcInput.value = '';
             }
+
+            checkFormValidity();
         });
     }
 })();
 
-function checkFormValidity() {
-    const form = document.getElementById('regForm');
-    const submitBtn = document.getElementById('submitBtn');
 
-    if (!form || !submitBtn) return;
-
-    const companyName = form.querySelector('input[name="company_name"]');
-    const personName = form.querySelector('input[name="person_name"]');
-    const password = form.querySelector('input[name="password"]');
-    const mobile = form.querySelector('input[name="mobile"]');
-    const email = form.querySelector('input[name="email"]');
-    const cv = form.querySelector('input[name="cv"]');
-    const appoinment_letter = form.querySelector('input[name="appoinment_letter"]');
-    const n_id = form.querySelector('input[name="n_id"]');
-    const confirmPassword = form.querySelector('input[name="confirm_password"]');
-    const aggregatorToggle = document.getElementById('aggregatorToggle');
-    const brtc = document.getElementById('brtcLicenceInput');
-
-    function allValid() {
-        const brtcValid = (aggregatorToggle.classList.contains('yes')) ? brtc.value.trim() !== '' : true;
-        return companyName.value.trim() !== '' &&
-               personName.value.trim() !== '' &&
-               mobile.value.trim() !== '' &&
-               email.value.trim() !== '' &&
-               password.value.trim() !== '' &&
-               confirmPassword.value.trim() !== '' &&
-               cv.value.trim() !== '' &&
-               appoinment_letter.value.trim() !== '' &&
-               n_id.value.trim() !== '' &&
-               password.value === confirmPassword.value &&
-               brtcValid;
-    }
-    submitBtn.disabled = !allValid();
-}
-
-document.querySelectorAll('#regForm input').forEach(input => {
-    input.addEventListener('input', checkFormValidity);
-});
-
-const toggleBtnValid = document.getElementById('aggregatorToggle');
-if (toggleBtnValid) {
-    toggleBtnValid.addEventListener('click', () => {
-        setTimeout(checkFormValidity, 50);
-    });
-}
-
-checkFormValidity();
-
+// ================= FILE NAME DISPLAY =================
 function updateFileName(input) {
     const fileName = input.files[0] ? input.files[0].name : "No file chosen";
-    // Find the display div within the same parent wrapper
     const display = input.parentElement.querySelector('.file-name-display');
     display.textContent = fileName;
-    
-    // Change style to show it's selected
+
     if (input.files[0]) {
         display.style.color = "#28a745";
         input.parentElement.querySelector('.file-drop-zone').style.borderStyle = "solid";
     }
 }
 
-toggleBtn.addEventListener('click', function() {
-    const brtcLabel = brtcInput.closest('.form-group').querySelector('label');
-    if (this.classList.contains('no')) {
-        this.classList.remove('no');
-        this.classList.add('yes');
-        aggregatorValue.value = 'yes';
-        brtcInput.disabled = false;
-        brtcInput.required = true;
-        brtcLabel.classList.add('required-toggle'); // Adds the star
-        brtcInput.focus();
-    } else {
-        this.classList.remove('yes');
-        this.classList.add('no');
-        aggregatorValue.value = 'no';
-        brtcInput.disabled = true;
-        brtcInput.required = false;
-        brtcLabel.classList.remove('required-toggle'); // Removes the star
-        brtcInput.value = '';
-    }
+
+// ================= FORM VALIDATION =================
+function checkFormValidity() {
+    const form = document.getElementById('regForm');
+    const submitBtn = document.getElementById('submitBtn');
+    if (!form || !submitBtn) return;
+
+    const companyName = form.querySelector('input[name="company_name"]');
+    const personName = form.querySelector('input[name="person_name"]');
+    const password = form.querySelector('input[name="password"]');
+    const confirmPassword = form.querySelector('input[name="confirm_password"]');
+    const mobile = form.querySelector('input[name="mobile"]');
+    const email = form.querySelector('input[name="email"]');
+    const cv = form.querySelector('input[name="cv"]');
+    const appoinment_letter = form.querySelector('input[name="appoinment_letter"]');
+    const n_id = form.querySelector('input[name="n_id"]');
+    const aggregatorToggle = document.getElementById('aggregatorToggle');
+    const brtc = document.getElementById('brtcLicenceInput');
+
+    const brtcValid = (aggregatorToggle && aggregatorToggle.classList.contains('yes'))
+        ? brtc.value.trim() !== ''
+        : true;
+
+    const allValid =
+        companyName.value.trim() !== '' &&
+        personName.value.trim() !== '' &&
+        mobile.value.trim() !== '' &&
+        email.value.trim() !== '' &&
+        password.value.trim() !== '' &&
+        confirmPassword.value.trim() !== '' &&
+        password.value === confirmPassword.value &&
+        cv.files.length > 0 &&
+        appoinment_letter.files.length > 0 &&
+        n_id.value.trim() !== '' &&
+        brtcValid;
+
+    submitBtn.disabled = !allValid;
+}
+
+document.querySelectorAll('#regForm input').forEach(input => {
+    input.addEventListener('input', checkFormValidity);
 });
+
+checkFormValidity();
+
+
+// ================= OTP EDIT MOBILE =================
+function showEditPhone() {
+    document.getElementById('otpDisplayState').style.display = 'none';
+    document.getElementById('otpEditState').style.display = 'block';
+    document.getElementById('newMobileInput').focus();
+}
+
+function cancelEditPhone() {
+    document.getElementById('otpDisplayState').style.display = 'block';
+    document.getElementById('otpEditState').style.display = 'none';
+}
+
+function submitNewPhone() {
+    const newMobile = document.getElementById('newMobileInput').value.trim();
+    if (newMobile.length < 10) {
+        alert("Please enter a valid mobile number.");
+        return;
+    }
+
+    document.getElementById('mobileHiddenField').value = newMobile;
+
+    const hiddenResendMobile = document.querySelector('#hiddenResendForm input[name="mobile"]');
+    if (hiddenResendMobile) {
+        hiddenResendMobile.value = newMobile;
+    }
+
+    resendOTP();
+}
+
+const newMobileInput = document.getElementById('newMobileInput');
+if (newMobileInput) {
+    newMobileInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9+]/g, '');
+    });
+}
 </script>
 {% endblock main %}

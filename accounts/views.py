@@ -208,42 +208,64 @@ def edit_profile(request):
     return render(request, "home/layouts/edit_profile.html", context)
 
 
+# ================== REGISTRATION VIEW ==================
 def registration_view(request):
-    # --- OTP VERIFY / RESEND ---
+
+    # -------- OTP VERIFY / RESEND --------
     if request.method == "POST" and ("otp_code" in request.POST or "resend_otp" in request.POST):
+
         mobile = normalize_phone(request.POST.get("mobile"))
         reg_data = request.session.get('pending_registration')
 
-        if not reg_data or reg_data.get('mobile') != mobile:
-            messages.error(request, "Session expired or invalid request. Please register again.")
+        # ✅ FIXED SESSION ISSUE
+        if not reg_data:
+            messages.error(request, "Session expired. Please register again.")
             return redirect("registration")
 
-        # RESEND OTP
+        # ✅ যদি mobile change করে
+        if reg_data.get('mobile') != mobile:
+            reg_data['mobile'] = mobile
+            request.session['pending_registration'] = reg_data
+
+        # -------- RESEND OTP --------
         if "resend_otp" in request.POST:
             new_otp = str(random.randint(100000, 999999))
+
             reg_data['otp'] = hash_otp(new_otp)
             reg_data['otp_created_at'] = timezone.now().isoformat()
             request.session['pending_registration'] = reg_data
 
-            print(f"[RESEND OTP] Phone: {mobile}, OTP: {new_otp}")
-            return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
+            # ✅ SEND SMS
+            if send_sms(mobile, f"Your OTP is {new_otp}"):
+                messages.success(request, "OTP resent successfully.")
+            else:
+                messages.error(request, "Failed to resend OTP.")
 
-        # VERIFY OTP
+            return render(request, "home/layouts/registration.html", {
+                "otp_sent": True,
+                "mobile": mobile
+            })
+
+        # -------- VERIFY OTP --------
         user_otp = request.POST.get("otp_code")
+
         otp_time = timezone.datetime.fromisoformat(reg_data.get('otp_created_at'))
 
         if (timezone.now() - otp_time).total_seconds() > 60:
-            messages.error(request, "OTP expired. Please click 'Resend OTP'.")
-            return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
+            messages.error(request, "OTP expired. Please click Resend OTP.")
+            return render(request, "home/layouts/registration.html", {
+                "otp_sent": True,
+                "mobile": mobile
+            })
 
         if hash_otp(user_otp) != reg_data.get('otp'):
             messages.error(request, "Invalid OTP.")
-            return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
+            return render(request, "home/layouts/registration.html", {
+                "otp_sent": True,
+                "mobile": mobile
+            })
 
-        # Save files to disk first
-        cv_file = reg_data.get('cv_file')
-        app_file = reg_data.get('app_file')
-
+        # -------- SAVE DATA --------
         TempMember.objects.create(
             company_name=reg_data.get("company_name"),
             person_name=reg_data.get("person_name"),
@@ -256,21 +278,24 @@ def registration_view(request):
             is_aggregator=reg_data.get("is_aggregator"),
             n_id=reg_data.get("n_id"),
             address=reg_data.get("address"),
-            cv=cv_file,
-            appoinment_letter=app_file,
+            cv=reg_data.get("cv_file"),
+            appoinment_letter=reg_data.get("app_file"),
             otp=reg_data.get("otp"),
             otp_created_at=otp_time,
             status='pending'
         )
 
         del request.session['pending_registration']
+
         messages.success(request, "Registration successful! Wait for approval.")
         return redirect("registration")
 
-    # --- INITIAL FORM SUBMISSION ---
+    # -------- INITIAL FORM --------
     elif request.method == "POST":
+
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
+
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
             return redirect("registration")
@@ -278,20 +303,23 @@ def registration_view(request):
         mobile = normalize_phone(request.POST.get("mobile"))
         email = request.POST.get("email")
 
+        if not mobile:
+            messages.error(request, "Invalid mobile number format.")
+            return redirect("registration")
+
         if TempMember.objects.filter(mobile=mobile).exists():
-            messages.error(request, "Phone already registered or in process.")
+            messages.error(request, "Phone already registered.")
             return redirect("registration")
 
         otp = str(random.randint(100000, 999999))
 
-        # Save uploaded files to disk
         cv = request.FILES.get("cv")
         app_letter = request.FILES.get("appoinment_letter")
 
         cv_path = default_storage.save(f"cv/{cv.name}", ContentFile(cv.read())) if cv else None
         app_path = default_storage.save(f"letter/{app_letter.name}", ContentFile(app_letter.read())) if app_letter else None
 
-        # Save only paths & other text data in session
+        # SAVE SESSION
         request.session['pending_registration'] = {
             "company_name": request.POST.get("company_name"),
             "person_name": request.POST.get("person_name"),
@@ -301,7 +329,7 @@ def registration_view(request):
             "app_file": app_path,
             "email": email,
             "mobile": mobile,
-            "phone":  request.POST.get("phone"),
+            "phone": request.POST.get("phone"),
             "password": make_password(password),
             "brtc_licence_no": request.POST.get("brtc_licence_no", "").strip(),
             "is_aggregator": 'Yes' if request.POST.get("is_aggregator") == 'yes' else 'No',
@@ -310,10 +338,19 @@ def registration_view(request):
             "otp_created_at": timezone.now().isoformat()
         }
 
-        print(f"[NEW OTP] mobile: {mobile}, OTP: {otp}")
-        return render(request, "home/layouts/registration.html", {"otp_sent": True, "mobile": mobile})
+        # ✅ SEND OTP
+        if send_sms(mobile, f"Your OTP is {otp}"):
+            messages.success(request, "OTP sent successfully.")
+        else:
+            messages.error(request, "Failed to send OTP.")
+
+        return render(request, "home/layouts/registration.html", {
+            "otp_sent": True,
+            "mobile": mobile
+        })
 
     return render(request, "home/layouts/registration.html", {"otp_sent": False})
+
 
 def search(request):
     member_id = request.GET.get('member_id')
@@ -387,7 +424,6 @@ def get_aggregator_info(request):
 def meeting_call(request, id):
     last_title = get_object_or_404(MeetingTitle, id=id)
 
-
     context_data = {
         'company_name': '', 'name': '', 'no_of_person': '',
         'phone': '', 'email': '', 'payment_method': '', 'transection_id': '',
@@ -398,30 +434,49 @@ def meeting_call(request, id):
         for field in context_data:
             context_data[field] = request.POST.get(field, '').strip()
 
-
         phone = context_data['phone']
+
+        # ✅ Check member exists
         if not Aggregator.objects.filter(phone__icontains=phone[-10:]).exists():
             messages.error(request, "Registration failed: Phone number not found in member list.")
             return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **context_data})
-
 
         try:
             no_of_person = int(context_data['no_of_person'])
             total_price = (last_title.amount or 0) * no_of_person
 
+            # ✅ Save Data
             MeetingCall.objects.create(
                 title=last_title,
                 company_name=context_data['company_name'],
                 name=context_data['name'],
                 no_of_person=no_of_person,
-                phone=context_data['phone'],
+                phone=phone,
                 email=context_data['email'],
                 payment_method=context_data['payment_method'],
                 transection_id=context_data['transection_id'],
                 amount=total_price
             )
-            messages.success(request, "Submitted successfully!")
+
+            # ✅ SEND CONFIRMATION SMS
+            message = f"""
+Dear {context_data['name']},
+Congatulations! Your meeting registration is successful.
+
+Event: {last_title.title}
+Persons: {no_of_person}
+Amount: {total_price} BDT
+
+Thank you.
+"""
+
+            if send_sms(phone, message):
+                messages.success(request, "Submitted successfully! SMS sent.")
+            else:
+                messages.warning(request, "Submitted successfully! কিন্তু SMS যায়নি।")
+
             return redirect('meeting_call', id=last_title.id)
+
         except Exception as e:
             messages.error(request, f"Error: {e}")
 
