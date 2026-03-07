@@ -301,7 +301,7 @@
   }
 
   .btn-add:hover {
-    background: var(--success-600);
+    background: #059669;
     color: white;
   }
 
@@ -604,7 +604,8 @@
         </div>
         {% endfor %}
     {% endif %}
-
+        {% if all_company_info %}
+        {% for info in all_company_info %}
     <!-- Company Information Card -->
     <div class="content-card">
         <div class="card-header">
@@ -612,14 +613,13 @@
                 <i class="bi bi-building"></i>
                 <h2>Company Information</h2>
             </div>
-            <a href="{% url 'company_info_input' %}" class="btn-edit">
+            <a href="{% url 'company_info_input' info.id %}" class="btn-edit">
                 <i class="bi bi-pencil"></i>
                 Edit
             </a>
         </div>
         <div class="card-body">
-            {% if all_company_info %}
-                {% for info in all_company_info %}
+    
                 <div class="info-grid">
                     <div class="info-item">
                         <div class="info-label">
@@ -662,9 +662,17 @@
                     <div class="info-item">
                         <div class="info-label">
                             <i class="bi bi-calendar"></i>
-                            Friday Hours
+                            Day Off
                         </div>
-                        <div class="info-value">{{ info.friday|default:"—"|safe }}</div>
+                        <div class="info-value">
+                          {% if info.day_off.all %}
+                              {% for day in info.day_off.all %}
+                                  {{ day.day }}{% if not forloop.last %}, {% endif %}
+                              {% endfor %}
+                          {% else %}
+                              —
+                          {% endif %}
+                      </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -777,7 +785,7 @@
                 </div>
                 <h4>No Videos</h4>
                 <p>Add your company videos.</p>
-                <a href="{% url 'video_input' %}" class="btn-add">
+                <a href="{% url 'video_add' %}" class="btn-add">
                     <i class="bi bi-plus"></i>
                     Add Video
                 </a>

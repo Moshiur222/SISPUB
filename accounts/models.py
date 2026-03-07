@@ -1,10 +1,10 @@
-import re
+import re, os
 import hashlib
-from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.text import slugify
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -33,7 +33,7 @@ def bd_phone_validator(value):
     """Valid Bangladeshi phone number: 01XXXXXXXXX"""
     pattern = r'^01[3-9]\d{8}$'
     if not re.match(pattern, value):
-        raise ValidationError("Please enter a valid mobile number (example: 017XXXXXXXX)")
+        raise ValidationError("Please enter a valid mobile number (example: 01XXXXXXXXX)")
 
 def hash_otp(otp):
     return hashlib.sha256(otp.encode()).hexdigest()
@@ -68,18 +68,25 @@ class Gellary(models.Model):
     def __str__(self):
         return self.gellary_name
 
-class Company_info(models.Model):
+class Weekend(models.Model):
+    day = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.day
+
+
+class CompanyInfo(models.Model):
     company_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=50)
     email = models.EmailField(null=True, blank=True)
     office_hours = models.CharField(max_length=50)
-    friday = models.CharField(max_length=50)
+    day_off = models.ManyToManyField(Weekend, related_name="companies", blank=True)
     house_no = models.CharField(max_length=50)
     block = models.CharField(max_length=50, null=True, blank=True)
     district = models.CharField(max_length=60)
-    cirtificate = models.ImageField(upload_to="image/", null=True)
+    certificate = models.ImageField(upload_to="image/", null=True, blank=True)
     country = models.CharField(max_length=50)
-    
+
     def __str__(self):
         return self.company_name
 
@@ -201,30 +208,31 @@ class PreviousExecutiveCommittee(models.Model):
         return self.name
     
 class EventTitle(models.Model):
-   title = models.CharField(max_length=200, null= True)
-   description = models.TextField(blank=True, null=True)
-   def __str__(self):
-       return self.title
+    title = models.CharField(max_length=200, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title or "Untitled"
 
 class Events(models.Model):
     title = models.ForeignKey(EventTitle, on_delete=models.CASCADE, null=True)
-    url_1 = models.URLField(null=True, blank=True)
-    url_2 = models.URLField(null=True, blank=True)
-   
+    url = models.URLField(null=True, blank=True)
 
     def __str__(self):
-        return self.title
-    
+        return str(self.title)  # returns the actual title string
+
     def generate_embed_url(self, url):
         if not url:
             return None
 
         si_param = "FzYOnU1EAQsQ4JFe"
 
+        # If already an embed URL
         if "youtube.com/embed/" in url:
             clean_url = re.sub(r'\?si=.*', '', url)
             return f"{clean_url}?si={si_param}"
 
+        # Extract video ID from normal YouTube URLs
         youtube_regex = (
             r'(?:https?://)?(?:www\.)?'
             r'(?:youtube\.com/watch\?v=|youtu\.be/)'
@@ -238,13 +246,8 @@ class Events(models.Model):
         return url
 
     @property
-    def embed_url_1(self):
-        return self.generate_embed_url(self.url_1)
-
-    @property
-    def embed_url_2(self):
-        return self.generate_embed_url(self.url_2)
-
+    def embed_url(self):
+        return self.generate_embed_url(self.url)
 
 class Events_Meetings(models.Model):
     title = models.CharField(max_length=200)
@@ -254,19 +257,18 @@ class Events_Meetings(models.Model):
     def __str__(self):
         return self.title
 
-    # --- Helper method to generate embed URL ---
     def generate_embed_url(self, url):
         if not url:
             return None
 
         si_param = "FzYOnU1EAQsQ4JFe"
 
-        # If already an embed URL
+
         if "youtube.com/embed/" in url:
             clean_url = re.sub(r'\?si=.*', '', url)
             return f"{clean_url}?si={si_param}"
 
-        # Match normal or short YouTube URLs
+    
         youtube_regex = (
             r'(?:https?://)?(?:www\.)?'
             r'(?:youtube\.com/watch\?v=|youtu\.be/)'
@@ -346,13 +348,21 @@ class MembershipRules(models.Model):
 
 class News(models.Model):
     title = models.CharField(max_length=50, null=True)
+    slug = models.SlugField(max_length=60, unique=True, blank=True) 
     image = models.ImageField(upload_to="news/", null=True)
-    date = models.DateField(null = True)
     description = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.title
-    
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.title:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+
 
 class Career(models.Model):
     title = models.CharField( max_length=50)
@@ -373,7 +383,7 @@ class TempMember(models.Model):
     brtc_licence_no = models.CharField(max_length=50, blank=True)
     mobile = models.CharField(max_length=15,validators=[bd_phone_validator],blank=True,unique=True)
     phone = models.CharField(max_length=20,blank=True, null=True)
-    n_id = models.CharField(max_length=22,null=True, unique=True)
+    n_id = models.CharField(max_length=22,null=True)
     appoinment_letter = models.FileField(upload_to="letter/", blank=True, null=True)
     cv = models.FileField(upload_to="cv/", blank=True, null=True)
     address = models.TextField(blank=True)
@@ -387,62 +397,134 @@ class TempMember(models.Model):
         return self.person_name
 
 
+
 class Aggregator(models.Model):
+
+    USER_TYPE_CHOICES = [
+        (1, 'AGM'),
+        (2, 'AGU')
+    ]
+    STATUS_CHOICES = [
+        (1, 'unverified'),
+        (2, 'verified')
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="aggregators")
-    member_id = models.CharField(max_length=10, unique=True, blank=True)
+
+    user_type = models.IntegerField(choices=USER_TYPE_CHOICES, editable=False, null=True)
+    member_id = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=50)
     company_name = models.CharField(max_length=50)
-    image = models.ImageField( upload_to="Aggregator/", null=True)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    image = models.ImageField(upload_to="Aggregator/", null=True)
+    company_logo = models.ImageField(upload_to="Aggregator/", null=True)
     designation = models.CharField(max_length=50, null=True)
-    is_aggregator = models.CharField(max_length=3, null=True)
-    mobile = models.CharField(max_length=15,validators=[bd_phone_validator],blank=True,unique=True)
-    phone = models.CharField(max_length=20,blank=True, null=True)
+    is_aggregator = models.CharField(max_length=3, null=True)  
+    status = models.IntegerField(choices=USER_TYPE_CHOICES, editable=False, null=True, default=1)
+    mobile = models.CharField(max_length=15, validators=[bd_phone_validator], blank=True, unique=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+
     brtc_licence_no = models.CharField(max_length=50, blank=True)
     tread_licence_no = models.CharField(max_length=50, blank=True, null=True)
-    n_id = models.CharField(max_length=22,null=True, unique=True)
+    n_id = models.CharField(max_length=22, null=True)
+
     appoinment_letter = models.FileField(upload_to="letter/", blank=True, null=True)
     cv = models.FileField(upload_to="cv/", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+
     address = models.TextField(blank=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user_type', 'member_id'], name='unique_member_per_type')
+        ]
+
     def save(self, *args, **kwargs):
+        # Set user_type (1 = AGM, 2 = AGU)
+        if self.is_aggregator == "Yes":
+            self.user_type = 1
+        else:
+            self.user_type = 2
+
+        # Generate member_id (number only)
         if not self.member_id:
-            last_member = Aggregator.objects.order_by('id').last()
-            if last_member and last_member.member_id:
-                last_number = int(last_member.member_id.split('-')[1])
-                new_number = last_number + 1
+            last = Aggregator.objects.filter(user_type=self.user_type).order_by('-id').first()
+            if last and last.member_id:
+                try:
+                    new_number = int(last.member_id) + 1
+                except ValueError:
+                    new_number = 100
             else:
-                new_number = 445990  
-            self.member_id = f"SIS-{new_number}"
+                new_number = 100
+            self.member_id = str(new_number)
+
+        # Generate slug from company_name
+        if not self.slug and self.company_name:
+            self.slug = slugify(self.company_name)
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} ({self.company_name})"
-    
+        return f"{self.member_id} - {self.name}"
+
 
 class PhotoAlbum(models.Model):
     title = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null= True)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)  
     banner = models.ImageField(upload_to="gallery/")
 
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        # Auto-generate slug from title if not provided
+        if not self.slug and self.title:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+
+
+def photo_upload_to(instance, filename):
+    ext = filename.split('.')[-1]  # get file extension
+    if instance.slug:
+        # use the slug in the filename
+        filename = f"{instance.slug}.{ext}"
+    else:
+        import time
+        filename = f"{int(time.time())}.{ext}"  # fallback for new object
+    return os.path.join("gallery/", filename)
 
 class Photo(models.Model):
     album = models.ForeignKey(PhotoAlbum, on_delete=models.CASCADE, related_name="photos", null=True)
-    image = models.ImageField(upload_to="gallery/")
+    image = models.ImageField(upload_to=photo_upload_to)
     created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=150, unique=True, blank=True)  # slug field
 
     def __str__(self):
         return f"{self.album.title} - Photo {self.id}"
 
+    def save(self, *args, **kwargs):
+        # generate slug if not exists
+        if not self.slug and self.album:
+            base_slug = slugify(self.album.title)
+            count = Photo.objects.filter(album=self.album).count() + 1
+            self.slug = f"SISPAB-{base_slug}-{count}"
+        super().save(*args, **kwargs)
+
 
 class MeetingTitle(models.Model):
     title = models.CharField(max_length=255, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     amount = models.IntegerField(null=True)
     description = models.TextField(null=True)
     image = models.ImageField(upload_to="image/", null=True)
     expire_date = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.title:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -466,6 +548,8 @@ class MeetingCall(models.Model):
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
     transection_id = models.CharField(max_length=255)
     amount = models.IntegerField(null=True, blank=True)
+    payout_number = models.CharField(max_length=20, null=True)
+    screenshot = models.ImageField(upload_to="payment/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -484,3 +568,37 @@ class Seo(models.Model):
 
     def __str__(self):
         return self.page_name
+    
+class GovermentServices(models.Model):
+    title = models,models.CharField(max_length=50)
+    url = models.URLField(max_length=200)
+    def __str__(self):
+        return self.title
+
+class EmergencyServices(models.Model):
+    title = models,models.CharField(max_length=50)
+    url = models.URLField(max_length=200)
+    def __str__(self):
+        return self.title
+    
+class BecomeMember(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.TextField(null=True)
+    def __str__(self):
+        return self.title
+
+
+class Sponsor(models.Model):
+    sponsor_name = models.CharField(max_length=200)
+    company_name = models.CharField(max_length=200, null=True)
+    designation = models.CharField(max_length=200, null=True)
+    sponsor_email = models.EmailField()
+    sponsor_phone = models.CharField(max_length=20)
+    description = models.TextField(blank=True, null=True)
+    company_logo = models.ImageField(upload_to="sponsor_logo/", blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.sponsor_name
+    

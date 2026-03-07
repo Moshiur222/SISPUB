@@ -1,0 +1,260 @@
+{% extends "home/base/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ===== Header ===== */
+.news-header {
+    text-align: center;
+    padding: 350px 20px 50px;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("{% static 'home/images/banner4.png' %}");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    margin-bottom: 50px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.news-header h1 { font-size: 3rem; margin-bottom: 15px; color: #fff}
+
+/* ===== Filter Buttons ===== */
+.filter-bar {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.filter-btn {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 25px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: 0.3s;
+    color: #333;
+}
+
+.filter-btn.active {
+    background: #3498db;
+    color: #fff;
+    border-color: #3498db;
+}
+
+/* ===== Data Table Styling ===== */
+.table-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    overflow-x: auto; /* For responsiveness on mobile */
+}
+
+.table-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.table-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    padding: 5px 10px;
+    border-bottom: 3px solid #6688aa; 
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+.custom-table th, 
+.custom-table td {
+    border: 1px solid #dcdcdc;
+    padding: 12px 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.custom-table th {
+    font-weight: bold;
+    color: #333;
+    background-color: #fcfcfc;
+}
+
+.custom-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.custom-table tbody tr:nth-child(even) {
+    background-color: #eaf6fa; 
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.text-muted {
+    color: #666;
+    display: block;
+    margin-top: 4px;
+}
+
+.line-break {
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* ===== Pagination ===== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 40px 0 60px;
+}
+
+.pagination a, .pagination span {
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    background: #fff;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    font-weight: 500;
+}
+
+.pagination a:hover {
+    background: #3498db;
+    color: #fff;
+    border-color: #3498db;
+}
+
+.pagination .current {
+    background: #3498db;
+    color: #fff;
+    border-color: #3498db;
+    font-weight: 600;
+}
+
+.pagination .disabled {
+    color: #999;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+</style>
+{% endblock extra_css %}
+
+{% block main %}
+
+<div class="news-header">
+    <h1>Sponser List</h1>
+</div>
+
+
+<div class="table-container">
+    <table class="custom-table" id="memberTable">
+        <thead>
+<tr>
+    <th style="width:5%;">SL</th>
+    <th>Logo</th>
+    <th>Sponsor Name</th>
+    <th>Company Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Description</th>
+</tr>
+</thead>
+        <tbody id="memberGrid">
+
+{% for sponsor in sponsors %}
+
+<tr class="member-row">
+
+    <td>{{ forloop.counter }}</td>
+
+    <td>
+        {% if sponsor.company_logo %}
+        <img src="{{ sponsor.company_logo.url }}" width="50">
+        {% else %}
+        -
+        {% endif %}
+    </td>
+
+    <td>
+        <span class="line-break">{{ sponsor.sponsor_name }}</span>
+    </td>
+
+    <td>
+        <span class="line-break">{{ sponsor.company_name }}</span>
+    </td>
+
+    <td>
+        <span class="line-break">{{ sponsor.designation }}</span>
+    </td>
+
+    <td>
+        <span class="text-muted">{{ sponsor.sponsor_email }}</span>
+    </td>
+
+    <td>
+        <span class="text-muted">{{ sponsor.sponsor_phone }}</span>
+    </td>
+
+</tr>
+
+{% empty %}
+
+<tr id="emptyRow">
+<td colspan="9" style="padding:30px;text-align:center;color:#666;">
+<h3>No Sponsor Found</h3>
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">« First</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% else %}
+            <span class="disabled">« First</span>
+            <span class="disabled">Previous</span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="current">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+        {% else %}
+            <span class="disabled">Next</span>
+            <span class="disabled">Last »</span>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}

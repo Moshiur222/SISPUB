@@ -1,12 +1,11 @@
+import re
 import random
 import hashlib
-import requests
-import re
-from django.contrib import messages
-from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponseRedirect
 from .models import *
+from django.utils import timezone
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.views.decorators.csrf import csrf_exempt
 
 
 SMS_API_URL = "http://sms.iglweb.com/api/v1/send"
@@ -30,7 +29,47 @@ def normalize_phone(mobile):
     return None
 
 
-# ------------------ SEND SMS ------------------
+# # ------------------ SEND SMS ------------------
+# def send_sms(mobile, message):
+#     try:
+#         phone = normalize_phone(mobile)
+
+#         if not phone:
+#             print(f"Invalid phone format: {mobile}")
+#             return False
+
+#         payload = {
+#             "api_key": SMS_API_KEY,
+#             "contacts": phone,
+#             "senderid": SMS_SENDER_ID,
+#             "msg": message
+#         }
+
+#         response = requests.post(SMS_API_URL, data=payload, timeout=10)
+
+#         if response.status_code == 200:
+#             try:
+#                 data = response.json()
+#                 if str(data.get("code")) == "445000":
+#                     print(f"SMS sent to {phone}")
+#                     return True
+#                 else:
+#                     print("API error:", data)
+#                     return False
+#             except:
+#                 if "success" in response.text.lower():
+#                     return True
+#                 return False
+#         else:
+#             print("HTTP error:", response.text)
+#             return False
+
+#     except Exception as e:
+#         print("SMS Error:", e)
+#         return False
+
+
+
 def send_sms(mobile, message):
     try:
         phone = normalize_phone(mobile)
@@ -39,31 +78,9 @@ def send_sms(mobile, message):
             print(f"Invalid phone format: {mobile}")
             return False
 
-        payload = {
-            "api_key": SMS_API_KEY,
-            "contacts": phone,
-            "senderid": SMS_SENDER_ID,
-            "msg": message
-        }
-
-        response = requests.post(SMS_API_URL, data=payload, timeout=10)
-
-        if response.status_code == 200:
-            try:
-                data = response.json()
-                if str(data.get("code")) == "445000":
-                    print(f"SMS sent to {phone}")
-                    return True
-                else:
-                    print("API error:", data)
-                    return False
-            except:
-                if "success" in response.text.lower():
-                    return True
-                return False
-        else:
-            print("HTTP error:", response.text)
-            return False
+        # ---------------- DEVELOPMENT: PRINT OTP IN TERMINAL ----------------
+        print(f"[DEV] SMS to {phone}: {message}")
+        return True
 
     except Exception as e:
         print("SMS Error:", e)

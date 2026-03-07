@@ -22,7 +22,7 @@
 /* ===== Filter Buttons ===== */
 .filter-bar {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .filter-btn {
@@ -43,76 +43,77 @@
     border-color: #3498db;
 }
 
-/* ===== Grid ===== */
-.member-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 15px; /* smaller gap between cards */
+/* ===== Data Table Styling ===== */
+.table-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     max-width: 1200px;
-    margin: 0 auto 50px;
+    margin: 0 auto 30px;
+    overflow-x: auto; /* For responsiveness on mobile */
 }
 
-/* ===== Card ===== */
-.member-card {
-    flex: 0 0 32%;
-    max-width: 32%;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    text-align: center;
+.table-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
 }
 
-.member-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-}
-
-.card-image {
-    width: 100%;
-    height: 420px;
-    overflow: hidden;
-}
-
-.card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.card-body {
-    padding: 15px 20px;
-    text-align: left;
-}
-
-.card-body h3 {
-    font-size: 20px;
+.table-title {
+    font-size: 1.2rem;
     font-weight: bold;
-    margin-bottom: 5px;
-    color: #222;
+    color: #333;
+    margin: 0;
+    padding: 5px 10px;
+    border-bottom: 3px solid #6688aa; 
 }
 
-.card-body p {
-    font-size: 14px;
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+.custom-table th, 
+.custom-table td {
+    border: 1px solid #dcdcdc;
+    padding: 12px 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.custom-table th {
+    font-weight: bold;
+    color: #333;
+    background-color: #fcfcfc;
+}
+
+.custom-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.custom-table tbody tr:nth-child(even) {
+    background-color: #eaf6fa; 
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.text-muted {
     color: #666;
-    margin: 3px 0;
+    display: block;
+    margin-top: 4px;
 }
 
-.card-body span {
-    font-weight: 500;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 1200px) {
-    .member-card { flex: 0 0 48%; max-width: 48%; }
-    .card-image { height: 380px; }
-}
-
-@media (max-width: 768px) {
-    .member-card { flex: 0 0 100%; max-width: 100%; }
-    .card-image { height: 350px; }
+.line-break {
+    display: block;
+    margin-bottom: 4px;
 }
 
 /* ===== Pagination ===== */
@@ -164,34 +165,53 @@
 
 <div class="filter-bar">
     <button class="filter-btn active" onclick="filterMembers('all', this)">All</button>
-    <button class="filter-btn" onclick="filterMembers('Yes', this)">Aggregators</button>
-    <button class="filter-btn" onclick="filterMembers('No', this)">Members</button>
+    <button class="filter-btn" onclick="filterMembers('yes', this)">Aggregators</button>
+    <button class="filter-btn" onclick="filterMembers('no', this)">Members</button>
 </div>
 
-<div class="member-grid" id="memberGrid">
-    {% for member in page_obj %}
-    <div class="member-card" data-aggregator="{{ member.is_aggregator }}">
-        <div class="card-image">
-            {% if member.image and member.image.url %}
-                <img src="{{ member.image.url }}" alt="{{ member.company_name }}">
-            {% else %}
-                <img src="{% static 'home/images/PP.jpg' %}" alt="{{ member.company_name }}">
-            {% endif %}
-        </div>
-        <div class="card-body">
-            <h3>{{ member.name }}</h3>
-            <p><span>Company:</span> {{ member.company_name }}</p>
-            <p><span>Designation:</span> {{ member.designation }}</p>
-        </div>
-    </div>
+<div class="table-container">
+    <table class="custom-table" id="memberTable">
+        <thead>
+            <tr>
+                <th style="width: 5%;">SL</th>
+                <th style="width: 20%;">Member Id</th>
+                <th style="width: 20%;">Company Name</th>
+                <th style="width: 20%;">Owner Name</th>
+                <th style="width: 20%;">Designation</th>
+            </tr>
+        </thead>
+        <tbody id="memberGrid">
+    {% for member in members %}
+       {% if member.status == 2 %}
+        <tr class="member-row" data-aggregator="{{ member.is_aggregator|lower }}" data-href="{% url 'member_detail' member.slug %}" style="cursor:pointer;">
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>
+                {% if member.user_type == 1 %}
+                <span class="line-break">AGM-{{ member.member_id }}</span>
+                {% else %}
+                <span class="line-break">AGU-{{ member.member_id }}</span>
+                {% endif %}
+            </td>
+            <td>
+                <span class="line-break">{{ member.company_name }}</span>
+            </td>
+            <td>
+                <span class="line-break">{{ member.name }}</span>
+            </td>
+            <td><span class="text-muted">{{ member.designation }}</span></td>
+        </tr>
+        {% endif %}
     {% empty %}
-    <div class="no-news">
-        <h3>No Members Found</h3>
-    </div>
+        <tr id="emptyRow">
+            <td colspan="6" style="padding: 30px; text-align: center; color: #666;">
+                <h3>Loading ...</h3>
+            </td>
+        </tr>
     {% endfor %}
+</tbody>
+    </table>
 </div>
 
-<!-- Pagination -->
 <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
@@ -224,36 +244,90 @@
 
 {% block extra_js %}
 <script>
-function filterMembers(type, btn) {
-    const cards = document.querySelectorAll('.member-card');
+    function filterMembers(type, btn) {
+    const rows = document.querySelectorAll('.member-row');
     let visibleCount = 0;
 
-    // Toggle active class
+    // Toggle active class on buttons
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
-    cards.forEach(card => {
-        if(type === 'all' || card.dataset.aggregator === type) {
-            card.style.display = 'block'; // keep layout consistent
+    // Filter table rows
+    rows.forEach(row => {
+        const rowType = row.dataset.aggregator ? row.dataset.aggregator.toLowerCase() : '';
+        const filterType = type.toLowerCase();
+
+        if(filterType === 'all' || rowType === filterType) {
+            row.style.display = '';
             visibleCount++;
         } else {
-            card.style.display = 'none';
+            row.style.display = 'none';
         }
     });
 
-    // Show no-members message if none
-    const noNewsDiv = document.querySelector('.no-news');
+    // Handle "No members found"
+    let noNewsRow = document.getElementById('noFilterRow');
+    const tbody = document.getElementById('memberGrid');
+
     if(visibleCount === 0) {
-        if(!noNewsDiv) {
-            const grid = document.getElementById('memberGrid');
-            const noDiv = document.createElement('div');
-            noDiv.className = 'no-news';
-            noDiv.innerHTML = '<h3>No Members Found for this filter</h3>';
-            grid.appendChild(noDiv);
+        if(!noNewsRow) {
+            noNewsRow = document.createElement('tr');
+            noNewsRow.id = 'noFilterRow';
+            noNewsRow.innerHTML = '<td colspan="6" style="padding: 30px; text-align: center; color: #666;"><h3>No Members Found for this filter</h3></td>';
+            tbody.appendChild(noNewsRow);
         }
-    } else if(noNewsDiv) {
-        noNewsDiv.remove();
+    } else if(noNewsRow) {
+        noNewsRow.remove();
+    }
+}
+
+// Make rows clickable
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.member-row').forEach(row => {
+        row.addEventListener('click', function() {
+            const href = this.dataset.href;
+            if(href) {
+                window.location.href = href;
+            }
+        });
+    });
+});
+function filterMembers(type, btn) {
+    const rows = document.querySelectorAll('.member-row');
+    let visibleCount = 0;
+
+    // Toggle active class on buttons
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Filter table rows
+    rows.forEach(row => {
+        // Ensure standard string comparison (lowercase)
+        const rowType = row.dataset.aggregator ? row.dataset.aggregator.toLowerCase() : '';
+        const filterType = type.toLowerCase();
+
+        if(filterType === 'all' || rowType === filterType) {
+            row.style.display = ''; // default table row display
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Handle "No members found" message specifically for the table
+    let noNewsRow = document.getElementById('noFilterRow');
+    const tbody = document.getElementById('memberGrid');
+
+    if(visibleCount === 0) {
+        if(!noNewsRow) {
+            noNewsRow = document.createElement('tr');
+            noNewsRow.id = 'noFilterRow';
+            noNewsRow.innerHTML = '<td colspan="6" style="padding: 30px; text-align: center; color: #666;"><h3>No Members Found for this filter</h3></td>';
+            tbody.appendChild(noNewsRow);
+        }
+    } else if(noNewsRow) {
+        noNewsRow.remove();
     }
 }
 </script>
-{% endblock %}
+{% endblock extra_js %}

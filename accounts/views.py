@@ -1,18 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.db.models import Sum, Q
 from collections import defaultdict
 from django.contrib import messages
 from django.utils import timezone
 from django.db import transaction
 from datetime import datetime
+from itertools import chain
 from .models import *
 from .utils import *
 import random
@@ -31,7 +33,7 @@ def home_view(request):
 
 
 def about_view(request):
-    return render(request, "home/layouts/about.html", {'about_para': AboutParagraph.objects.all(), "about_albums":AboutAlbum.objects.all(), "company_info": Company_info.objects.all()})
+    return render(request, "home/layouts/about.html", {'about_para': AboutParagraph.objects.all(), "about_albums":AboutAlbum.objects.all(), "company_info": CompanyInfo.objects.all()})
 
 def vision(request):
     vision = Vision.objects.all()
@@ -61,9 +63,8 @@ def founder_view(request):
 
     paginator = Paginator(founders_list, 6)
 
-    page_number = request.GET.get('page')  # may be None or ''
-    founders = paginator.get_page(page_number)  # ✅ SAFE
-
+    page_number = request.GET.get('page') 
+    founders = paginator.get_page(page_number)  
     context = {
         'founders': founders,
         'page_obj': founders
@@ -72,7 +73,7 @@ def founder_view(request):
 
 
 def current_executive_commitee(request):
-    commitees_list = SispabExecutiveCom.objects.all().order_by('id')  # QuerySet
+    commitees_list = SispabExecutiveCom.objects.all().order_by('id') 
     paginator = Paginator(commitees_list, 6)  # 6 cards per page
 
     page_number = request.GET.get('page')
@@ -120,6 +121,27 @@ def advisory_council(request):
 
 def member_resistation(request):
     return render(request, "home/layouts/member_resistation.html")
+
+def become_a_member(request):
+    members = BecomeMember.objects.all().order_by("-id")
+
+    paginator = Paginator(members, 6)   # 6 cards per page
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "home/layouts/become_a_member.html", {
+        "page_obj": page_obj
+    })
+
+
+def sponser_list(request):
+    sponsors = Sponsor.objects.all().order_by("-created_at")
+
+    context = {
+        "sponsors": sponsors
+    }
+
+    return render(request, "home/layouts/sponser_list.html", context)
 
 def login_view(request):
     if request.method == "POST":
@@ -189,6 +211,9 @@ def edit_profile(request):
 
         if request.FILES.get("image"):
             aggregator.image = request.FILES.get("image")
+
+        if request.FILES.get("company_logo"):
+            aggregator.company_logo = request.FILES.get("company_logo")
 
         if request.FILES.get("appoinment_letter"):
             aggregator.appoinment_letter = request.FILES.get("appoinment_letter")
@@ -353,22 +378,29 @@ def registration_view(request):
 
 
 def search(request):
-    member_id = request.GET.get('member_id')
-    member = None
-    if member_id:
-        try:
-            member = Aggregator.objects.get(member_id=member_id)
-        except Aggregator.DoesNotExist:
-            member = None
+    member_id = request.GET.get('member_id', '').strip()
+
+
+    normalized_id = member_id.upper().replace('-', '')
+
+    members = Aggregator.objects.all()
+    filtered_members = []
+    for member in members:
+        code = f'AGM{member.member_id}' if member.user_type == 1 else f'AGU{member.member_id}'
+        if normalized_id == code.upper():
+            filtered_members.append(member)
+
+    
+    paginator = Paginator(filtered_members, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'member': member,
-        'member_id': member_id
+        'members': page_obj.object_list,
+        'page_obj': page_obj,
+        'member_id': member_id,
     }
-    return render(request, "home/layouts/search_result.html", context)
-
-
-
+    return render(request, 'home/layouts/search_result.html', context)
 
 
 def meeting_calls(request):
@@ -377,7 +409,6 @@ def meeting_calls(request):
     upcoming_list = MeetingTitle.objects.filter(expire_date__gt=now).order_by('expire_date')
     previous_list = MeetingTitle.objects.filter(expire_date__lte=now).order_by('-expire_date')
 
-    # Pagination: 6 meetings per page
     upcoming_page_number = request.GET.get('upcoming_page')
     previous_page_number = request.GET.get('previous_page')
 
@@ -395,87 +426,108 @@ def meeting_calls(request):
 User = get_user_model()
 
 def get_aggregator_info(request):
-    phone = request.GET.get('phone', '').strip()
+    mobile = request.GET.get('mobile', '').strip()
 
-    if phone.startswith("+880"):
-        phone = phone[3:]
-    elif phone.startswith("880"):
-        phone = phone[2:]
+    mobile = normalize_phone(mobile)
 
     try:
-        aggregator = Aggregator.objects.select_related('user').filter(phone=phone).first()
+        # Check Aggregator first
+        aggregator = Aggregator.objects.select_related('user').filter(mobile=mobile).first()
 
         if aggregator:
-            data = {
-                'is_aggregator': "Yes" if aggregator.is_aggregator else "No",
-                'company_name': aggregator.company_name,
-                'name': aggregator.name,
-                'no_of_person': getattr(aggregator, 'no_of_person', 1),
-                'email': aggregator.user.email if aggregator.user else "",
-            }
-            return JsonResponse({'exists': True, 'data': data})
+            return JsonResponse({
+                'exists': True,
+                'source': 'aggregator',
+                'data': {
+                    'company_name': aggregator.company_name,
+                    'person_name': aggregator.name,
+                    'email': aggregator.user.email if aggregator.user else "",
+                    'mobile': aggregator.mobile,
+                }
+            })
 
-        return JsonResponse({'exists': False, 'data': {}})
+        # Check TempMember
+        temp = TempMember.objects.filter(mobile=mobile).first()
+
+        if temp:
+            return JsonResponse({
+                'exists': True,
+                'source': 'temp',
+                'data': {
+                    'company_name': temp.company_name,
+                    'person_name': temp.person_name,
+                    'email': temp.email,
+                    'mobile': temp.mobile,
+                }
+            })
+
+        return JsonResponse({'exists': False})
 
     except Exception as e:
         return JsonResponse({'exists': False, 'error': str(e)}, status=500)
     
 
-def meeting_call(request, id):
-    last_title = get_object_or_404(MeetingTitle, id=id)
 
+def meeting_call(request, slug):
+    # Get the event/meeting
+    last_title = get_object_or_404(MeetingTitle, slug=slug)
+
+    # Default form data
     context_data = {
-        'company_name': '', 'name': '', 'no_of_person': '',
-        'phone': '', 'email': '', 'payment_method': '', 'transection_id': '',
+        'company_name': '',
+        'name': '',
+        'no_of_person': '',
+        'mobile': '',
+        'email': '',
+        'payment_method': '',
+        'transection_id': '',
+        'payout_number': ''
     }
 
     if request.method == 'POST':
-
+        # Fill context_data with submitted values
         for field in context_data:
             context_data[field] = request.POST.get(field, '').strip()
 
-        phone = context_data['phone']
+        mobile = context_data['mobile'].strip()
+        mobile_last10 = mobile[-10:]  # Take last 10 digits for matching
 
-        # ✅ Check member exists
-        if not Aggregator.objects.filter(phone__icontains=phone[-10:]).exists():
-            messages.error(request, "Registration failed: Phone number not found in member list.")
+        # Check if mobile exists in Aggregator or TempMember
+        if not (Aggregator.objects.filter(mobile__endswith=mobile_last10).exists() 
+                or TempMember.objects.filter(mobile__endswith=mobile_last10).exists()):
+            messages.error(request, "Registration failed: Mobile number not found in member list.")
             return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **context_data})
 
         try:
-            no_of_person = int(context_data['no_of_person'])
+            # Number of persons and total price
+            no_of_person = int(context_data['no_of_person'] or 1)
             total_price = (last_title.amount or 0) * no_of_person
+            screenshot = request.FILES.get('screenshot')
 
-            # ✅ Save Data
+            # Save MeetingCall
             MeetingCall.objects.create(
                 title=last_title,
                 company_name=context_data['company_name'],
                 name=context_data['name'],
                 no_of_person=no_of_person,
-                phone=phone,
+                phone=mobile,
                 email=context_data['email'],
                 payment_method=context_data['payment_method'],
                 transection_id=context_data['transection_id'],
+                payout_number=context_data['payout_number'],
+                screenshot=screenshot,
                 amount=total_price
             )
 
-            # ✅ SEND CONFIRMATION SMS
-            message = f"""
-Dear {context_data['name']},
-Congatulations! Your meeting registration is successful.
-
-Event: {last_title.title}
-Persons: {no_of_person}
-Amount: {total_price} BDT
-
-Thank you.
-"""
-
-            if send_sms(phone, message):
+            # Send confirmation SMS
+            message = f""" Dear {context_data['name']}, Congratulations! Your meeting registration is successful. Event: {last_title.title} Persons: {no_of_person} Amount: {total_price} BDT Thank you. """
+            if send_sms(mobile, message):
                 messages.success(request, "Submitted successfully! SMS sent.")
             else:
-                messages.warning(request, "Submitted successfully! কিন্তু SMS যায়নি।")
+                messages.warning(request, "Submitted successfully, but SMS was not sent.")
 
-            return redirect('meeting_call', id=last_title.id)
+            # Redirect back to same meeting page
+            return redirect('meeting_call', slug=slug)
 
         except Exception as e:
             messages.error(request, f"Error: {e}")
@@ -495,7 +547,7 @@ def blog_view(request):
     })
     
 def news_view(request):
-    newses = News.objects.all().order_by('-date')
+    newses = News.objects.all().order_by('-created_at')
 
     paginator = Paginator(newses, 9)
     page_number = request.GET.get('page')
@@ -505,8 +557,8 @@ def news_view(request):
         "page_obj": page_obj
     })
 
-def news_detail_view(request, id):
-    news = get_object_or_404(News, id=id)
+def news_detail_view(request, slug):
+    news = get_object_or_404(News, slug=slug)
     return render(request, "home/layouts/news_detail.html", { "news": news })
 
 
@@ -557,9 +609,9 @@ def media_view(request):
 
     return render(request, "home/layouts/media_page.html", {'media_by_year': media_by_year})
 
-def photo_gallery(request, id):
-    album = get_object_or_404(PhotoAlbum, id=id)
-    all_photos_list = album.photos.all().order_by('-id')  # latest first
+def photo_gallery(request, slug):
+    album = get_object_or_404(PhotoAlbum, slug=slug)
+    all_photos_list = album.photos.all()
 
     paginator = Paginator(all_photos_list, 9)  # 9 photos per page
     page_number = request.GET.get('page')
@@ -576,7 +628,7 @@ def photos(request):
   
     albums_list = PhotoAlbum.objects.all() 
 
-    paginator = Paginator(albums_list, 9)  # Show 9 albums per page
+    paginator = Paginator(albums_list, 9) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -604,6 +656,14 @@ def membership_list(request):
     return render(request, "home/layouts/membership_lists.html", context)
 
 
+def member_detail(request, slug):
+    member = get_object_or_404(Aggregator, slug=slug)
+    context = {
+        'member': member
+    }
+    return render(request, "home/layouts/member_detail.html", context)
+
+
 def events_view(request):
     events = Events.objects.all()
     events_meetings = Events_Meetings.objects.all()
@@ -615,33 +675,71 @@ def events_view(request):
 
 
 def video_gallery(request):
-    # Fetch events and meetings
-    events = Events.objects.all().order_by('-id')
-    events_meetings = Events_Meetings.objects.all().order_by('-id')
+    """
+    Display event videos in a paginated gallery.
+    """
+    # Fetch events with videos
+    events = Events.objects.select_related('title').filter(
+        url__isnull=False  # Only get events with URLs
+    ).exclude(
+        url__exact=''  # Exclude empty URLs
+    ).order_by('-id')
 
-    # Combine videos into a single list with a uniform structure
-    videos = []
+    # Helper function to generate embed URL
+    def generate_embed_url(url):
+        if not url:
+            return None
 
-    for event in events:
-        if getattr(event, 'embed_url_1', None):
-            videos.append({'title': event.title, 'url': event.embed_url_1})
-        if getattr(event, 'embed_url_2', None):
-            videos.append({'title': event.title, 'url': event.embed_url_2})
+        si_param = "FzYOnU1EAQsQ4JFe"
 
-    for meeting in events_meetings:
-        if getattr(meeting, 'video_link', None):  # Replace with your actual field in Events_Meetings
-            videos.append({'title': meeting.title, 'url': meeting.video_link})
+        # If already an embed URL
+        if "youtube.com/embed/" in url:
+            clean_url = re.sub(r'\?si=.*', '', url)
+            return f"{clean_url}?si={si_param}"
 
-    # Pagination
-    paginator = Paginator(videos, 6)  # 6 videos per page
+        # Extract video ID from normal YouTube URLs
+        youtube_regex = (
+            r'(?:https?://)?(?:www\.)?'
+            r'(?:youtube\.com/watch\?v=|youtu\.be/)'
+            r'([A-Za-z0-9_-]{11})'
+        )
+        match = re.search(youtube_regex, url)
+        if match:
+            video_id = match.group(1)
+            return f"https://www.youtube.com/embed/{video_id}?si={si_param}"
+
+        return url
+
+    # Build video list
+    event_videos = []
+    for e in events:
+        # Get the title string from the ForeignKey
+        title_str = e.title.title if e.title else "Untitled Event"
+        
+        # Generate embed URL
+        embed_url = generate_embed_url(e.url)
+        
+        if embed_url:  # Only add if we have a valid embed URL
+            event_videos.append({
+                'id': e.id,
+                'title': title_str,
+                'url': embed_url,
+                'created_at': getattr(e, 'created_at', None),
+            })
+
+    # Pagination - 6 videos per page
+    paginator = Paginator(event_videos, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'events': page_obj.object_list,  # For template compatibility
+        'is_paginated': paginator.num_pages > 1,
+        'total_videos': len(event_videos),
     }
+    
     return render(request, "home/layouts/video_gallery.html", context)
-
 
 def meetings(request):
 
@@ -683,62 +781,69 @@ def dashboard(request):
 @login_required
 def home_details(request):
     context = {
-        "all_company_info" : Company_info.objects.all(),
+        "all_company_info" : CompanyInfo.objects.all(),
         "videos": Video.objects.all(), 
         "hero_areas": HeroArea.objects.all(),
     }
     return render (request, 'admin/pages/home_details.html', context)
 
-@login_required
-def company_info_input(request):
 
-    try:
-        company = Company_info.objects.get(id=1)
-    except Company_info.DoesNotExist:
-        company = None
+@login_required
+def company_info_input(request, id=None):
+    # Get company instance
+    if id:
+        company = get_object_or_404(CompanyInfo, id=id)
+    else:
+        company, created = CompanyInfo.objects.get_or_create(id=1)  # <-- FIXED
 
     if request.method == "POST":
         company_name = request.POST.get("company_name")
         phone = request.POST.get("phone")
         email = request.POST.get("email")
         office_hours = request.POST.get("office_hours")
-        friday = request.POST.get("friday")
+        day_off_ids = request.POST.getlist("day_off")
         house_no = request.POST.get("house_no")
         block = request.POST.get("block")
         district = request.POST.get("district")
-        cirtificate = request.POST.get("cirtificate")
+        certificate = request.FILES.get("certificate")
         country = request.POST.get("country")
 
-        if company is None:
-            company = Company_info.objects.create(
-                company_name=company_name,
-                phone=phone,
-                email=email,
-                office_hours=office_hours,
-                friday=friday,
-                house_no=house_no,
-                block=block,
-                district=district,
-                cirtificate=cirtificate,
-                country=country
-            )
-        else:
-            company.company_name = company_name
-            company.phone = phone
-            company.email = email
-            company.office_hours = office_hours
-            company.friday = friday
-            company.house_no = house_no
-            company.block = block
-            company.district = district
-            company.country = country
-            company.save()
+        # Max 2 days validation
+        if len(day_off_ids) > 2:
+            messages.error(request, "You can select a maximum of 2 day offs.")
+            return redirect(home_details)
 
-        messages.success(request, "Company information updated successfully!")
-        return redirect("company_info_input")
+        # Update company fields
+        company.company_name = company_name
+        company.phone = phone
+        company.email = email
+        company.office_hours = office_hours
+        company.house_no = house_no
+        company.block = block
+        company.district = district
+        company.country = country
 
-    return render(request, "admin/pages/company_info_input.html", {"company": company})
+        if certificate:
+            company.certificate = certificate
 
+        company.save()
+
+        # Update many-to-many for day_off
+        weekends = Weekend.objects.filter(id__in=day_off_ids)
+        company.day_off.set(weekends)
+
+        messages.success(request, "Company information saved successfully!")
+        return redirect(home_details)
+
+    # GET request
+    weekends = Weekend.objects.all()
+    selected_days = list(company.day_off.values_list('id', flat=True))
+
+    return render(request, "admin/pages/company_info_input.html", {
+        "company": company,
+        "weekends": weekends,
+        "selected_days": selected_days,
+    })
 
 @login_required
 def video_input(request, id):
@@ -754,6 +859,44 @@ def video_input(request, id):
         return redirect("video_input", video.id)
 
     return render(request, "admin/pages/video_input.html", { "video": video })
+
+
+
+@login_required
+def video_input(request, id=None):
+    
+    # যদি id থাকে → update mode
+    if id:
+        video = get_object_or_404(Video, id=id)
+    else:
+        video = None
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        url = request.POST.get("url")
+        description = request.POST.get("description")
+
+        if video:  # Update
+            video.title = title
+            video.url = url
+            video.description = description
+            video.save()
+            messages.success(request, "Video updated successfully!")
+        else:  # Create
+            Video.objects.create(
+                title=title,
+                url=url,
+                description=description
+            )
+            messages.success(request, "Video added successfully!")
+
+        return redirect("home_details")
+
+    context = {
+        "video": video
+    }
+
+    return render(request, "admin/pages/video_input.html", context)
 
 @login_required
 def gallry_input(request):
@@ -821,30 +964,41 @@ def gallry_delete(request, gellary_id):
         return redirect("home_details")
     return render(request, "admin/pages/home_details.html", {"gallery": gallery})
 
-@login_required
-def hero_area_input(request):
-    return render (request, 'admin/pages/hero_area_input.html')
 
 @login_required
-def hero_area_update(request, id):
-    hero_area = get_object_or_404(HeroArea, id=id)
+def hero_area_input(request, id=None):
+    """
+    Handles both creating a new HeroArea and updating an existing one.
+    If id is provided, it updates; otherwise, it creates a new entry.
+    """
+    if id:
+        # Update existing hero area
+        hero_area = get_object_or_404(HeroArea, id=id)
+    else:
+        # Create new hero area instance
+        hero_area = HeroArea()
 
     if request.method == "POST":
         hero_area.tittle = request.POST.get("tittle")
         hero_area.descriptions = request.POST.get("descriptions")
 
+        # Only update image if a file is uploaded
         if request.FILES.get("image"):
             hero_area.image = request.FILES.get("image")
 
         hero_area.save()
 
-        messages.success(request, "Updated Successfully")
-        return redirect("hero_area_input")
+        if id:
+            messages.success(request, "Hero area updated successfully!")
+        else:
+            messages.success(request, "Hero area created successfully!")
+
+        return redirect("hero_area_input")  # or redirect to a list page
 
     return render(
         request,
         "admin/pages/hero_area_input.html",
-        {"hero": hero_area} 
+        {"hero": hero_area}
     )
 
 @login_required
@@ -887,10 +1041,14 @@ def admin_vision(request):
     }
     return render(request, "admin/pages/vision.html", context)
 
+
 @login_required
-def update_vision(request, id):
-     # Fetch the CoreValues object
-    vision = get_object_or_404(Vision, id=id)
+def update_vision(request, id=None):
+
+    if id:
+        vision = get_object_or_404(Vision, id=id)
+    else:
+        vision = None
 
     if request.method == "POST":
         title = request.POST.get("title")
@@ -898,23 +1056,41 @@ def update_vision(request, id):
 
         if not title:
             messages.error(request, "Title cannot be empty")
-            return render(request, "admin/pages/update_vision.html", {"vision": vision})
+            return render(
+                request,
+                "admin/pages/vision_input.html",
+                {"vision": vision}
+            )
 
-        # Update fields
-        vision.title = title
-        vision.descriptions = descriptions
+        # 🔹 UPDATE
+        if vision:
+            vision.title = title
+            vision.descriptions = descriptions
 
-        # Handle image upload
-        if request.FILES.get("image"):
-            vision.image = request.FILES.get("image")
+            if request.FILES.get("image"):
+                if vision.image:
+                    vision.image.delete(save=False)
+                vision.image = request.FILES.get("image")
 
-        vision.save()
-        messages.success(request, "Vision has been updated successfully!")
+            vision.save()
+            messages.success(request, "Vision updated successfully!")
 
-        # Redirect to the list page after update
-        return redirect("update_vision", id=vision.id)
+        # 🔹 CREATE
+        else:
+            vision = Vision.objects.create(
+                title=title,
+                descriptions=descriptions,
+                image=request.FILES.get("image")
+            )
+            messages.success(request, "Vision created successfully!")
 
-    return render(request, "admin/pages/update_vision.html", {"vision": vision})
+        return redirect("admin_vision")
+
+    return render(
+        request,
+        "admin/pages/update_vision.html",
+        {"vision": vision}
+    )
 
 @login_required
 def admin_mission(request):
@@ -924,10 +1100,14 @@ def admin_mission(request):
     }
     return render(request, "admin/pages/mission.html", context)
 
+
 @login_required
-def update_mission(request, id):
-     # Fetch the CoreValues object
-    mission = get_object_or_404(Mission, id=id)
+def mission_input(request, id=None):
+
+    if id:
+        mission = get_object_or_404(Mission, id=id)
+    else:
+        mission = None
 
     if request.method == "POST":
         title = request.POST.get("title")
@@ -935,23 +1115,41 @@ def update_mission(request, id):
 
         if not title:
             messages.error(request, "Title cannot be empty")
-            return render(request, "admin/pages/update_vision.html", {"mission": mission})
+            return render(
+                request,
+                "admin/pages/mission_input.html",
+                {"mission": mission}
+            )
 
-        # Update fields
-        mission.title = title
-        mission.descriptions = descriptions
+        # 🔹 UPDATE
+        if mission:
+            mission.title = title
+            mission.descriptions = descriptions
 
-        # Handle image upload
-        if request.FILES.get("image"):
-            mission.image = request.FILES.get("image")
+            if request.FILES.get("image"):
+                if mission.image:
+                    mission.image.delete(save=False)
+                mission.image = request.FILES.get("image")
 
-        mission.save()
-        messages.success(request, "Vision has been updated successfully!")
+            mission.save()
+            messages.success(request, "Mission updated successfully!")
 
-        # Redirect to the list page after update
-        return redirect("update_mission", id=mission.id)
+        # 🔹 CREATE
+        else:
+            mission = Mission.objects.create(
+                title=title,
+                descriptions=descriptions,
+                image=request.FILES.get("image")
+            )
+            messages.success(request, "Mission created successfully!")
 
-    return render(request, "admin/pages/update_mission.html", {"mission": mission})
+        return redirect("admin_mission")
+
+    return render(
+        request,
+        "admin/pages/update_mission.html",
+        {"mission": mission}
+    )
 
 @login_required
 def admin_core_values(request):
@@ -962,9 +1160,12 @@ def admin_core_values(request):
     return render(request, "admin/pages/core_values.html", context)
 
 @login_required
-def update_core_values(request, id):
-    # Fetch the CoreValues object
-    core_value = get_object_or_404(CoreValues, id=id)
+def update_core_values(request, id=None):
+
+    if id:
+        core_value = get_object_or_404(CoreValues, id=id)
+    else:
+        core_value = None
 
     if request.method == "POST":
         title = request.POST.get("title")
@@ -972,24 +1173,39 @@ def update_core_values(request, id):
 
         if not title:
             messages.error(request, "Title cannot be empty")
-            return render(request, "admin/pages/update_core_values.html", {"core_value": core_value})
+            return render(
+                request,
+                "admin/pages/update_core_values.html",
+                {"core_value": core_value}
+            )
 
-        # Update fields
-        core_value.title = title
-        core_value.descriptions = descriptions
+        # 🔹 UPDATE
+        if core_value:
+            core_value.title = title
+            core_value.descriptions = descriptions
 
-        # Handle image upload
-        if request.FILES.get("image"):
-            core_value.image = request.FILES.get("image")
+            if request.FILES.get("image"):
+                core_value.image = request.FILES.get("image")
 
-        core_value.save()
-        messages.success(request, "Core Value has been updated successfully!")
+            core_value.save()
+            messages.success(request, "Core Value updated successfully!")
 
-        # Redirect to the list page after update
+        # 🔹 CREATE
+        else:
+            core_value = CoreValues.objects.create(
+                title=title,
+                descriptions=descriptions,
+                image=request.FILES.get("image")
+            )
+            messages.success(request, "Core Value created successfully!")
+
         return redirect("admin_core_values")
 
-    # Render the update form
-    return render(request, "admin/pages/update_core_values.html", {"core_value": core_value})
+    return render(
+        request,
+        "admin/pages/update_core_values.html",
+        {"core_value": core_value}
+    )
 
 @login_required
 def album_input(request):
@@ -1290,8 +1506,7 @@ def upload_video(request):
     if request.method == "POST":
         title_text = request.POST.get("title")
         description_text = request.POST.get("description")
-        url_1 = request.POST.get("url_1")
-        url_2 = request.POST.get("url_2")
+        url = request.POST.get("url")
 
         event_title = EventTitle.objects.create(
             title=title_text,
@@ -1300,8 +1515,7 @@ def upload_video(request):
 
         Events.objects.create(
             title=event_title,
-            url_1=url_1,
-            url_2=url_2
+            url=url,
         )
 
         messages.success(request, "Video uploaded successfully!")
@@ -1332,8 +1546,7 @@ def video_update(request, id):
             )
             info.title = event_title
 
-        info.url_1 = request.POST.get("url_1")
-        info.url_2 = request.POST.get("url_2")
+        info.url = request.POST.get("url")
         info.save()
 
         messages.success(request, "Updated Successfully")
@@ -1638,13 +1851,27 @@ def AdminMembersRulesDelete(request, id):
         return redirect("AdminMembersRules")
     
 
-@login_required
 def admin_membership_list(request):
-    members = Aggregator.objects.all().order_by('company_name')
-    comtext = {
-        "members" : members
+    # Get unverified members (status=1)
+    unverified_members = Aggregator.objects.filter(status=1)
+    
+    # Get verified members (status=2)
+    verified_members = Aggregator.objects.filter(status=2)
+    # Get temp members (pending registration)
+    temp = TempMember.objects.all()
+    
+    context = {
+        'unverified_members': unverified_members,
+        'verified_members': verified_members,
+        'temp': temp,
+        'total_members': verified_members.count(),
+        'agm_count': verified_members.filter(is_aggregator="Yes").count(),
+        'agu_count': verified_members.filter(is_aggregator="No").count(),
+        'verified_count': verified_members.count(),
+        'unverified_count': unverified_members.count(),
+        # 'exp_count': 0,  # Removed since field doesn't exist
     }
-    return render(request, "admin/pages/admin_membership_list.html", comtext)
+    return render(request, 'admin/pages/admin_membership_list.html', context)
 
 @login_required
 def admin_membership_list_details(request, id):
@@ -1665,7 +1892,6 @@ def AdminAddNews(request):
         News.objects.create(
             title=request.POST.get("title"),
             image=request.FILES.get("image"), 
-            date=request.POST.get("date") or None,
             description=request.POST.get("description"),
         )
         messages.success(request, "News uploaded successfully")
@@ -1684,7 +1910,6 @@ def AdminUpdateNews(request, id):
         if request.FILES.get("image"):
             newses.image = request.FILES.get("image")
         
-        newses.date = request.POST.get("date") or None
         newses.description = request.POST.get("description")
         
         newses.save()
@@ -1728,9 +1953,6 @@ def admin_add_photo(request, id):
             for file in files:
                 photo = Photo.objects.create(album=album, image=file)
                 photos.append(photo)
-
-            album.banner = random.choice(photos).image
-            album.save()
 
             messages.success(request, "Photos added successfully!")
             return redirect('admin_photo_list', id=album.id)
@@ -1803,14 +2025,19 @@ def admin_Album_list(request):
 def admin_add_album(request):
     if request.method == 'POST':
         title = request.POST.get('title')
+        description = request.POST.get('description')   # ✅ FIXED
         banner = request.FILES.get('banner')
 
-        if title and banner:
-            PhotoAlbum.objects.create(title=title, banner=banner)
+        if title and banner and description:
+            PhotoAlbum.objects.create(
+                title=title,
+                banner=banner,
+                description=description
+            )
             messages.success(request, "Album created successfully!")
             return redirect('admin_add_album')
         else:
-            messages.error(request, "Please enter a title and select a banner image.")
+            messages.error(request, "Please enter a title, description and select a banner image.")
 
     return render(request, 'admin/pages/admin_add_album.html')
 
@@ -1820,22 +2047,29 @@ def admin_update_album(request, id):
 
     if request.method == 'POST':
         title = request.POST.get('title')
+        description = request.POST.get('description')  # ✅ FIXED
         file = request.FILES.get('banner')
 
         # Update title
-        if title and title.strip() != "":
+        if title and title.strip():
             album.title = title
-            album.save()
+
+        # Update description
+        if description and description.strip():
+            album.description = description
 
         # Update banner image
         if file:
             album.banner = file
-            album.save()
+
+        album.save()  # ✅ Save once only
 
         messages.success(request, "Album updated successfully!")
         return redirect('admin_update_album', id=album.id)
 
-    return render(request, 'admin/pages/admin_update_album.html', { 'album': album })
+    return render(request, 'admin/pages/admin_update_album.html', {
+        'album': album
+    })
 
 @login_required
 def delete_album(request, id):
@@ -1914,6 +2148,7 @@ def meeting_call_list(request, id):
         'meeting_calls': calls
     }
     return render(request, "admin/pages/meeting_call_list.html", context)
+
 
 @login_required
 def admin_meeting_call(request):
@@ -2058,13 +2293,7 @@ def call_delete(request, id):
 
     return redirect('meeting_call_list', call.title.id)
 
-@login_required
-def admin_member_registration_list(request):
-    registrations = TempMember.objects.all()
-    context = {
-        'registrations': registrations
-    }
-    return render(request, "admin/pages/admin_member_registration_list.html", context)
+
 
 
 @login_required
@@ -2170,7 +2399,21 @@ def accept(request, id):
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
         
-    return redirect('admin_member_registration_list')
+    return redirect('admin_membership_list')
+
+def approve(request, id):
+    aggre = get_object_or_404(Aggregator, id=id)
+    
+    aggre.status = 2 
+    aggre.save()     
+    
+    return redirect('admin_membership_list')
+
+def reject_member(request, id):
+    # Get the Aggregator
+    aggre = get_object_or_404(Aggregator, id=id)
+    aggre.user.delete()
+    return redirect('admin_membership_list')
 
 @login_required
 def reject(request, id):
@@ -2179,7 +2422,127 @@ def reject(request, id):
     temp_member.delete()
     messages.success(request, "Rejected successfully!")
 
-    return redirect('admin_member_registration_list')
+    return redirect('admin_membership_list')
+
+@login_required
+def emergency_services():
+    return redirect("admin/pages/emergency_services.html")
+
+@login_required
+def government_services():
+    return redirect("admin/pages/government_services.html")
+
+@login_required
+def admin_sponser_list(request):
+    sponsors = Sponsor.objects.all()
+
+    context = {
+        "sponsors": sponsors,
+    }
+    return render(request, "admin/pages/admin_sponser_list.html", context)
+
+@login_required
+def sponsor_form(request, id=None):
+
+    sponsor = None
+    if id:
+        sponsor = get_object_or_404(Sponsor, id=id)
+
+    if request.method == "POST":
+        sponsor_name = request.POST.get("sponsor_name")
+        company_name = request.POST.get("company_name")
+        designation = request.POST.get("designation")
+        sponsor_email = request.POST.get("sponsor_email")
+        sponsor_phone = request.POST.get("sponsor_phone")
+        description = request.POST.get("description")
+        company_logo = request.FILES.get("company_logo")
+
+        if sponsor:
+            sponsor.sponsor_name = sponsor_name
+            sponsor.company_name = company_name
+            sponsor.designation = designation
+            sponsor.sponsor_email = sponsor_email
+            sponsor.sponsor_phone = sponsor_phone
+            sponsor.description = description
+
+            if company_logo:
+                sponsor.company_logo = company_logo
+
+            sponsor.save()
+            messages.success(request, "Sponsor Updated Successfully")
+
+        else:
+            Sponsor.objects.create(
+                sponsor_name=sponsor_name,
+                company_name=company_name,
+                designation=designation,
+                sponsor_email=sponsor_email,
+                sponsor_phone=sponsor_phone,
+                description=description,
+                company_logo=company_logo
+            )
+            messages.success(request, "Sponsor Created Successfully")
+
+        return redirect("admin_sponser_list")
+
+    return render(request, "admin/pages/sponsor_form.html", {"sponsor": sponsor})
+
+
+
+@login_required
+def delete_sponsor(request, id):
+    sponsor = get_object_or_404(Sponsor, id=id)
+    sponsor.delete()
+    messages.success(request, f"deleted successfully.")
+    return redirect("admin_become_a_member")
+
+
+
+@login_required
+def admin_become_a_member(request):
+    mem = BecomeMember.objects.all()
+
+    context = {
+        "mem": mem,
+    }
+    return render(request, "admin/pages/admin_become_a_member.html", context)
+
+@login_required
+def admin_become_a_member_form(request, id=None):
+
+    mem = None
+    if id:
+        mem = get_object_or_404(BecomeMember, id=id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+
+        if mem:
+            mem.title = title
+            mem.description = description
+            mem.save()
+            messages.success(request, "Updated Successfully")
+
+        else:
+            BecomeMember.objects.create(
+                title=title,
+                description=description,
+            )
+            messages.success(request, "Created Successfully")
+
+        return redirect("admin_become_a_member")
+
+    return render(request, "admin/pages/admin_become_a_member_form.html", {"mem": mem})
+
+
+
+@login_required
+def delete_become_a_member(request, id):
+    sponsor = get_object_or_404(BecomeMember, id=id)
+    sponsor.delete()
+    messages.success(request, f"deleted successfully.")
+    return redirect("admin_become_a_member")
 
 
 # admin_view end
@@ -2213,10 +2576,10 @@ def check_phone(request):
     return JsonResponse({'phone_exists': phone_exists})
 
 
-
-
-
-
+def check_company(request):
+    company = request.GET.get('company_name', '').strip()
+    exists = Aggregator.objects.filter(company_name__iexact=company).exists() or TempMember.objects.filter(company_name__iexact=company).exists()
+    return JsonResponse({'exists': exists})
 
 
 #profile

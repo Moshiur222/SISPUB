@@ -1,0 +1,163 @@
+{% extends "home/base/base.html" %}
+
+{% load static %}
+{% block extra_css %}
+<style>
+/* --- Header --- */
+.news-header {
+    text-align: center;
+    padding: 350px 20px 50px;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("{% static 'home/images/banner4.png' %}");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    margin-bottom: 50px;
+    border-radius: 10px;
+}
+
+.news-header h1 {
+    color: #fff;
+    font-size: 35px;
+}
+
+/* --- Job Card --- */
+.job-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.job-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+}
+
+.job-card-body {
+    padding: 25px;
+    flex-grow: 1;
+}
+
+.job-title-modern {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.job-description-modern {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0;
+}
+
+.pagination a, .pagination span {
+    padding: 8px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    background: #fff;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    font-weight: 500;
+}
+
+.pagination a:hover {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination .current {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+    font-weight: 600;
+}
+
+.pagination .disabled {
+    color: #999;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+.job-title-modern {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #333;
+    text-align: center;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+
+<!-- Header -->
+<div class="news-header">
+    <h1>Become A Member</h1>
+</div>
+
+<section class="career-section pt-5 pb-5">
+    <div class="container">
+        <div class="row">
+            {% for career in page_obj %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="job-card">
+                    <div class="job-card-body">
+                        <h3 class="job-title-modern">{{ career.title }}</h3>
+                        <div class="job-description-modern">
+                            {{ career.description|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center w-100">No careers available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Pagination -->
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">← Prev</a>
+    {% else %}
+        <span class="disabled">« First</span>
+        <span class="disabled">← Prev</span>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="current">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+    {% else %}
+        <span class="disabled">Next →</span>
+        <span class="disabled">Last »</span>
+    {% endif %}
+</div>
+
+{% endblock %}

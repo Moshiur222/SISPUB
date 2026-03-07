@@ -639,9 +639,6 @@
                     <tr>
                         <th>#</th>
                         <th>Title</th>
-                        <th>Image</th>
-                        <th>Year</th>
-                        <th>Description</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -651,27 +648,6 @@
                         <td class="counter">{{ forloop.counter }}</td>
                         <td>
                             <span class="news-title">{{ news.title|default:"—" }}</span>
-                        </td>
-                        <td>
-                            {% if news.image %}
-                                <img src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
-                            {% else %}
-                                <div class="no-image">
-                                    <i class="bi bi-image"></i>
-                                </div>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="date-badge">{{ news.date.year }}</span>
-                        </td>
-                        <td>
-                            {% if news.description %}
-                                <div class="description-preview">
-                                    {{ news.description|truncatewords:15|safe }}
-                                </div>
-                            {% else %}
-                                <span class="text-muted">—</span>
-                            {% endif %}
                         </td>
                         <td class="text-center">
                             <div class="action-group">

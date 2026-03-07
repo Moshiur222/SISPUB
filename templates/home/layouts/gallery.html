@@ -165,7 +165,7 @@
 <div class="gallery-section">
     <div class="gallery-grid">
         {% for album in page_obj %}
-        <a href="{% url 'photos' album.id %}">
+        <a href="{% url 'photos' album.slug %}">
             <div class="gallery-item">
                 {% if album.banner %}
                     <img src="{{ album.banner.url }}" alt="{{ album.title }}">

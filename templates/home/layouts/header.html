@@ -74,12 +74,10 @@
             right: 0; /* Slide in */
         }
 
-        .nav-list {
-            flex-direction: column !important;
-            padding: 70px 20px 40px !important;
-            margin: 0;
-        }
-
+      .nav-list {
+    flex-direction: column !important;
+    padding: 80px 25px 40px !important;
+}
         .nav-item {
             width: 100%;
             margin: 0 !important;
@@ -199,7 +197,84 @@
         cursor: pointer;
         font-family: inherit;
     }
+    
+    @media (max-width: 768px) {
 
+    .top-bar{
+        display: none !important;
+    }
+
+    hr{
+        display: none !important;
+    }
+
+}
+
+@media (max-width: 768px){
+
+    .main-nav{
+        margin: 10px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        background: #fff;
+    }
+
+    .nav-container{
+        padding: 12px 18px;
+    }
+
+    .logo-img{
+        max-height: 30px;
+        padding-left: 140px;
+    }
+
+}
+
+/* Mobile Search Under Navbar */
+.mobile-search-wrapper{
+    display: none;
+}
+
+@media (max-width: 1024px){
+    .mobile-search-wrapper{
+        display: block;
+        padding: 100px 18px;
+        background: #fff;
+    }
+
+    .mobile-search-wrapper form{
+        display:flex;
+        gap:1px;
+    }
+
+    .mobile-search-wrapper input{
+        flex:1;
+        padding:6px 10px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:14px;
+    }
+
+    .mobile-search-wrapper button{
+        padding:6px 12px;
+        border:none;
+        background:#007bff;
+        color:#fff;
+        border-radius:6px;
+        font-size:14px;
+        cursor:pointer;
+    }
+}
+
+.mobile-auth{
+    display: none;
+}
+
+@media (max-width: 1024px){
+    .mobile-auth{
+        display: block;
+    }
+}
 
 </style>
 {% endblock extra_css %}
@@ -213,7 +288,11 @@
                     <div class="contact-info" style="display: flex; gap: 20px;">
                         <span class="contact-item">
                             <i class="fas fa-phone-alt"></i>
-                            <span>Phone: {{info.phone}}</span>
+                            <a href="tel:{{ info.phone }}" class="contact-item" style = "text-decoration: none; color: #333;">
+                                Call:
+                                
+                                <span>+{{ info.phone }}</span>
+                            </a>
                         </span>
                         <span class="contact-item">
                             <i class="fas fa-envelope"></i>
@@ -222,6 +301,10 @@
                         <span class="contact-item">
                             <i class="fas fa-clock"></i>
                             <span>Sat-Thu: {{info.office_hours}}</span>
+                        </span>
+                        <span class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="topBarClock">--:--:--</span>
                         </span>
                     </div>
                     {% endfor %}
@@ -259,7 +342,7 @@
                         <div class="dropdown-menu" style="min-width: 420px;">
                             <div style="display: flex; padding: 0 10px;">
                                 <div style="width: 70%; margin-left: 20px;">
-                                    <p style="color: #000; font-weight: bold; font-size: 15px; margin-bottom: 10px;">About SiSPUB</p>
+                                    <p style="color: #000; font-weight: bold; font-size: 15px; margin-bottom: 10px;">About SiSPAB</p>
                                     <a href="{% url 'core_values' %}" class="dropdown-item {% active 'core_values' %}" style="height: 30px;">Core Values</a>
                                     <a href="{% url 'vision'%}" class="dropdown-item {% active 'vision' %}" style="height: 30px;">Vision</a>
                                     <a href="{% url 'mission' %}" class="dropdown-item {% active 'mission' %}" style="height: 30px;">Mission</a>
@@ -275,7 +358,7 @@
                         </div>
                     </li>
 
-                    <li class="nav-item dropdown {% active 'benefit_od_member' 'advisory_council' 'member_resistation' 'membership_rules' 'membership_list' 'process_of_members' %}">
+                    <li class="nav-item dropdown {% active 'benefit_od_member' 'advisory_council' 'member_resistation' 'sponser_list' 'become_a_member' 'membership_rules' 'membership_list' 'process_of_members' %}">
                         <a href="#" class="nav-link dropdown-toggle">Membership</a>
                         <div class="dropdown-menu">
                             {% comment %} <a href="{% url 'benefit_od_member' %}" class="dropdown-item {% active 'benefit_od_member' %}" style="margin-left: 20px; height: 30px">Benefit of Members</a>
@@ -284,6 +367,8 @@
                             {% comment %} {% if user.is_authenticated %}
                             <a href="{% url 'member_resistation' %}" class="dropdown-item {% active 'member_resistation' %}" style="margin-left: 20px; height: 30px">Membership Form</a>
                             {% endif %} {% endcomment %}
+                            <a href="{% url 'become_a_member' %}" class="dropdown-item {% active 'become_a_member' %}" style="margin-left: 20px; height: 30px">Become A Member</a>
+                            <a href="{% url 'sponser_list' %}" class="dropdown-item {% active 'sponser_list' %}" style="margin-left: 20px; height: 30px">Sponser List</a>
                             <a href="{% url 'membership_rules' %}" class="dropdown-item {% active 'membership_rules' %}" style="margin-left: 20px; height: 30px">Membership Rules</a>
                         </div>
                     </li>
@@ -324,19 +409,46 @@
                             </div>
                         </div>
                     {% endif %}
+                    {% if not user.is_authenticated %}
+                        <li class="nav-item mobile-auth">
+                            <a href="{% url 'login' %}" class="nav-link">Login</a>
+                        </li>
+                        <li class="nav-item mobile-auth">
+                            <a href="{% url 'registration' %}" class="nav-link">Member Registration</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
-
+            
             <div class="nav-actions">
                 <button class="menu-toggle" aria-label="Toggle Menu">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
+            
         </div>
     </nav>
 </header>
+<!-- Mobile Search Bar -->
+<div class="mobile-search-wrapper">
+    <form method="GET" action="{% url 'search' %}">
+        <input type="text" name="member_id" placeholder="Search by Member ID" required>
+        <button type="submit">Search</button>
+    </form>
+</div>
 
 <script>
+    function updateTopBarClock() {
+    const clockEl = document.getElementById('topBarClock');
+    if (!clockEl) return;
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2,'0');
+    const minutes = String(now.getMinutes()).padStart(2,'0');
+    const seconds = String(now.getSeconds()).padStart(2,'0');
+    clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+}
+updateTopBarClock();
+setInterval(updateTopBarClock, 1000);
     // Logic to open/close the mobile drawer
     const menuBtn = document.querySelector('.menu-toggle');
     const navMenu = document.querySelector('.nav-menu');

@@ -38,6 +38,8 @@
     --success-50: #ecfdf5;
     --success-500: #10b981;
     --info-500: #0ea5e9;
+    --warning-500: #f59e0b;
+    --danger-500: #ef4444;
     
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
@@ -78,6 +80,8 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
   .header-left {
@@ -128,12 +132,57 @@
   }
 
   /* ==========================================================================
+     Filter Tabs
+     ========================================================================== */
+  .filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 50px;
+  }
+
+  .filter-tab {
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .filter-tab:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+    text-decoration: none;
+  }
+
+  .filter-tab.active {
+    background: var(--primary-600);
+    color: white;
+  }
+
+  .filter-tab i {
+    margin-right: 0.25rem;
+  }
+
+  /* ==========================================================================
      Stats Cards
      ========================================================================== */
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
     margin-bottom: 2rem;
   }
 
@@ -141,10 +190,10 @@
     background: white;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
-    padding: 1.25rem 1.5rem;
+    padding: 1rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     transition: all 0.2s;
   }
 
@@ -154,27 +203,27 @@
   }
 
   .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     background: var(--primary-50);
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--primary-600);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .stat-content h3 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--gray-900);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.1rem;
     line-height: 1.2;
   }
 
   .stat-content p {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--gray-500);
     margin: 0;
     text-transform: uppercase;
@@ -238,6 +287,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
   .card-header h5 {
@@ -247,6 +298,125 @@
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.02em;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  /* ==========================================================================
+     Member Badges
+     ========================================================================== */
+  .member-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .badge-aimr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .badge-agh {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+  }
+
+  .badge-agm {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+  }
+
+  .badge-agu {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+  }
+
+  .badge-temp {
+    background: #6b7280;
+    color: white;
+  }
+
+  /* Status Badges - Only for verified members */
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .status-verified {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #bbf7d0;
+  }
+
+  /* Experience Level */
+  .exp-level {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .exp-stars {
+    color: #fbbf24;
+    letter-spacing: 2px;
+  }
+
+  .exp-value {
+    background: var(--gray-100);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    color: var(--gray-700);
+    font-weight: 600;
+  }
+
+  .exp-level.L34 {
+    color: var(--primary-700);
+    background: var(--primary-50);
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 600;
+  }
+
+  /* PM Status */
+  .pm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--primary-50);
+    color: var(--primary-700);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  /* EXP Status */
+  .exp-status {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .exp-status.pending {
+    background: #fff7ed;
+    color: #c2410c;
+  }
+
+  .exp-status.approved {
+    background: #ecfdf5;
+    color: #065f46;
   }
 
   /* ==========================================================================
@@ -318,8 +488,8 @@
 
   .table-clean thead th {
     background: var(--gray-50);
-    padding: 1rem 1rem;
-    font-size: 0.75rem;
+    padding: 1rem 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.02em;
@@ -329,7 +499,7 @@
   }
 
   .table-clean tbody td {
-    padding: 1rem;
+    padding: 0.75rem;
     font-size: 0.875rem;
     color: var(--gray-700);
     border-bottom: 1px solid var(--gray-200);
@@ -340,17 +510,31 @@
     background: var(--gray-50);
   }
 
+  .table-clean tbody tr.temp-row {
+    background-color: #fff9f0;
+  }
+
+  .table-clean tbody tr.temp-row:hover td {
+    background-color: #fff2e0;
+  }
+
   /* Member ID */
   .member-id {
     font-weight: 600;
     color: var(--primary-700);
     font-family: monospace;
+    font-size: 0.8rem;
   }
 
   /* Company Name */
   .company-name {
     font-weight: 500;
     color: var(--gray-800);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
   }
 
   /* Person Name */
@@ -366,8 +550,12 @@
     background: var(--primary-50);
     color: var(--primary-700);
     border-radius: 50px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* Is Aggregator */
@@ -375,7 +563,7 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: 50px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
   }
 
@@ -394,11 +582,11 @@
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.5rem;
     background: var(--gray-100);
     color: var(--gray-700);
-    border-radius: 50px;
-    font-size: 0.75rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
     text-decoration: none;
     transition: all 0.2s;
   }
@@ -409,29 +597,30 @@
   }
 
   .file-link i {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
   }
 
   .no-file {
     color: var(--gray-400);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-style: italic;
   }
 
   /* Action Buttons */
   .btn-group {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.25rem;
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .btn-view {
-    padding: 0.4rem 1rem;
+    padding: 0.25rem 0.5rem;
     background: var(--info-500);
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
@@ -445,8 +634,68 @@
     color: white;
   }
 
-  .btn-view i {
-    font-size: 0.875rem;
+  .btn-edit {
+    padding: 0.25rem 0.5rem;
+    background: var(--primary-600);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-edit:hover {
+    background: var(--primary-700);
+    color: white;
+  }
+
+  .btn-view i, .btn-edit i {
+    font-size: 0.75rem;
+  }
+
+  .btn-approve {
+    padding: 0.25rem 0.5rem;
+    background: var(--success-500);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-approve:hover {
+    background: #0b8e5e;
+    color: white;
+  }
+
+  .btn-reject {
+    padding: 0.25rem 0.5rem;
+    background: var(--danger-500);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-reject:hover {
+    background: #dc2626;
+    color: white;
   }
 
   /* Empty State */
@@ -503,6 +752,12 @@
   /* ==========================================================================
      Responsive
      ========================================================================== */
+  @media (max-width: 1200px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
   @media (max-width: 992px) {
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
@@ -517,17 +772,25 @@
     .page-header {
       flex-direction: column;
       align-items: flex-start;
-      gap: 1rem;
     }
 
     .stats-grid {
       grid-template-columns: 1fr;
     }
 
+    .filter-tabs {
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      white-space: nowrap;
+      flex-wrap: nowrap;
+      padding: 0.5rem;
+    }
+
     .btn-group {
       flex-direction: column;
     }
   }
+
 </style>
 {% endblock custom_css %}
 
@@ -540,8 +803,8 @@
                 <i class="bi bi-people-fill"></i>
             </div>
             <div class="header-text">
-                <h1>Members</h1>
-                <p>Manage all member information</p>
+                <h1>Members Directory</h1>
+                <p>Complete member management system</p>
             </div>
         </div>
         <div class="date-badge">
@@ -553,39 +816,45 @@
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-people"></i>
-            </div>
+            <div class="stat-icon"><i class="bi bi-people"></i></div>
             <div class="stat-content">
-                <h3>{{ members|length }}</h3>
+                <h3>{{ total_members }}</h3>
                 <p>Total Members</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-file-pdf"></i>
-            </div>
+            <div class="stat-icon"><i class="bi bi-person-check"></i></div>
             <div class="stat-content">
-                <h3>{{ members_with_appointment|default:members|length }}</h3>
-                <p>Appointment Letters</p>
+                <h3>{{ agm_count }}</h3>
+                <p>AGM</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-file-text"></i>
-            </div>
+            <div class="stat-icon"><i class="bi bi-person"></i></div>
             <div class="stat-content">
-                <h3>{{ members_with_cv|default:members|length }}</h3>
-                <p>CVs Uploaded</p>
+                <h3>{{ agu_count }}</h3>
+                <p>AGU</p>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">
-                <i class="bi bi-building"></i>
-            </div>
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
             <div class="stat-content">
-                <h3>{{ unique_companies|default:members|length }}</h3>
-                <p>Companies</p>
+                <h3>{{ verified_count }}</h3>
+                <p>VERIFIED</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-hourglass"></i></div>
+            <div class="stat-content">
+                <h3>{{ unverified_count }}</h3>
+                <p>PENDING</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-graph-up"></i></div>
+            <div class="stat-content">
+                <h3>{{ exp_count }}</h3>
+                <p>EXP</p>
             </div>
         </div>
     </div>
@@ -603,163 +872,239 @@
         {% endfor %}
     {% endif %}
 
-    <!-- Main Card -->
-    <div class="main-card">
-        <div class="card-header">
-            <h5>Member Directory</h5>
-        </div>
+    <!-- Filter Tabs -->
+    <div class="filter-tabs" id="filterTabs">
+        <a class="filter-tab active" data-filter="all"><i class="bi bi-grid"></i> All</a>
+        <a class="filter-tab" data-filter="agm"><i class="bi bi-briefcase"></i> AGM</a>
+        <a class="filter-tab" data-filter="agu"><i class="bi bi-person"></i> AGU</a>
+        <a class="filter-tab" data-filter="verified"><i class="bi bi-check-circle"></i> VERIFY</a>
+        <a class="filter-tab" data-filter="pending"><i class="bi bi-hourglass"></i> PENDING</a>
+        <a class="filter-tab" data-filter="exp"><i class="bi bi-graph-up"></i> EXP</a>
+    </div>
 
-        <div class="table-responsive">
-            {% if members %}
-            <table id="example" class="table-clean">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Member ID</th>
-                        <th>Company Name</th>
-                        <th>Person Name</th>
-                        <th>Designation</th>
-                        <th>Aggregator</th>
-                        <th>Appointment</th>
-                        <th>CV</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for title in members %}
-                    <tr>
+    <div class="table-responsive">
+        <table id="example" class="table-clean">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User Type</th>
+                    <th>Member ID</th>
+                    <th>Company</th>
+                    <th>Person Name</th>
+                    <th>Designation</th>
+                    <th>Aggregator</th>
+                    <th>Appointment</th>
+                    <th>CV</th>
+                    <th>EXP</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% comment %} Unverified Members {% endcomment %}
+                {% for member in unverified_members %}
+                <tr data-member-type="{% if member.is_aggregator == 'Yes' %}AGM{% else %}AGU{% endif %}" data-status="unverified">
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        {% if member.is_aggregator == "Yes" %}
+                        <span class="member-badge badge-agm">AGM</span>
+                        {% else %}
+                        <span class="member-badge badge-agu">AGU</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="member-id">{{ member.member_id|default:"—" }}</span></td>
+                    <td><span class="company-name" title="{{ member.company_name }}">{{ member.company_name|default:"—"|truncatechars:20 }}</span></td>
+                    <td><span class="person-name">{{ member.name|default:"—" }}</span></td>
+                    <td>
+                        {% if member.designation %}
+                        <span class="designation-badge" title="{{ member.designation }}">{{ member.designation|truncatechars:15 }}</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if member.is_aggregator == "Yes" %}
+                        <span class="aggregator-badge yes">Yes</span>
+                        {% else %}
+                        <span class="aggregator-badge no">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if member.appoinment_letter %}
+                        <a href="{{ member.appoinment_letter.url }}" target="_blank" class="file-link">
+                            <i class="bi bi-file-pdf"></i> View
+                        </a>
+                        {% else %}<span class="no-file">—</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if member.cv %}
+                        <a href="{{ member.cv.url }}" target="_blank" class="file-link">
+                            <i class="bi bi-file-text"></i> View
+                        </a>
+                        {% else %}<span class="no-file">—</span>{% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            {% if member.pm_status %}
+                            <span class="pm-badge"></span>
+                            {% endif %}
+                            {% if member.exp_status %}
+                            <span class="exp-status {% if member.exp_status == 'approved' %}approved{% else %}pending{% endif %}">
+                                {{ member.exp_status|upper }}
+                            </span>
+                            {% else %}<span class="no-file">—</span>{% endif %}
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <a href="{% url 'admin_membership_list_details' member.id %}" class="btn-view" title="View Details">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'approve' member.id %}" class="btn-approve" title="Approve"><i class="bi bi-check-lg"></i></a>
+                            <a href="{% url 'reject_member' member.id %}" class="btn-reject" title="Reject"><i class="bi bi-x-lg"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% comment %} Verified AGM Members {% endcomment %}
+                {% for member in verified_members %}
+                    {% if member.is_aggregator == "Yes" %}
+                    <tr data-member-type="AGM" data-status="verified">
                         <td>{{ forloop.counter }}</td>
-                        <td><span class="member-id">{{ title.member_id|default:"—" }}</span></td>
-                        <td><span class="company-name">{{ title.company_name|default:"—" }}</span></td>
-                        <td><span class="person-name">{{ title.name|default:"—" }}</span></td>
+                        <td><span class="member-badge badge-agm">AGM</span></td>
+                        <td><span class="member-id">{{ member.member_id|default:"—" }}</span></td>
+                        <td><span class="company-name" title="{{ member.company_name }}">{{ member.company_name|default:"—"|truncatechars:20 }}</span></td>
+                        <td><span class="person-name">{{ member.name|default:"—" }}</span></td>
+                        <td>{% if member.designation %}<span class="designation-badge" title="{{ member.designation }}">{{ member.designation|truncatechars:15 }}</span>{% else %}—{% endif %}</td>
+                        <td><span class="aggregator-badge yes">Yes</span></td>
+                        <td>{% if member.appoinment_letter %}<a href="{{ member.appoinment_letter.url }}" target="_blank" class="file-link"><i class="bi bi-file-pdf"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
+                        <td>{% if member.cv %}<a href="{{ member.cv.url }}" target="_blank" class="file-link"><i class="bi bi-file-text"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
                         <td>
-                            {% if title.designation %}
-                                <span class="designation-badge">{{ title.designation }}</span>
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if title.is_aggregator == "Yes" %}
-                                <span class="aggregator-badge yes">Yes</span>
-                            {% else %}
-                                <span class="aggregator-badge no">No</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if title.appoinment_letter %}
-                                <a href="{{ title.appoinment_letter.url }}" target="_blank" class="file-link">
-                                    <i class="bi bi-file-pdf"></i>
-                                    View Letter
-                                </a>
-                            {% else %}
-                                <span class="no-file">No file</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if title.cv %}
-                                <a href="{{ title.cv.url }}" target="_blank" class="file-link">
-                                    <i class="bi bi-file-text"></i>
-                                    View CV
-                                </a>
-                            {% else %}
-                                <span class="no-file">No file</span>
-                            {% endif %}
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                {% if member.pm_status %}<span class="pm-badge"><i class="bi bi-check-circle"></i> PM</span>{% endif %}
+                                {% if member.exp_status %}
+                                <span class="exp-status {% if member.exp_status == 'approved' %}approved{% else %}pending{% endif %}">{{ member.exp_status|upper }}</span>
+                                {% else %}<span class="no-file">—</span>{% endif %}
+                            </div>
                         </td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <a href="{% url 'admin_membership_list_details' title.id %}" class="btn-view" title="View Details">
-                                    <i class="bi bi-eye"></i>
-                                    View More
-                                </a>
+                                <a href="{% url 'admin_membership_list_details' member.id %}" class="btn-view" title="View Details"><i class="bi bi-eye"></i></a>
                             </div>
                         </td>
                     </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <!-- Empty State -->
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="bi bi-people"></i>
-                </div>
-                <p>No member records found</p>
-            </div>
-            {% endif %}
+                    {% else %}
+                    <tr data-member-type="AGU" data-status="verified">
+                        <td>{{ forloop.counter }}</td>
+                        <td><span class="member-badge badge-agm">AGU</span></td>
+                        <td><span class="member-id">{{ member.member_id|default:"—" }}</span></td>
+                        <td><span class="company-name" title="{{ member.company_name }}">{{ member.company_name|default:"—"|truncatechars:20 }}</span></td>
+                        <td><span class="person-name">{{ member.name|default:"—" }}</span></td>
+                        <td>{% if member.designation %}<span class="designation-badge" title="{{ member.designation }}">{{ member.designation|truncatechars:15 }}</span>{% else %}—{% endif %}</td>
+                        <td><span class="aggregator-badge yes">Yes</span></td>
+                        <td>{% if member.appoinment_letter %}<a href="{{ member.appoinment_letter.url }}" target="_blank" class="file-link"><i class="bi bi-file-pdf"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
+                        <td>{% if member.cv %}<a href="{{ member.cv.url }}" target="_blank" class="file-link"><i class="bi bi-file-text"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                {% if member.pm_status %}<span class="pm-badge"><i class="bi bi-check-circle"></i> PM</span>{% endif %}
+                                {% if member.exp_status %}
+                                <span class="exp-status {% if member.exp_status == 'approved' %}approved{% else %}pending{% endif %}">{{ member.exp_status|upper }}</span>
+                                {% else %}<span class="no-file">—</span>{% endif %}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a href="{% url 'admin_membership_list_details' member.id %}" class="btn-view" title="View Details"><i class="bi bi-eye"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+
+                {% comment %} Temp Members {% endcomment %}
+                {% for tmp in temp %}
+                <tr class="temp-row" data-member-type="temp" data-status="pending">
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="member-badge badge-temp">TEMP</span></td>
+                    <td><span class="member-id">—</span></td>
+                    <td><span class="company-name" title="{{ tmp.company_name }}">{{ tmp.company_name|default:"—"|truncatechars:20 }}</span></td>
+                    <td><span class="person-name">{{ tmp.person_name|default:"—" }}</span></td>
+                    <td>{% if tmp.designation %}<span class="designation-badge" title="{{ tmp.designation }}">{{ tmp.designation|truncatechars:15 }}</span>{% else %}—{% endif %}</td>
+                    <td>{% if tmp.is_aggregator == "Yes" %}<span class="aggregator-badge yes">Yes</span>{% else %}<span class="aggregator-badge no">No</span>{% endif %}</td>
+                    <td>{% if tmp.appoinment_letter %}<a href="{{ tmp.appoinment_letter.url }}" target="_blank" class="file-link"><i class="bi bi-file-pdf"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
+                    <td>{% if tmp.cv %}<a href="{{ tmp.cv.url }}" target="_blank" class="file-link"><i class="bi bi-file-text"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
+                    <td><span class="no-file">—</span></td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <a href="{% url 'admin_member_registration_list_details' tmp.id %}" class="btn-view" title="View Details"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'accept' tmp.id %}" class="btn-approve" title="Approve"><i class="bi bi-check-lg"></i></a>
+                            <a href="{% url 'reject' tmp.id %}" class="btn-reject" title="Reject"><i class="bi bi-x-lg"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not members and not temp %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-people"></i></div>
+            <p>No member records found</p>
         </div>
+        {% endif %}
     </div>
 </div>
 
-<!-- jQuery -->
+<!-- jQuery and DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
-<!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- Buttons -->
+<!-- Buttons JS -->
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-
-<!-- Export dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <script>
+
 $(document).ready(function() {
-    // Initialize DataTable
-    $('#example').DataTable({
-        dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
-             '<"row"<"col-sm-12"tr>>' +
-             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-        buttons: [
-            {
-                extend: 'copy',
-                text: '<i class="bi bi-files"></i> Copy',
-                className: 'dt-button'
-            },
-            {
-                extend: 'excel',
-                text: '<i class="bi bi-file-excel"></i> Excel',
-                className: 'dt-button'
-            },
-            {
-                extend: 'pdf',
-                text: '<i class="bi bi-file-pdf"></i> PDF',
-                className: 'dt-button'
-            },
-            {
-                extend: 'print',
-                text: '<i class="bi bi-printer"></i> Print',
-                className: 'dt-button'
+    // Initialize DataTable once
+    var table = $('#example').DataTable({
+        dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>rtip',
+        buttons: ['copy','excel','csv','pdf','print']
+    });
+
+    // Filter Tabs
+    $('#filterTabs .filter-tab').click(function(){
+        var filter = $(this).data('filter');
+
+        // Highlight active tab
+        $('#filterTabs .filter-tab').removeClass('active');
+        $(this).addClass('active');
+
+        // Loop through table rows
+        $('#example tbody tr').each(function(){
+            var $row = $(this);
+            var memberType = ($row.data('member-type') || '').toLowerCase();
+            var status = ($row.data('status') || '').toLowerCase();
+
+            if(filter === 'all') {
+                $row.show();
+            } else if(filter === 'agm') {
+                if(memberType === 'agm' && status === 'verified') $row.show(); else $row.hide();
+            } else if(filter === 'agu') {
+                if(memberType === 'agu' && status === 'verified') $row.show(); else $row.hide();
+            } else if(filter === 'verified') {
+                if(status === 'unverified') $row.show(); else $row.hide();
+            } else if(filter === 'pending') {
+                if(memberType === 'temp') $row.show(); else $row.hide();
+            } else if(filter === 'exp') {
+                if(status === 'exp') $row.show(); else $row.hide();
             }
-        ],
-        pageLength: 10,
-        responsive: true,
-        language: {
-            search: "Search:",
-            searchPlaceholder: "Search members...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ members",
-            infoEmpty: "Showing 0 to 0 of 0 members",
-            infoFiltered: "(filtered from _MAX_ total entries)"
-        }
+        });
     });
 });
-
-// Auto-dismiss alerts
-setTimeout(() => {
-    const alerts = document.querySelectorAll('.alert-modern');
-    alerts.forEach(alert => {
-        alert.style.transition = 'opacity 0.3s';
-        alert.style.opacity = '0';
-        setTimeout(() => alert.remove(), 300);
-    });
-}, 5000);
 </script>
-
 {% endblock content %}

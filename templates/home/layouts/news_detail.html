@@ -138,7 +138,7 @@
         <div class="top-nav-row">
             <a href="{% url 'news' %}" class="back-link">← Back</a>
             <div class="timestamp">
-                <i class="far fa-clock"></i> {{ news.date|date:"d-m-Y" }}
+                <i class="far fa-clock"></i> {{ news.created_at|date:"l, d-m-Y" }}
             </div>
         </div>
 

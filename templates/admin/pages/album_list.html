@@ -637,8 +637,9 @@
                     <tr>
                         <th>#</th>
                         <th>Title</th>
+                        <th>Description</th>
                         <th>Banner</th>
-                        <th>Photos</th>
+                        <th>Total Photos</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -648,6 +649,11 @@
                         <td class="counter">{{ forloop.counter }}</td>
                         <td>
                             <span class="album-title">{{ album_item.title|default:"—" }}</span>
+                        </td>
+                        <td>
+                            <div class="album-description">
+                                {{ album_item.description|default:"—"|safe }}
+                            </div>
                         </td>
                         <td>
                             {% if album_item.banner %}
@@ -668,7 +674,7 @@
                             <div class="action-group">
                                 <a href="{% url 'admin_photo_list' album_item.id %}" class="btn-action btn-view" title="View Photos">
                                     <i class="bi bi-images"></i>
-                                    Photos
+                                    Add Photos
                                 </a>
                                 <a href="{% url 'admin_update_album' album_item.id %}" class="btn-action btn-edit" title="Edit Album">
                                     <i class="bi bi-pencil"></i>

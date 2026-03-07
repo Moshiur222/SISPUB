@@ -609,6 +609,8 @@ body, .card, .table, .btn, input, select, .form-control {
                         <th>Amount</th>
                         <th>Payment</th>
                         <th>Trx ID</th>
+                        <th>Payout Numbers</th>
+                        <th>Screen shorts</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -624,14 +626,22 @@ body, .card, .table, .btn, input, select, .form-control {
                         <td><span class="amount-badge">${{ call.amount|default:"0" }}</span></td>
                         <td><span class="payment-badge">{{ call.payment_method|default:"—" }}</span></td>
                         <td><span class="transaction-id">{{ call.transection_id|default:"—" }}</span></td>
+                        <td><span class="transaction-id">{{ call.payout_number|default:"—" }}</span></td>
+                       <td>
+                            {% if call.screenshot %}
+                                <img src="{{ call.screenshot.url }}" alt="Screenshot" style="width:50px; height:auto; border-radius:4px;">
+                            {% else %}
+                                — 
+                            {% endif %}
+                        </td>
                         <td class="text-center">
                             <div class="action-buttons">
-                                <a href="{% url 'call_update' id=call.id %}" 
+                                <a href="{% url 'call_update' call.id %}" 
                                    class="btn-icon btn-edit" 
                                    title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form action="{% url 'call_delete' id=call.id %}" method="post" style="margin:0;">
+                                <form action="{% url 'call_delete' call.id %}" method="post" style="margin:0;">
                                     {% csrf_token %}
                                     <button type="submit" 
                                         class="btn-icon btn-delete" 

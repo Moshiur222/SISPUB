@@ -457,6 +457,51 @@
     padding: 2rem 0;
   }
 }
+
+/* Social Media Row Styles */
+.social-media-row {
+    display: flex;
+    flex-direction: row !important;  /* Force row layout */
+    gap: 15px;  /* Space between icons */
+    align-items: center;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link i {
+    font-size: 14px;
+}
+
+.social-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* YouTube hover effect */
+.social-link:hover i.fa-youtube {
+    color: #FF0000 !important;
+}
+
+/* Facebook hover effect */
+.social-link:hover i.fa-facebook-f {
+    color: #1877F2 !important;
+}
+
+/* Optional: Add background color on hover */
+.social-link:hover {
+    background: white;
+}
+
 </style>
 {% endblock extra_css %}
 
@@ -542,7 +587,7 @@
 						<path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
 					</svg>
 				</a>
-			  <a href="https://brtc.gov.bd/" target="_blank" rel="noopener noreferrer" class="gov-link">
+			  <a href="https://btrc.gov.bd/" target="_blank" rel="noopener noreferrer" class="gov-link">
 				  <div class="gov-link-icon">
 					  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
 						  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
@@ -600,7 +645,7 @@
               <svg class="contact-icon" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
               </svg>
-              <span>{{ company_info.phone }}</span>
+              <span>+{{ company_info.phone }}</span>
             </a>
             
             <a href="mailto:{{ company_info.email }}" class="contact-item">
@@ -630,35 +675,41 @@
               <svg class="hours-icon" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
               </svg>
+              <div class="hours-item">
+              <svg class="hours-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+              </svg>
               <div class="hours-details">
-                <p class="hours-days">Friday: {{ company_info.friday }}</p>
+                <p class="hours-days">
+                  Day off: 
+                  {% if company_info.day_off.all %}
+                      {% for day in company_info.day_off.all %}
+                          {{ day.day }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                  {% else %}
+                      —
+                  {% endif %}
+                </p>
               </div>
+            </div>
             </div>
           </div>
         </div>
         {% endfor %}
-        <!-- Quick Links -->
-        <div class="footer-column">
-          <h4 class="footer-heading">Social Media</h4>
-          <div class="footer-content">
-            <nav class="footer-navigation">
-              <a href="https://www.youtube.com/@SISPAB" class="social-link" style="color: #1c8bd4" title="YouTube" clip-rule="evenodd"/>
-                        <i class="fab fa-youtube"></i>
-                    </a>
-              <a href="#" class="social-link" style="color: #1c8bd4" title="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-              
-              <a href="#" class="social-link" style="color: #1c8bd4" title="Twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-              
-              <a href="#" class="social-link" style="color: #1c8bd4" title="LinkedIn">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-            </nav>
-          </div>
-        </div>
+       <!-- Quick Links -->
+<div class="footer-column">
+    <h4 class="footer-heading">Social Media</h4>
+    <div class="footer-content">
+        <nav class="footer-navigation social-media-row">
+            <a href="https://www.youtube.com/@SISPAB" class="social-link" target="_blank" title="YouTube">
+                <i class="fab fa-youtube" style="color: #FF0000;"></i>
+            </a>
+            <a href="https://www.facebook.com/sispab.org/" class="social-link" target="_blank" title="Facebook">
+                <i class="fab fa-facebook-f" style="color: #1877F2;"></i>
+            </a>
+        </nav>
+    </div>
+</div>
       </div>
     </div>
   </div>

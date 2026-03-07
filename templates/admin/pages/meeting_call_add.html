@@ -5,7 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- Flatpickr CSS -->
+<!-- Flatpickr CSS (only for date picker) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <!-- Quill CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -35,6 +35,7 @@
     --gray-800: #1f2937;
     --gray-900: #111827;
     
+    --success-50: #f0fdf4;
     --success-500: #10b981;
     --success-600: #059669;
     
@@ -184,6 +185,7 @@
      ========================================================================== */
   .form-group {
     margin-bottom: 1.75rem;
+    position: relative;
   }
 
   .form-group:last-child {
@@ -245,6 +247,11 @@
     color: var(--gray-400);
   }
 
+  .form-input:read-only {
+    background-color: white;
+    cursor: pointer;
+  }
+
   /* ==========================================================================
      Date & Time Row
      ========================================================================== */
@@ -258,6 +265,269 @@
     flex: 1;
     padding: 0 0.5rem;
     min-width: 200px;
+    position: relative;
+  }
+
+  /* ==========================================================================
+     Clock Input Styles
+     ========================================================================== */
+  .clock-input-wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+  }
+  
+  .clock-input-wrapper .form-input {
+    padding-right: 45px;
+    width: 100%;
+    cursor: pointer;
+    background-color: white;
+  }
+  
+  .clock-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 40px;
+    background: none;
+    border: none;
+    border-left: 1px solid var(--gray-300);
+    color: var(--gray-600);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.2s;
+    z-index: 2;
+  }
+  
+  .clock-button:hover {
+    background-color: var(--gray-100);
+    color: var(--primary-600);
+  }
+  
+  /* Clock Interface */
+  .clock-interface {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 1000;
+    margin-top: 5px;
+    padding: 15px;
+    width: 300px;
+  }
+  
+  .clock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .clock-time-display {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--gray-800);
+  }
+  
+  .clock-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray-600);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+  }
+  
+  .clock-close:hover {
+    background-color: var(--gray-100);
+    color: #ef4444;
+  }
+  
+  /* Analog Clock */
+  .analog-clock {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .clock-face {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border: 3px solid var(--gray-700);
+    border-radius: 50%;
+    background: var(--gray-50);
+    cursor: pointer;
+  }
+  
+  .hour-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin-left: -15px;
+    margin-top: -15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--gray-700);
+    font-size: 14px;
+  }
+  
+  .clock-hour-hand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 4px;
+    background: var(--gray-700);
+    transform-origin: 0% 50%;
+    transform: rotate(-90deg) translateX(-50%);
+    margin-top: -2px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+  
+  .clock-minute-hand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 2px;
+    background: var(--primary-600);
+    transform-origin: 0% 50%;
+    transform: rotate(-90deg) translateX(-50%);
+    margin-top: -1px;
+    border-radius: 2px;
+    z-index: 1;
+  }
+  
+  .clock-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: var(--gray-700);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+  }
+  
+  /* Digital Time Picker */
+  .digital-time-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .time-select {
+    padding: 8px 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    background-color: white;
+    flex: 1;
+  }
+  
+  .time-select:hover {
+    border-color: var(--primary-500);
+  }
+  
+  .time-select:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-focus);
+  }
+  
+  .time-separator {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--gray-600);
+  }
+  
+  /* Quick Times */
+  .quick-times {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .quick-time {
+    flex: 1;
+    padding: 8px 4px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-700);
+    transition: all 0.2s;
+  }
+  
+  .quick-time:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-500);
+    color: var(--primary-700);
+  }
+  
+  /* Action Buttons */
+  .clock-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .clock-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    font-family: var(--font-sans);
+    transition: all 0.2s;
+  }
+  
+  .clock-btn-cancel {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+  }
+  
+  .clock-btn-cancel:hover {
+    background: var(--gray-200);
+  }
+  
+  .clock-btn-ok {
+    background: var(--primary-600);
+    color: white;
+  }
+  
+  .clock-btn-ok:hover {
+    background: var(--primary-700);
   }
 
   /* ==========================================================================
@@ -305,8 +575,8 @@
   .preview-container {
     margin-top: 1rem;
     display: none;
-    width: 200px;
-    height: 300px;
+    width: 300px;
+    height: 200px;
     border: 2px solid var(--primary-300);
     border-radius: var(--radius-md);
     overflow: hidden;
@@ -384,22 +654,6 @@
     font-style: normal;
   }
 
-  .ql-toolbar button {
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
-    transition: all 0.2s;
-  }
-
-  .ql-toolbar button:hover {
-    background: var(--primary-100) !important;
-  }
-
-  .ql-toolbar button.ql-active {
-    background: var(--primary-500) !important;
-    color: white !important;
-  }
-
   /* ==========================================================================
      Helper Text
      ========================================================================== */
@@ -445,6 +699,7 @@
     gap: 0.5rem;
     border: none;
     font-family: var(--font-sans);
+    text-decoration: none;
   }
 
   .btn-primary {
@@ -525,6 +780,12 @@
     .col-custom:last-child {
       margin-bottom: 0;
     }
+    
+    .clock-interface {
+      width: 280px;
+      right: 0;
+      left: auto;
+    }
   }
 </style>
 {% endblock custom_css %}
@@ -550,7 +811,7 @@
             <div class="alert-modern">
                 <i class="bi bi-check-circle-fill"></i>
                 <span>{{ message }}</span>
-                <button type="button" data-bs-dismiss="alert">
+                <button type="button" onclick="this.parentElement.remove()">
                     <i class="bi bi-x"></i>
                 </button>
             </div>
@@ -614,12 +875,107 @@
                                    required>
                         </div>
 
-                        <!-- Time -->
+                        <!-- Time with Clock Interface -->
                         <div class="col-custom">
-                            <input type="text" name="expire_date_time" id="expiry-time"
-                                   class="form-input bg-white"
-                                   placeholder="Select Time"
-                                   required>
+                            <div class="clock-input-wrapper">
+                                <input type="text" name="expire_date_time" id="expiry-time"
+                                       class="form-input bg-white"
+                                       placeholder="Select Time"
+                                       readonly
+                                       required>
+                                <button type="button" class="clock-button" id="clock-toggle">
+                                    <i class="bi bi-clock"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Clock Interface -->
+                            <div class="clock-interface" id="clock-interface" style="display: none;">
+                                <div class="clock-header">
+                                    <span class="clock-time-display" id="clock-display">12:00</span>
+                                    <button type="button" class="clock-close" id="clock-close">&times;</button>
+                                </div>
+                                
+                                <!-- Analog Clock -->
+                                <div class="analog-clock">
+                                    <div class="clock-face" id="clock-face">
+                                        <div class="clock-hour-hand" id="hour-hand"></div>
+                                        <div class="clock-minute-hand" id="minute-hand"></div>
+                                        <div class="clock-center"></div>
+                                        
+                                        <!-- Hour markers -->
+                                        <div class="hour-marker" style="transform: rotate(0deg) translateY(-80px)">12</div>
+                                        <div class="hour-marker" style="transform: rotate(30deg) translateY(-80px)">1</div>
+                                        <div class="hour-marker" style="transform: rotate(60deg) translateY(-80px)">2</div>
+                                        <div class="hour-marker" style="transform: rotate(90deg) translateY(-80px)">3</div>
+                                        <div class="hour-marker" style="transform: rotate(120deg) translateY(-80px)">4</div>
+                                        <div class="hour-marker" style="transform: rotate(150deg) translateY(-80px)">5</div>
+                                        <div class="hour-marker" style="transform: rotate(180deg) translateY(-80px)">6</div>
+                                        <div class="hour-marker" style="transform: rotate(210deg) translateY(-80px)">7</div>
+                                        <div class="hour-marker" style="transform: rotate(240deg) translateY(-80px)">8</div>
+                                        <div class="hour-marker" style="transform: rotate(270deg) translateY(-80px)">9</div>
+                                        <div class="hour-marker" style="transform: rotate(300deg) translateY(-80px)">10</div>
+                                        <div class="hour-marker" style="transform: rotate(330deg) translateY(-80px)">11</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Digital Time Picker -->
+                                <div class="digital-time-picker">
+                                    <select class="time-select" id="hour-select">
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+                                    <span class="time-separator">:</span>
+                                    <select class="time-select" id="minute-select">
+                                        <option value="00">00</option>
+                                        <option value="05">05</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                        <option value="25">25</option>
+                                        <option value="30">30</option>
+                                        <option value="35">35</option>
+                                        <option value="40">40</option>
+                                        <option value="45">45</option>
+                                        <option value="50">50</option>
+                                        <option value="55">55</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Quick Time Buttons -->
+                                <div class="quick-times">
+                                    <button type="button" class="quick-time" data-time="00:00">Midnight</button>
+                                    <button type="button" class="quick-time" data-time="12:00">Noon</button>
+                                    <button type="button" class="quick-time" data-time="23:59">End of Day</button>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="clock-actions">
+                                    <button type="button" class="clock-btn clock-btn-cancel" id="clock-cancel">Cancel</button>
+                                    <button type="button" class="clock-btn clock-btn-ok" id="clock-ok">OK</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -641,7 +997,6 @@
                         Description
                     </label>
                     
-                    <!-- Quill Editor -->
                     <div class="quill-wrapper">
                         <div id="quill-editor" style="height: 200px;"></div>
                     </div>
@@ -654,20 +1009,21 @@
                     </div>
                 </div>
 
-                <!-- Image Field -->
+                <!-- Image Field (Mandatory) -->
                 <div class="form-group">
                     <label class="form-label">
                         <span class="label-icon">
                             <i class="bi bi-image"></i>
                         </span>
                         Meeting Image
+                        <span class="required-star">*</span>
                     </label>
                     
-                    <input type="file" name="image" class="file-input" accept="image/*" id="image-input">
+                    <input type="file" name="image" class="file-input" accept="image/*" id="image-input" required>
                     
                     <div class="size-note">
                         <i class="bi bi-info-circle"></i>
-                        <strong>Note:</strong> Image size must be exactly <strong>200x300 pixels</strong>
+                        <strong>Note:</strong> Image size must be exactly <strong>300x200 pixels</strong>
                     </div>
                     
                     <div id="size-error" class="size-error" style="display: none;">
@@ -675,7 +1031,6 @@
                         <span id="error-message"></span>
                     </div>
                     
-                    <!-- Preview Container -->
                     <div id="preview-container" class="preview-container">
                         <img id="image-preview" src="" alt="Preview">
                     </div>
@@ -697,34 +1052,199 @@
     </div>
 </div>
 
-<!-- Flatpickr JS -->
+<!-- Flatpickr JS (only for date picker) -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 <!-- Quill JS -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     
-    // ✅ Date Picker
+    // ==================== DATE PICKER (Flatpickr) ====================
     flatpickr("#expiry-date", {
         dateFormat: "Y-m-d",
         minDate: "today",
         altInput: true,
-        altFormat: "F j, Y"
+        altFormat: "F j, Y",
+        onChange: function() {
+            updateHiddenDateTime();
+        }
     });
 
-    // ✅ Time Picker
-    flatpickr("#expiry-time", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: false,
-        altInput: true,
-        altFormat: "h:i K"
+    // ==================== CLOCK INTERFACE ====================
+    const timeInput = document.getElementById('expiry-time');
+    const clockInterface = document.getElementById('clock-interface');
+    const clockToggle = document.getElementById('clock-toggle');
+    const clockClose = document.getElementById('clock-close');
+    const clockCancel = document.getElementById('clock-cancel');
+    const clockOk = document.getElementById('clock-ok');
+    const clockDisplay = document.getElementById('clock-display');
+    const hourSelect = document.getElementById('hour-select');
+    const minuteSelect = document.getElementById('minute-select');
+    const hourHand = document.getElementById('hour-hand');
+    const minuteHand = document.getElementById('minute-hand');
+    const clockFace = document.getElementById('clock-face');
+    const dateInput = document.getElementById('expiry-date');
+    const hiddenDateTime = document.getElementById('expiry-datetime');
+    
+    let currentHour = 12;
+    let currentMinute = 0;
+    
+    // Initialize time to current time
+    const now = new Date();
+    currentHour = now.getHours();
+    currentMinute = Math.floor(now.getMinutes() / 5) * 5; // Round to nearest 5 minutes
+    
+    // Update displays
+    updateTimeDisplay();
+    
+    // Toggle clock interface
+    if (clockToggle) {
+        clockToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (clockInterface.style.display === 'none' || clockInterface.style.display === '') {
+                clockInterface.style.display = 'block';
+                updateAnalogClock();
+            } else {
+                clockInterface.style.display = 'none';
+            }
+        });
+    }
+    
+    // Close clock interface
+    function closeClock() {
+        clockInterface.style.display = 'none';
+    }
+    
+    if (clockClose) clockClose.addEventListener('click', closeClock);
+    if (clockCancel) clockCancel.addEventListener('click', closeClock);
+    
+    // Update time display
+    function updateTimeDisplay() {
+        const formattedHour = String(currentHour).padStart(2, '0');
+        const formattedMinute = String(currentMinute).padStart(2, '0');
+        const timeString = `${formattedHour}:${formattedMinute}`;
+        
+        if (clockDisplay) clockDisplay.textContent = timeString;
+        if (timeInput) {
+            timeInput.value = timeString;
+            // Trigger change event
+            const event = new Event('change', { bubbles: true });
+            timeInput.dispatchEvent(event);
+        }
+        
+        // Update selects
+        if (hourSelect) hourSelect.value = String(currentHour).padStart(2, '0');
+        if (minuteSelect) minuteSelect.value = String(currentMinute).padStart(2, '0');
+        
+        // Update analog clock
+        updateAnalogClock();
+        
+        // Update hidden datetime
+        updateHiddenDateTime();
+    }
+    
+    // Update analog clock hands
+    function updateAnalogClock() {
+        if (hourHand && minuteHand) {
+            const hourAngle = (currentHour % 12) * 30 + (currentMinute * 0.5) - 90;
+            const minuteAngle = currentMinute * 6 - 90;
+            
+            hourHand.style.transform = `rotate(${hourAngle}deg) translateX(-50%)`;
+            minuteHand.style.transform = `rotate(${minuteAngle}deg) translateX(-50%)`;
+        }
+    }
+    
+    // Handle analog clock click
+    if (clockFace) {
+        clockFace.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+            let degrees = angle + 90;
+            if (degrees < 0) degrees += 360;
+            
+            // Determine if setting hour or minute based on click distance from center
+            const distance = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
+            const isMinute = distance > 70; // Outer circle for minutes
+            
+            if (isMinute) {
+                // Set minutes (5-minute intervals)
+                const minuteValue = Math.round(degrees / 6) * 5;
+                currentMinute = minuteValue % 60;
+            } else {
+                // Set hours
+                let hourValue = Math.round(degrees / 30) % 12;
+                if (hourValue === 0) hourValue = 12;
+                
+                // Convert to 24-hour format
+                if (currentHour >= 12) {
+                    currentHour = hourValue === 12 ? 12 : hourValue + 12;
+                } else {
+                    currentHour = hourValue === 12 ? 0 : hourValue;
+                }
+            }
+            
+            updateTimeDisplay();
+        });
+    }
+    
+    // Handle hour select change
+    if (hourSelect) {
+        hourSelect.addEventListener('change', function() {
+            currentHour = parseInt(this.value);
+            updateTimeDisplay();
+        });
+    }
+    
+    // Handle minute select change
+    if (minuteSelect) {
+        minuteSelect.addEventListener('change', function() {
+            currentMinute = parseInt(this.value);
+            updateTimeDisplay();
+        });
+    }
+    
+    // Handle quick time buttons
+    document.querySelectorAll('.quick-time').forEach(button => {
+        button.addEventListener('click', function() {
+            const [hours, minutes] = this.dataset.time.split(':').map(Number);
+            currentHour = hours;
+            currentMinute = minutes;
+            updateTimeDisplay();
+        });
+    });
+    
+    // OK button
+    if (clockOk) {
+        clockOk.addEventListener('click', function() {
+            closeClock();
+        });
+    }
+    
+    // Update hidden datetime
+    function updateHiddenDateTime() {
+        if (dateInput && dateInput.value && timeInput && timeInput.value) {
+            // Format: YYYY-MM-DD HH:MM:SS
+            hiddenDateTime.value = dateInput.value + ' ' + timeInput.value + ':00';
+            console.log('Hidden datetime:', hiddenDateTime.value);
+        }
+    }
+    
+    // Close clock when clicking outside
+    document.addEventListener('click', function(e) {
+        if (clockInterface && clockToggle && 
+            clockInterface.style.display === 'block' && 
+            !clockInterface.contains(e.target) && 
+            !clockToggle.contains(e.target)) {
+            clockInterface.style.display = 'none';
+        }
     });
 
-    // ✅ Initialize Quill Editor
+    // ==================== QUILL EDITOR ====================
     var quill = new Quill('#quill-editor', {
         theme: 'snow',
         placeholder: 'Enter meeting description, agenda, and details...',
@@ -739,67 +1259,79 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // ✅ Image Preview & Dimension Validation (Strict 200x300)
+    // ==================== IMAGE PREVIEW & VALIDATION ====================
     const imageInput = document.getElementById('image-input');
     const preview = document.getElementById('image-preview');
     const container = document.getElementById('preview-container');
     const sizeError = document.getElementById('size-error');
     const errorMessage = document.getElementById('error-message');
 
-    imageInput.addEventListener('change', function(event){
-        const file = event.target.files[0];
-        
-        if(file){
-            const img = new Image();
-            const objectUrl = URL.createObjectURL(file);
+    if (imageInput) {
+        imageInput.addEventListener('change', function(event){
+            const file = event.target.files[0];
+            if(file){
+                const img = new Image();
+                const objectUrl = URL.createObjectURL(file);
 
-            img.onload = function() {
-                // Check dimensions
-                if (this.width !== 200 || this.height !== 300) {
-                    // Show error message
-                    errorMessage.innerHTML = `Invalid image dimensions! Please upload an image that is exactly 200x300 pixels.<br>Your image: ${this.width}x${this.height}`;
-                    sizeError.style.display = 'flex';
-                    
-                    // Reset input and hide preview
-                    imageInput.value = ""; 
-                    container.style.display = 'none';
-                } else {
-                    // ✅ Correct size: Show preview and hide error
-                    preview.src = objectUrl;
-                    container.style.display = 'block';
-                    sizeError.style.display = 'none';
-                }
-                // Free memory
-                URL.revokeObjectURL(objectUrl);
-            };
+                img.onload = function() {
+                    if (this.width !== 300 || this.height !== 200) {
+                        if (errorMessage) {
+                            errorMessage.innerHTML = `Invalid image dimensions! Upload exactly 300x200 pixels.<br>Your image: ${this.width}x${this.height}`;
+                        }
+                        if (sizeError) sizeError.style.display = 'flex';
+                        imageInput.value = ""; 
+                        if (container) container.style.display = 'none';
+                    } else {
+                        if (preview) preview.src = objectUrl;
+                        if (container) container.style.display = 'block';
+                        if (sizeError) sizeError.style.display = 'none';
+                    }
+                    URL.revokeObjectURL(objectUrl);
+                };
+                img.src = objectUrl;
+            } else {
+                if (container) container.style.display = 'none';
+                if (sizeError) sizeError.style.display = 'none';
+            }
+        });
+    }
 
-            img.src = objectUrl;
-        } else {
-            // No file selected
-            container.style.display = 'none';
-            sizeError.style.display = 'none';
-        }
-    });
-
-    // ✅ Form Submission
+    // ==================== FORM SUBMISSION ====================
     const form = document.getElementById('meetingForm');
     const submitBtn = document.getElementById('submitBtn');
 
-    form.addEventListener('submit', function(e) {
-        // Combine Date + Time
-        const date = document.getElementById('expiry-date').value;
-        const time = document.getElementById('expiry-time').value;
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Combine Date + Time
+            const date = document.getElementById('expiry-date').value;
+            const time = document.getElementById('expiry-time').value;
+            if (date && time) {
+                document.getElementById('expiry-datetime').value = date + " " + time + ":00";
+            }
 
-        if (date && time) {
-            document.getElementById('expiry-datetime').value = date + " " + time;
-        }
+            // Save Quill content
+            const descriptionInput = document.getElementById('description-input');
+            if (descriptionInput && quill) {
+                descriptionInput.value = quill.root.innerHTML;
+            }
 
-        // Save Quill content
-        document.getElementById('description-input').value = quill.root.innerHTML;
+            // Image validation (mandatory)
+            if (!imageInput || !imageInput.files[0]) {
+                alert("Please upload a meeting image!");
+                e.preventDefault();
+                return false;
+            }
 
-        // Show loading state
-        submitBtn.classList.add('btn-loading');
-    });
+            if (sizeError && sizeError.style.display === "flex") {
+                alert("Please fix the image size to 300x200 pixels!");
+                e.preventDefault();
+                return false;
+            }
+
+            // Loading state
+            if (submitBtn) submitBtn.classList.add('btn-loading');
+        });
+    }
 
     // Auto-dismiss alerts
     setTimeout(() => {
@@ -812,5 +1344,4 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 5000);
 });
 </script>
-
 {% endblock content %}

@@ -3,7 +3,7 @@ from django.urls import reverse
 
 def company_info(request):
     return {
-        'all_company_info': Company_info.objects.all(),
+        'all_company_info': CompanyInfo.objects.all(),
         'co_sponsers': Co_sponsers.objects.all()
     }
 

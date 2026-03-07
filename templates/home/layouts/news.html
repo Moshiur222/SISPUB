@@ -149,7 +149,7 @@
 <div class="news-grid">
 
     {% for news in page_obj %}
-    <a href="{% url 'news_detail_view' news.id %}" class="news-card">
+    <a href="{% url 'news_detail_view' news.slug %}" class="news-card">
         {% if news.image %}
             <img src="{{ news.image.url }}" data-src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
         {% else %}
@@ -160,8 +160,8 @@
 
         <h3 class="news-title">{{ news.title }}</h3>
 
-        {% if news.date %}
-            <span class="news-date">{{ news.date|date:"F d, Y" }}</span>
+        {% if news.created_at %}
+            <span class="news-date">{{ news.created_at|date:"F d, Y" }}</span>
         {% endif %}
     </a>
     {% empty %}

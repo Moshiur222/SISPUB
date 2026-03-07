@@ -109,7 +109,7 @@
     </div>
     <div class="gallery-grid">
         {% for meeting in upcoming_meetings %}
-        <a href="{% url 'meeting_call' meeting.id %}" class="gallery-card">
+        <a href="{% url 'meeting_call' meeting.slug %}" class="gallery-card">
             <div class="image-wrapper">
                 {% if meeting.image %}
                     <img src="{{ meeting.image.url }}" alt="{{ meeting.title }}">

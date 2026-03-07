@@ -14,14 +14,123 @@
     margin-bottom: 50px;
     border-radius: 10px;
 }
-.news-header h1 { font-size: 35px; color: #fff; }
+.news-header h1 { 
+    font-size: 35px; 
+    color: #fff; 
+    margin: 0;
+}
 
-.video-card { max-width: 1400px; margin: 0 auto 60px; background: #fff; border-radius: 12px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-.video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.video-wrapper { position: relative; padding-top: 56.25%; }
-.video-wrapper iframe { position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; }
+/* Stats Card */
+.stats-card {
+    max-width: 300px;
+    margin: -30px auto 40px;
+    background: #fff;
+    border-radius: 50px;
+    padding: 15px 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 10;
+}
 
-.pagination { display: flex; justify-content: center; gap: 10px; margin: 30px 0; }
+.stats-card i {
+    color: #2ea3f2;
+    font-size: 1.5rem;
+}
+
+.stats-card span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.video-card { 
+    max-width: 1400px; 
+    margin: 0 auto 60px; 
+    background: #fff; 
+    border-radius: 12px; 
+    padding: 25px; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
+}
+
+.video-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 20px; 
+}
+
+.video-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.video-wrapper { 
+    position: relative; 
+    padding-top: 56.25%; 
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.video-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(46, 163, 242, 0.2);
+}
+
+.video-wrapper iframe { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0; 
+    border: none; 
+}
+
+.video-title {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    padding: 0 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Event Badge */
+.video-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #2ea3f2, #1e7fb0);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+}
+
+.video-badge i {
+    margin-right: 3px;
+    font-size: 0.7rem;
+}
+
+/* Pagination Styles */
+.pagination { 
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    margin: 30px 0 50px;
+    flex-wrap: wrap;
+}
+
 .pagination a, .pagination span {
     padding: 8px 15px;
     border-radius: 5px;
@@ -32,15 +141,84 @@
     font-weight: 500;
     transition: 0.3s;
 }
-.pagination a:hover { background: #2ea3f2; color: #fff; border-color: #2ea3f2; }
-.pagination .current { background: #2ea3f2; color: #fff; border-color: #2ea3f2; font-weight: 600; }
-.pagination .disabled { color: #999; cursor: not-allowed; background: #f5f5f5; }
+
+.pagination a:hover { 
+    background: #2ea3f2; 
+    color: #fff; 
+    border-color: #2ea3f2; 
+}
+
+.pagination .current { 
+    background: #2ea3f2; 
+    color: #fff; 
+    border-color: #2ea3f2; 
+    font-weight: 600; 
+}
+
+.pagination .disabled { 
+    color: #999; 
+    cursor: not-allowed; 
+    background: #f5f5f5; 
+    border-color: #ddd;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #999;
+    margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .news-header {
+        padding: 180px 20px 40px;
+    }
+    
+    .news-header h1 {
+        font-size: 28px;
+    }
+    
+    .video-card {
+        padding: 15px;
+    }
+    
+    .video-grid {
+        gap: 15px;
+    }
+    
+    .stats-card {
+        margin: -20px auto 30px;
+        padding: 12px 20px;
+    }
+}
 </style>
 {% endblock %}
 
 {% block main %}
 <div class="news-header">
-    <h1>Video Gallery</h1>
+    <h1>Event Video Gallery</h1>
 </div>
 
 <div class="container">
@@ -48,14 +226,23 @@
         <div class="video-card">
             <div class="video-grid">
                 {% for video in page_obj %}
-                <div class="video-wrapper">
-                    <iframe title="{{ video.title }}" src="{{ video.url }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="video-item">
+                    <div class="video-wrapper">
+                        <iframe 
+                            src="{{ video.url }}"
+                            title="{{ video.title }}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Pagination -->
+        {% if is_paginated %}
         <div class="pagination">
             {% if page_obj.has_previous %}
                 <a href="?page=1">« First</a>
@@ -68,7 +255,7 @@
             {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
                     <span class="current">{{ num }}</span>
-                {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
                     <a href="?page={{ num }}">{{ num }}</a>
                 {% endif %}
             {% endfor %}
@@ -81,10 +268,13 @@
                 <span class="disabled">Last »</span>
             {% endif %}
         </div>
+        {% endif %}
 
     {% else %}
-        <div style="text-align:center; padding: 80px;">
-            <h3>No videos available</h3>
+        <div class="empty-state">
+            <i class="fas fa-video"></i>
+            <h3>No Event Videos Available</h3>
+            <p>Check back later for new event videos</p>
         </div>
     {% endif %}
 </div>

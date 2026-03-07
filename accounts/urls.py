@@ -1,6 +1,6 @@
-from django.contrib import admin
 from .views import *
 from django.urls import path
+from django.contrib import admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,11 +27,11 @@ urlpatterns = [
     path('blog/', blog_view, name = 'blog' ),
     path('view_more/<int:id>/',view_more, name='view_more'),
     path('news/', news_view, name = 'news' ),
-    path("news_detail_view/<int:id>/", news_detail_view, name="news_detail_view"),
+    path("news/<slug:slug>/", news_detail_view, name="news_detail_view"),
     path('complain/', complain_view, name = 'complain' ),
     path('media/', media_view, name = 'media' ),
 
-    path('photos/<int:id>/', photo_gallery, name = 'photos' ),
+    path('photos/<slug:slug>/', photo_gallery, name = 'photos' ),
     path('photo/', photos, name = 'photo' ),
 
     path('events/', events_view, name = 'events' ),
@@ -39,9 +39,10 @@ urlpatterns = [
     path('meetings/', meetings, name = 'meetings' ),
     path('contact_submit/', contact_submit, name = 'contact_submit' ),
     path('career/', career, name = 'career' ),
-    path('meeting_call/<int:id>/', meeting_call, name = 'meeting_call' ),
+    path('meeting_call/<slug:slug>/', meeting_call, name = 'meeting_call' ),
     path('meeting_calls/', meeting_calls, name = 'meeting_calls' ),
     path('membership_list/', membership_list, name = 'membership_list' ),
+    path('member_detail/<slug:slug>/', member_detail, name='member_detail'),
 
     path('search/', search, name = 'search' ),
     path('profile/', profile, name = 'profile' ),
@@ -51,7 +52,10 @@ urlpatterns = [
     path('check_email/',check_email, name='check_email'),
     path('resend_otp/',resend_otp, name='resend_otp'),
     path('check_phone/',check_phone, name='check_phone'),
+    path('check_company/',check_company, name='check_company'),
     path("get_aggregator_info/", get_aggregator_info, name="get_aggregator_info"),
+    path("sponser_list/", sponser_list, name="sponser_list"),
+    path("become_a_member/", become_a_member, name="become_a_member"),
 
     
     #home_url end
@@ -61,15 +65,17 @@ urlpatterns = [
     
     path('dashboard/', dashboard, name = 'dashboard' ),
     path('company_info_input/', company_info_input, name = 'company_info_input' ),
+    path('company_info_input/<int:id>/', company_info_input, name = 'company_info_input' ),
     path('home_details/', home_details, name = 'home_details' ),
-    path('video_input/<int:id>/', video_input, name = 'video_input' ),
+    path("video/add/", video_input, name="video_add"),
+    path("video/edit/<int:id>/", video_input, name="video_input"),
 
     path('gallry_input/', gallry_input, name = 'gallry_input' ),
     path('gallry_update/<int:gellary_id>/', gallry_update, name='gallry_update'),
     path('gallry_delete/<int:gellary_id>/', gallry_delete, name='gallry_delete'),
 
-    path('hero_area_input/', hero_area_input, name = 'hero_area_input' ),
-    path('hero_area_update/<int:id>/', hero_area_update, name='hero_area_update'),
+    path('hero_area_input/', hero_area_input, name='hero_area_input'),
+    path('hero_area_input/<int:id>/', hero_area_input, name='hero_area_update'),
 
 
     path('about_details/', about_details, name='about_details'),
@@ -78,14 +84,17 @@ urlpatterns = [
     
     path('update_story/<int:id>/', update_story, name='update_story'),
 
-    path('admin_vission/', admin_vision, name='admin_vision'),
-    path('update_vision/<int:id>/', update_vision, name='update_vision'),
+    path("admin_vision/", admin_vision, name="admin_vision"),
+    path("admin_vision/add/", update_vision, name="add_vision"),
+    path("admin_vision/edit/<int:id>/", update_vision, name="update_vision"),
 
-    path('admin_mission/', admin_mission, name='admin_mission'),
-    path('update_mission/<int:id>/', update_mission, name='update_mission'),
+    path("admin_mission/", admin_mission, name="admin_mission"),
+    path("mission/add/", mission_input, name="add_mission"),
+    path("mission/edit/<int:id>/", mission_input, name="update_mission"),
 
-    path('admin_core_values/', admin_core_values, name='admin_core_values'),
-    path('update_core_values/<int:id>/', update_core_values, name='update_core_values'),
+    path("admin_core_values/", admin_core_values, name="admin_core_values"),
+    path("core_values/add/", update_core_values, name="add_core_values"),
+    path("core_values/update/<int:id>/", update_core_values, name="update_core_values"),
 
 
     path('album_update/<int:id>/', album_update, name='album_update'),
@@ -189,11 +198,25 @@ urlpatterns = [
     path('call_delete/<int:id>/', call_delete, name = 'call_delete'),
     path('call_update/<int:id>/', call_update, name = 'call_update'),
 
-    path('admin_member_registration_list/', admin_member_registration_list, name = 'admin_member_registration_list'), 
     path('admin_member_registration_list_details/<int:id>/', admin_member_registration_list_details, name = 'admin_member_registration_list_details'), 
     path('accept/<int:id>/', accept, name = 'accept'),
     path('reject/<int:id>/', reject, name = 'reject'),
 
+    path('approve/<int:id>/', approve, name = 'approve'),
+    path('reject_member/<int:id>/', reject_member, name = 'reject_member'),
+    
+    path('admin_become_a_member/', admin_become_a_member, name = 'admin_become_a_member'),
+    path('mem/create/', admin_become_a_member_form, name='create'),
+    path('mem/update/<int:id>/', admin_become_a_member_form, name='update'),
+    path('mem/delete/<int:id>/', delete_become_a_member, name='delete_become_a_member'),
+    
+    path('admin_sponser_list/', admin_sponser_list, name = 'admin_sponser_list'),
+    path('sponsor/create/', sponsor_form, name='create_sponsor'),
+    path('sponsor/update/<int:id>/', sponsor_form, name='update_sponsor'),
+    path('sponsor/delete/<int:id>/', delete_sponsor, name='admin_delete_sponsor'),
+    
+    
+    
     path('seo/', seo, name = 'seo'),
     path('add_seo/', add_seo, name = 'add_seo'),
     path('edit_seo/<int:id>/', edit_seo, name = 'edit_seo'),

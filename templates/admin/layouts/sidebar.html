@@ -23,9 +23,9 @@
                   <p>About Us</p>
                   <span class="caret"></span>
                 </a>
-                <div class="collapse" id="sidebarLayouts">
+                <div class="collapse {% if request.resolver_match.url_name in 'sispab_founders admin_core_values admin_vision admin_memberadmin_missionhip_list sispab_executive_com previous_executive_committee' %}show{% endif %}" id="sidebarLayouts">
                   <ul class="nav nav-collapse">
-                    <p style = "padding-left: 30px; font-size: 14px">About SiSPUB</p>
+                    <p style = "padding-left: 30px; font-size: 14px">About SiSPAB</p>
                     <li class="{% admin_active 'admin_core_values' %}">
                       <a href="{% url 'admin_core_values' %}">
                         <span class="sub-item">Core values</span>
@@ -66,12 +66,12 @@
                 </div>
               </li>
               
-              <li class="nav-item {% admin_active 'AdminMembersRules' %}">
+              <li class="nav-item {% admin_active 'AdminMembersRules' 'admin_sponser_list' 'admin_become_a_member' 'admin_membership_list'%}">
                 <a data-bs-toggle="collapse" href="#forms">
                   <p>Memberships</p>
                   <span class="caret"></span>
                 </a>
-                <div class="collapse" id="forms">
+                <div class="collapse {% if request.resolver_match.url_name in 'AdminMembersRules admin_sponser_list admin_become_a_member admin_membership_list' %}show{% endif %}" id="forms">
                   <ul class="nav nav-collapse">
                     {% comment %} <li class="">
                       <a href="">
@@ -93,6 +93,16 @@
                         <span class="sub-item">Membership List</span>
                       </a>
                     </li> 
+                    <li class="{% admin_active 'admin_become_a_member' %}">
+                      <a href="{% url 'admin_become_a_member' %}">
+                        <span class="sub-item">Become A Member</span>
+                      </a>
+                    </li> 
+                    <li class="{% admin_active 'admin_sponser_list' %}">
+                      <a href="{% url 'admin_sponser_list' %}">
+                        <span class="sub-item">Sponser List</span>
+                      </a>
+                    </li> 
                     <li class="{% admin_active 'AdminMembersRules' %}">
                       <a href="{% url 'AdminMembersRules' %}">
                         <span class="sub-item">Membership Rules</span>
@@ -107,12 +117,12 @@
                 </div>
               </li>
               <!-- News & Media Collapse -->
-              <li class="nav-item {% admin_active 'AdminNews' 'admin_Album_list' 'AdminVideoGallery' %}">
+              <li class="nav-item {% admin_active 'AdminNews' 'admin_Album_list' 'admin_video_gallery' %}">
                 <a data-bs-toggle="collapse" href="#newsMenu">
                   <p>News & Media</p>
                   <span class="caret"></span>
                 </a>
-                <div class="collapse {% if request.resolver_match.url_name in 'AdminNews admin_Album_list AdminVideoGallery' %}show{% endif %}" id="newsMenu">
+                <div class="collapse {% if request.resolver_match.url_name in 'AdminNews admin_Album_list admin_video_gallery' %}show{% endif %}" id="newsMenu">
                   <ul class="nav nav-collapse">
                     <li class="{% admin_active 'AdminNews' %}">
                       <a href="{% url 'AdminNews' %}">
@@ -152,14 +162,19 @@
                   <p>Meeting Call</p>
                 </a>
               </li>
-              <li class="nav-item {% admin_active 'admin_member_registration_list' %}">
-                <a href="{% url 'admin_member_registration_list' %}">
-                  <p>Member Registration</p>
+              <li class="nav-item {% admin_active 'seo' %}">
+                <a href="{% url 'seo' %}">
+                  <p>SEO</p>
                 </a>
               </li>
               <li class="nav-item {% admin_active 'seo' %}">
                 <a href="{% url 'seo' %}">
-                  <p>SEO</p>
+                  <p>Emergency Services</p>
+                </a>
+              </li>
+              <li class="nav-item {% admin_active 'seo' %}">
+                <a href="{% url 'seo' %}">
+                  <p>Government Services</p>
                 </a>
               </li>
               </li>

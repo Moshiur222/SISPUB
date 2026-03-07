@@ -486,13 +486,13 @@
                         <span class="label-icon">
                             <i class="bi bi-link-45deg"></i>
                         </span>
-                        Video URL 1
+                        Video URL
                     </label>
                     <input
-                        name="url_1"
+                        name="url"
                         type="url"
                         class="form-input"
-                        value="{{ info.url_1 }}"
+                        value="{{ info.url }}"
                         placeholder="https://www.youtube.com/watch?v=..."
                         id="url1Input"
                     />
@@ -508,34 +508,11 @@
                         YouTube, Vimeo, or other video platform URL
                     </div>
                 </div>
-
-                <!-- Video URL 2 (Optional) -->
-                <div class="form-group">
-                    <label class="form-label">
-                        <span class="label-icon">
-                            <i class="bi bi-link-45deg"></i>
-                        </span>
-                        Video URL 2
-                        <span class="optional-badge">Optional</span>
-                    </label>
-                    <input
-                        name="url_2"
-                        type="url"
-                        class="form-input"
-                        value="{{ info.url_2 }}"
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        id="url2Input"
-                    />
                     
                     <!-- Live Preview for URL 2 -->
                     <div id="url2Preview" class="url-preview" style="display: none;">
                         <i class="bi bi-check-circle-fill"></i>
                         <span>Preview: <a href="#" target="_blank" id="url2Link"></a></span>
-                    </div>
-                    
-                    <div class="helper-text">
-                        <i class="bi bi-info-circle"></i>
-                        Optional second video URL for additional content
                     </div>
                 </div>
 
@@ -559,9 +536,7 @@
                         Add context or details about the video content
                     </div>
                 </div>
-            </div>
-
-            <!-- Footer -->
+                <!-- Footer -->
             <div class="form-footer">
                 <a href="{% url 'admin_video_gallery' %}" class="btn btn-secondary">
                     <i class="bi bi-x"></i>
@@ -571,6 +546,7 @@
                     <i class="bi bi-check"></i>
                     Update Video
                 </button>
+            </div>
             </div>
         </form>
     </div>

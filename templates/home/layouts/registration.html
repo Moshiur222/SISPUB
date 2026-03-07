@@ -504,41 +504,7 @@
                         <span class="success-text" id="emailSuccess">Email available</span>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class = "required">Appointment Letter</label>
-                        <div class="file-upload-wrapper">
-                            <input type="file" name="appoinment_letter" id="appointmentInput" required onchange="updateFileName(this)">
-                            <div class="file-drop-zone">
-                                <i class="bi bi-cloud-arrow-up"></i>
-                                <span class="text-muted small">Click or drag file</span>
-                                <div id="appointment-name" class="file-name-display">No file chosen</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class = "required">CV (Curriculum Vitae)</label>
-                        <div class="file-upload-wrapper">
-                            <input type="file" name="cv" id="cvInput" required onchange="updateFileName(this)">
-                            <div class="file-drop-zone">
-                                <i class="bi bi-file-earmark-pdf"></i>
-                                <span class="text-muted small">Click or drag file</span>
-                                <div id="cv-name" class="file-name-display">No file chosen</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="text" name="phone">
-                    </div>
-                    <div class="form-group">
-                        <label class = "required">NID</label>
-                        <input type="text" name="n_id" required>
-                    </div>
-                </div>
-                <div class="form-row">
+                      <div class="form-row">
                     <div class="form-group">
                         <label class = "required">Password</label>
                         <input type="password" id="pass1" name="password" required minlength="8">
@@ -552,7 +518,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="reg-btn" id="submitBtn">Submit</button>
+                <button type="submit" class="reg-btn" id="submitBtn" disabled>Submit</button>
 {% else %}
 <div class="otp-verification-box">
     <div id="otpDisplayState">
@@ -642,7 +608,6 @@ function resendOTP() {
     document.getElementById('hiddenResendForm').submit();
 }
 
-
 // ================= PHONE NUMBER RESTRICTION =================
 const phoneInputField = document.getElementById('phoneInput');
 if (phoneInputField) {
@@ -650,7 +615,6 @@ if (phoneInputField) {
         this.value = this.value.replace(/[^0-9+]/g, '');
     });
 }
-
 
 // ================= EMAIL + PHONE CHECK (DEBOUNCE) =================
 (function() {
@@ -686,9 +650,22 @@ if (phoneInputField) {
                         emailInput.classList.add('field-valid');
                         emailInput.classList.remove('field-invalid');
                     }
+                    checkFormValidity();
                 });
         }, 500));
     }
+
+
+    function validatePDF(input) {
+    const file = input.files[0];
+    if (!file) return; // no file selected
+    const allowedType = "application/pdf";
+    if (file.type !== allowedType) {
+        alert("Only PDF files are allowed!");
+        input.value = ""; // clear invalid file
+        updateFileName(input); // reset display
+    }
+}
 
     const phoneInput = document.getElementById('phoneInput');
     const phoneError = document.getElementById('phoneError');
@@ -713,12 +690,12 @@ if (phoneInputField) {
                         phoneInput.classList.add('field-valid');
                         phoneInput.classList.remove('field-invalid');
                     }
+                    checkFormValidity();
                 });
         }, 500));
     }
 
 })();
-
 
 // ================= PASSWORD MATCH =================
 (function() {
@@ -735,12 +712,12 @@ if (phoneInputField) {
                 matchError.style.display = 'none';
                 pass2.style.borderColor = '';
             }
+            checkFormValidity();
         }
         pass1.addEventListener('input', checkMatch);
         pass2.addEventListener('input', checkMatch);
     }
 })();
-
 
 // ================= AGGREGATOR TOGGLE =================
 (function() {
@@ -753,6 +730,7 @@ if (phoneInputField) {
         toggleBtn.classList.add('no');
         aggregatorValue.value = 'no';
         brtcInput.disabled = true;
+        brtcInput.required = false;
 
         toggleBtn.addEventListener('click', function() {
 
@@ -776,8 +754,6 @@ if (phoneInputField) {
         });
     }
 })();
-
-
 // ================= FILE NAME DISPLAY =================
 function updateFileName(input) {
     const fileName = input.files[0] ? input.files[0].name : "No file chosen";
@@ -788,8 +764,8 @@ function updateFileName(input) {
         display.style.color = "#28a745";
         input.parentElement.querySelector('.file-drop-zone').style.borderStyle = "solid";
     }
+    checkFormValidity();
 }
-
 
 // ================= FORM VALIDATION =================
 function checkFormValidity() {
@@ -803,38 +779,68 @@ function checkFormValidity() {
     const confirmPassword = form.querySelector('input[name="confirm_password"]');
     const mobile = form.querySelector('input[name="mobile"]');
     const email = form.querySelector('input[name="email"]');
-    const cv = form.querySelector('input[name="cv"]');
-    const appoinment_letter = form.querySelector('input[name="appoinment_letter"]');
-    const n_id = form.querySelector('input[name="n_id"]');
-    const aggregatorToggle = document.getElementById('aggregatorToggle');
     const brtc = document.getElementById('brtcLicenceInput');
+    const aggregatorToggle = document.getElementById('aggregatorToggle');
 
-    const brtcValid = (aggregatorToggle && aggregatorToggle.classList.contains('yes'))
-        ? brtc.value.trim() !== ''
-        : true;
+    const isAggregator = aggregatorToggle && aggregatorToggle.classList.contains('yes');
 
-    const allValid =
+    const basicValid = 
         companyName.value.trim() !== '' &&
+        !companyName.classList.contains('field-invalid') &&
         personName.value.trim() !== '' &&
         mobile.value.trim() !== '' &&
         email.value.trim() !== '' &&
         password.value.trim() !== '' &&
         confirmPassword.value.trim() !== '' &&
-        password.value === confirmPassword.value &&
-        cv.files.length > 0 &&
-        appoinment_letter.files.length > 0 &&
-        n_id.value.trim() !== '' &&
-        brtcValid;
+        password.value === confirmPassword.value;
 
-    submitBtn.disabled = !allValid;
+    let aggregatorValid = true;
+    if (isAggregator) {
+        aggregatorValid = 
+            brtc.value.trim() !== '';
+    }
+
+    submitBtn.disabled = !(basicValid && aggregatorValid);
 }
 
-document.querySelectorAll('#regForm input').forEach(input => {
-    input.addEventListener('input', checkFormValidity);
-});
+// ================= COMPANY NAME CHECK =================
+(function() {
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
 
-checkFormValidity();
+    const companyInput = document.getElementById('companyInput');
+    const companyError = document.getElementById('companyError');
+    const companySuccess = document.getElementById('companySuccess');
 
+    if (companyInput) {
+        companyInput.addEventListener('input', debounce(function() {
+            const company = this.value.trim();
+            if (company.length < 2) return;
+
+            fetch(`/check_company?company=${encodeURIComponent(company)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists) {
+                        companyError.style.display = 'block';
+                        companySuccess.style.display = 'none';
+                        companyInput.classList.add('field-invalid');
+                        companyInput.classList.remove('field-valid');
+                    } else {
+                        companyError.style.display = 'none';
+                        companySuccess.style.display = 'block';
+                        companyInput.classList.add('field-valid');
+                        companyInput.classList.remove('field-invalid');
+                    }
+                    checkFormValidity();
+                });
+        }, 500));
+    }
+})();
 
 // ================= OTP EDIT MOBILE =================
 function showEditPhone() {
@@ -871,5 +877,12 @@ if (newMobileInput) {
         this.value = this.value.replace(/[^0-9+]/g, '');
     });
 }
+
+// ================= LISTEN TO ALL INPUTS TO ENABLE SUBMIT =================
+document.addEventListener('input', function(e) {
+    if (typeof checkFormValidity === "function") {
+        checkFormValidity();
+    }
+});
 </script>
 {% endblock main %}
