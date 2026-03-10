@@ -161,7 +161,6 @@ urlpatterns = [
     path('AdminMembersRules/', AdminMembersRules, name='AdminMembersRules'),
     path('AdminMembersRulesAdd/', AdminMembersRulesAdd, name='AdminMembersRulesAdd'),
     path('AdminMembersRulesUpdate/<int:id>/', AdminMembersRulesUpdate, name='AdminMembersRulesUpdate'),
-    path('AdminMembersRulesDelete/<int:id>/', AdminMembersRulesDelete, name='AdminMembersRulesDelete'),
 
     path('admin_membership_list/', admin_membership_list, name='admin_membership_list'),
     path('admin_membership_list_details/<int:id>', admin_membership_list_details, name='admin_membership_list_details'),
@@ -214,6 +213,16 @@ urlpatterns = [
     path('sponsor/create/', sponsor_form, name='create_sponsor'),
     path('sponsor/update/<int:id>/', sponsor_form, name='update_sponsor'),
     path('sponsor/delete/<int:id>/', delete_sponsor, name='admin_delete_sponsor'),
+
+    path('government_services/', government_services, name='government_services'),
+    path('government_services/create/', government_services_forms, name='create_government_services'),
+    path('government_services/update/<int:id>/', government_services_forms, name='update_government_services'),
+    path('government_services/delete/<int:id>/', delete_government_services, name='admin_delete_government_services'),
+    
+    path('emergency_services/', emergency_services, name='emergency_services'),
+    path('emergency_services/create/', emergency_services_forms, name='create_emergency_services'),
+    path('emergency_services/update/<int:id>/',emergency_services_forms, name='update_emergency_services'),
+    path('emergency_services/delete/<int:id>/', delete_emergency_services, name='admin_delete_emergency_services'),
     
     
     

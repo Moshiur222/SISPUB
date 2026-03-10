@@ -570,14 +570,14 @@ class Seo(models.Model):
         return self.page_name
     
 class GovermentServices(models.Model):
-    title = models,models.CharField(max_length=50)
+    title = models.CharField(max_length=50, null= True)
     url = models.URLField(max_length=200)
     def __str__(self):
         return self.title
 
 class EmergencyServices(models.Model):
-    title = models,models.CharField(max_length=50)
-    url = models.URLField(max_length=200)
+    title = models.CharField(max_length=50, null=True)
+    number = models.URLField(max_length=200)
     def __str__(self):
         return self.title
     

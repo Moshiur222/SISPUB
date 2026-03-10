@@ -3,6 +3,7 @@
 
 {% load static %}
 {% block main %}
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -233,7 +234,7 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Mobile Number</label>
+                    <label>Mobile Number<option style = "color: red;">*</option></label>
                     <div class="input-wrapper">
                         <input type="tel" name="mobile" id="phoneInput" required placeholder="01XXXXXXXXX" maxlength="14" autocomplete="off">
                         <span id="phoneChecking" class="checking-indicator"></span>
@@ -241,26 +242,26 @@
                     <span id="aggregatorBadge" class="aggregator-badge" style="display:none;"></span>
                 </div>
                 <div class="form-group">
-                    <label>Company Name</label>
+                    <label>Company Name<option style = "color: red;">*</option></label>
                     <input type="text" name="company_name" id="companyInput" readonly placeholder="Auto-filled">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Name</label>
+                    <label>Name<option style = "color: red;">*</option></label>
                     <input type="text" name="name" id="nameInput" readonly placeholder="Auto-filled">
                 </div>
                 <div class="form-group">
-                    <label>Email Address</label>
+                    <label>Email Address<option style = "color: red;">*</option></label>
                     <input type="email" name="email" id="emailInput" readonly placeholder="Auto-filled">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>No. of Persons (Max 5)</label>
-                    <input type="hidden" name="no_of_person" id="noOfPersonInput" value="1">
+                    <label>No. of Persons (Max 5)<option style = "color: red;">*</option></label>
+                    <input type="hidden" name="no_of_person" required id="noOfPersonInput" value="1">
                     <div class="btn-group-wrapper" id="personBtnGroup">
                         <button type="button" class="toggle-btn person-btn active" data-value="1">1</button>
                         <button type="button" class="toggle-btn person-btn" data-value="2">2</button>
@@ -270,14 +271,14 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Total Amount (BDT)</label>
-                    <input type="text" name="amount" id="amountInput" readonly value="0.00" placeholder="Calculated amount">
+                    <label>Total Amount (BDT)<option style = "color: red;">*</option></label>
+                    <input type="text" name="amount" id="amountInput" required readonly value="000" placeholder="Calculated amount">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Payment Method</label>
+                    <label>Payment Method<option style = "color: red;">*</option></label>
                     <div class="custom-dropdown">
                         <div class="dropdown-selected">
                             <span>Select Payment Method</span>
@@ -301,22 +302,22 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="payment_method" id="payment_method" required>
+                    <input type = "hidden" name="payment_method" id="payment_method" required>
                 </div>
                 <div class="form-group">
-                    <label>Transaction ID</label>
+                    <label>Transaction ID<option style = "color: red;">*</option></label>
                     <input type="text" style="text-transform: uppercase;" name="transection_id" required placeholder="Ex: 8NH672S1">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Payout Number</label>
-                    <input type="text" name="payout_number" placeholder="01XXXXXXXXX">
+                    <label>Payment Sending Number<option style = "color: red;">*</option></label>
+                    <input type="text" name="payout_number" required placeholder="01XXXXXXXXX">
                 </div>
 
                 <div class="form-group">
-                    <label>Payment Screenshot</label>
+                    <label>Payment Screenshot (optional)</label>
 
                     <div class="upload-box" id="uploadBox">
                         <input type="file" name="screenshot" id="screenshotInput" accept="image/*">
@@ -337,36 +338,53 @@
     </div>
 </div>
 
-<script>
-    // Basic JavaScript for custom dropdown
-    document.querySelector('.dropdown-selected').addEventListener('click', function() {
-        document.querySelector('.dropdown-options').classList.toggle('show');
-    });
-    
-    document.querySelectorAll('.dropdown-option').forEach(option => {
-        option.addEventListener('click', function() {
-            const value = this.dataset.value;
-            const text = this.querySelector('span').textContent;
-            const img = this.querySelector('img').cloneNode();
-            
-            document.querySelector('.dropdown-selected').innerHTML = '';
-            document.querySelector('.dropdown-selected').appendChild(img);
-            document.querySelector('.dropdown-selected').appendChild(document.createTextNode(' ' + text));
-            
-            document.getElementById('payment_method').value = value;
-            document.querySelector('.dropdown-options').classList.remove('show');
-        });
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.custom-dropdown')) {
-            document.querySelector('.dropdown-options').classList.remove('show');
-        }
-    });
-</script>
+
 
 <script>
+
+/* ==============================
+   CUSTOM PAYMENT DROPDOWN
+============================== */
+
+document.querySelector('.dropdown-selected').addEventListener('click', function () {
+    document.querySelector('.dropdown-options').classList.toggle('show');
+});
+
+document.querySelectorAll('.dropdown-option').forEach(option => {
+
+    option.addEventListener('click', function () {
+
+        const value = this.dataset.value;
+        const text = this.querySelector('span').textContent;
+        const img = this.querySelector('img').cloneNode();
+
+        const selected = document.querySelector('.dropdown-selected');
+
+        selected.innerHTML = '';
+        selected.appendChild(img);
+        selected.appendChild(document.createTextNode(' ' + text));
+
+        document.getElementById('payment_method').value = value;
+
+        document.querySelector('.dropdown-options').classList.remove('show');
+
+    });
+
+});
+
+document.addEventListener('click', function (event) {
+
+    if (!event.target.closest('.custom-dropdown')) {
+        document.querySelector('.dropdown-options').classList.remove('show');
+    }
+
+});
+
+
+/* ==============================
+   MEETING PRICE CALCULATION
+============================== */
+
 const perPersonAmount = parseFloat("{{ title.amount|default:0 }}");
 const phoneInput = document.getElementById('phoneInput');
 const amountInput = document.getElementById('amountInput');
@@ -380,117 +398,241 @@ function updateTotal(num) {
     const count = parseInt(num) || 1;
     amountInput.value = '৳ ' + (count * perPersonAmount).toFixed(2);
 }
+
 updateTotal(1);
 
 personButtons.forEach(btn => {
+
     btn.addEventListener('click', () => {
+
         personButtons.forEach(b => b.classList.remove('active'));
+
         btn.classList.add('active');
+
         hiddenNoOfPerson.value = btn.dataset.value;
+
         updateTotal(btn.dataset.value);
+
     });
+
 });
 
+
+/* ==============================
+   FORM VALIDATION
+============================== */
+
 function checkFormComplete() {
+
     const companyFilled = document.getElementById('companyInput').value.trim() !== '';
     const nameFilled = document.getElementById('nameInput').value.trim() !== '';
     const emailFilled = document.getElementById('emailInput').value.trim() !== '';
     const aggregatorFilled = aggregatorBadge.textContent.trim() !== '';
+
     submitBtn.disabled = !(companyFilled && nameFilled && emailFilled && aggregatorFilled);
+
 }
+
+
+/* ==============================
+   PHONE CHECK
+============================== */
 
 let phoneCheckTimeout;
 
-phoneInput.addEventListener('input', function() {
+phoneInput.addEventListener('input', function () {
+
     const mobile = this.value.trim();
+
     phoneInput.classList.remove('input-error-shake');
+
     aggregatorBadge.style.display = 'none';
+
     clearTimeout(phoneCheckTimeout);
 
-    if (mobile.length < 11) { resetFields(); checkFormComplete(); return; }
+    if (mobile.length < 11) {
+        resetFields();
+        checkFormComplete();
+        return;
+    }
+
     const bdRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
-    if (!bdRegex.test(mobile)) { resetFields(); checkFormComplete(); return; }
+
+    if (!bdRegex.test(mobile)) {
+        resetFields();
+        checkFormComplete();
+        return;
+    }
 
     phoneChecking.style.display = 'inline-block';
+
     phoneCheckTimeout = setTimeout(() => fetchMemberInfo(mobile), 500);
+
 });
 
-function fetchMemberInfo(mobile) {
-    fetch(`/get_aggregator_info/?mobile=${encodeURIComponent(mobile)}`)
-    .then(res => res.json())
-    .then(data => {
-        phoneChecking.style.display = 'none';
-        if (data.exists) {
-            phoneInput.style.borderColor = 'var(--primary-green)';
-            document.getElementById('companyInput').value = data.data.company_name || '';
-            document.getElementById('nameInput').value = data.data.person_name || '';
-            document.getElementById('emailInput').value = data.data.email || '';
-            
-            aggregatorBadge.textContent = data.data.is_aggregator ? "You are an Aggregator" : "You are not an Aggregator";
-            aggregatorBadge.className = `aggregator-badge ${data.data.is_aggregator ? '' : 'no'}`;
-            aggregatorBadge.style.display = 'inline-block';
 
-            if (data.data.no_of_person) {
-                const val = Math.min(parseInt(data.data.no_of_person), 5);
-                hiddenNoOfPerson.value = val;
-                personButtons.forEach(b => b.classList.toggle('active', b.dataset.value == val));
-                updateTotal(val);
+function fetchMemberInfo(mobile) {
+
+    fetch(`/get_aggregator_info/?mobile=${encodeURIComponent(mobile)}`)
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            phoneChecking.style.display = 'none';
+
+            if (data.exists) {
+
+                phoneInput.style.borderColor = 'var(--primary-green)';
+
+                document.getElementById('companyInput').value = data.data.company_name || '';
+                document.getElementById('nameInput').value = data.data.person_name || '';
+                document.getElementById('emailInput').value = data.data.email || '';
+
+                aggregatorBadge.textContent =
+                    data.data.is_aggregator ? "You are an Aggregator" : "You are not an Aggregator";
+
+                aggregatorBadge.className =
+                    `aggregator-badge ${data.data.is_aggregator ? '' : 'no'}`;
+
+                aggregatorBadge.style.display = 'inline-block';
+
+                if (data.data.no_of_person) {
+
+                    const val = Math.min(parseInt(data.data.no_of_person), 5);
+
+                    hiddenNoOfPerson.value = val;
+
+                    personButtons.forEach(b =>
+                        b.classList.toggle('active', b.dataset.value == val)
+                    );
+
+                    updateTotal(val);
+
+                }
+
+                checkFormComplete();
+
+            } else {
+
+                phoneInput.classList.add('input-error-shake');
+
+                resetFields();
+
+                checkFormComplete();
+
+                Swal.fire({
+                    title: 'Member Not Found',
+                    text: 'This phone number is not registered. Please become a member first.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Become a Member',
+                    cancelButtonText: 'Try Again'
+                }).then(result => {
+
+                    if (result.isConfirmed)
+                        window.location.href = "{% url 'registration' %}";
+
+                });
+
             }
 
-            checkFormComplete();
-        } else {
-            phoneInput.classList.add('input-error-shake');
-            resetFields();
-            checkFormComplete();
-            Swal.fire({
-                title: 'Member Not Found',
-                text: 'This phone number is not registered. Please become a member first.',
-                showCancelButton: true,
-                confirmButtonText: 'Become a Member',
-                cancelButtonText: 'Try Again'
-            }).then(result => {
-                if (result.isConfirmed) window.location.href = "{% url 'registration' %}";
-            });
-        }
-    }).catch(err => { console.error(err); phoneChecking.style.display = 'none'; });
+        })
+
+        .catch(err => {
+
+            console.error(err);
+
+            phoneChecking.style.display = 'none';
+
+        });
+
 }
 
+
 function resetFields() {
+
     document.getElementById('companyInput').value = '';
     document.getElementById('nameInput').value = '';
     document.getElementById('emailInput').value = '';
+
     aggregatorBadge.style.display = 'none';
     aggregatorBadge.textContent = '';
+
     phoneInput.style.borderColor = 'var(--border-color)';
+
     phoneChecking.style.display = 'none';
+
 }
 
-document.getElementById('regForm').addEventListener('submit', function(e) {
-    if (submitBtn.disabled) {
+
+/* ==============================
+   FORM SUBMIT VALIDATION
+============================== */
+
+document.getElementById('regForm').addEventListener('submit', function (e) {
+
+    const paymentMethod = document.getElementById('payment_method').value;
+
+    if (paymentMethod === "") {
+
         e.preventDefault();
-        Swal.fire({ title: 'Incomplete Information', text: 'Please enter a valid phone number to auto-fill your details.', icon: 'warning', confirmButtonText: 'OK' });
+
+        Swal.fire({
+            icon: "warning",
+            title: "Payment Method Required",
+            text: "Please select a payment method before submitting.",
+            confirmButtonColor: "#28a745"
+        });
+
+        return;
+
     }
+
+    if (submitBtn.disabled) {
+
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Incomplete Information',
+            text: 'Please enter a valid phone number to auto-fill your details.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+        });
+
+    }
+
 });
+
+
+/* ==============================
+   SCREENSHOT PREVIEW
+============================== */
+
 const screenshotInput = document.getElementById("screenshotInput");
 const previewImage = document.getElementById("previewImage");
 const uploadContent = document.getElementById("uploadContent");
 
-screenshotInput.addEventListener("change", function(){
+screenshotInput.addEventListener("change", function () {
 
     const file = this.files[0];
 
-    if(file){
+    if (file) {
 
         const reader = new FileReader();
 
-        reader.onload = function(e){
+        reader.onload = function (e) {
+
             previewImage.src = e.target.result;
             previewImage.style.display = "block";
             uploadContent.style.display = "none";
+
         }
 
         reader.readAsDataURL(file);
+
     }
+
 });
+
 </script>
 {% endblock main %}

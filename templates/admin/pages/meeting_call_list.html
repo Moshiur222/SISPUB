@@ -11,6 +11,9 @@
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<!-- Include BDT Font for better symbol display -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <style>
 /* ==========================================================================
    COMPACT PROFESSIONAL DESIGN - Meeting Call List
@@ -167,6 +170,12 @@ body, .card, .table, .btn, input, select, .form-control {
     margin: 0.1rem 0 0;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+}
+
+/* BDT Symbol Styling */
+.bdt-symbol {
+    font-family: 'Inter', 'SolaimanLipi', 'Nikosh', sans-serif;
+    font-weight: 600;
 }
 
 /* Alert */
@@ -484,6 +493,33 @@ body, .card, .table, .btn, input, select, .form-control {
     color: white !important;
 }
 
+/* PDF Download Button */
+.pdf-download-btn {
+    background: var(--danger-500);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 1rem;
+}
+
+.pdf-download-btn:hover {
+    background: var(--danger-600);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pdf-download-btn i {
+    font-size: 1rem;
+}
+
 /* Responsive */
 @media (max-width: 992px) {
     .stats-grid {
@@ -545,10 +581,10 @@ body, .card, .table, .btn, input, select, .form-control {
         </div>
         <div class="stat-card">
             <div class="stat-icon">
-                <i class="bi bi-currency-dollar"></i>
+                <i class="fa">&#x09F3;</i>
             </div>
             <div class="stat-content">
-                <h3>${{ total_amount|default:'0' }}</h3>
+                <h3>{{ total_amount|floatformat:2|default:'0.00' }}</h3>
                 <p>Total Amount</p>
             </div>
         </div>
@@ -592,7 +628,15 @@ body, .card, .table, .btn, input, select, .form-control {
                 <i class="bi bi-list-ul"></i>
                 Call Registrations
             </h5>
-            <span class="header-badge">{{ meeting_calls|length }} entries</span>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="header-badge">{{ meeting_calls|length }} entries</span>
+                {% if meeting_calls %}
+                <button id="downloadPdfBtn" class="pdf-download-btn">
+                    <i class="bi bi-file-pdf"></i>
+                    Download PDF
+                </button>
+                {% endif %}
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -606,11 +650,11 @@ body, .card, .table, .btn, input, select, .form-control {
                         <th>Persons</th>
                         <th>Phone</th>
                         <th>Email</th>
-                        <th>Amount</th>
+                        <th>Amount (৳)</th>
                         <th>Payment</th>
                         <th>Trx ID</th>
                         <th>Payout Numbers</th>
-                        <th>Screen shorts</th>
+                        <th>Screenshot</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -623,7 +667,7 @@ body, .card, .table, .btn, input, select, .form-control {
                         <td>{{ call.no_of_person|default:"1" }}</td>
                         <td><span class="phone-text">{{ call.phone|default:"—" }}</span></td>
                         <td><span class="email-text">{{ call.email|default:"—" }}</span></td>
-                        <td><span class="amount-badge">${{ call.amount|default:"0" }}</span></td>
+                        <td><span class="amount-badge">৳ {{ call.amount|floatformat:2|default:"0.00" }}</span></td>
                         <td><span class="payment-badge">{{ call.payment_method|default:"—" }}</span></td>
                         <td><span class="transaction-id">{{ call.transection_id|default:"—" }}</span></td>
                         <td><span class="transaction-id">{{ call.payout_number|default:"—" }}</span></td>
@@ -710,19 +754,82 @@ $(document).ready(function() {
                 text: '<i class="bi bi-file-pdf"></i> PDF',
                 className: 'dt-button',
                 orientation: 'landscape',
-                pageSize: 'A4'
+                pageSize: 'A4',
+                title: 'Meeting Call List',
+                download: 'open',
+                customize: function(doc) {
+                    // Customize PDF document
+                    if (doc.content[1] && doc.content[1].table) {
+                        doc.content[1].table.widths = 
+                            Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+                    }
+                    
+                    // Add header styling
+                    doc.styles.tableHeader = {
+                        fillColor: '#4f46e5',
+                        color: '#ffffff',
+                        alignment: 'left',
+                        fontSize: 9,
+                        bold: true
+                    };
+                    
+                    // Add footer with date
+                    doc.footer = function(currentPage, pageCount) {
+                        return {
+                            text: 'Generated on: ' + new Date().toLocaleDateString() + ' | Page ' + currentPage + ' of ' + pageCount,
+                            alignment: 'center',
+                            fontSize: 8,
+                            margin: [0, 10, 0, 0]
+                        };
+                    };
+                    
+                    // Add title with date and BDT indication
+                    doc.content.splice(0, 0, {
+                        text: 'Meeting Call List (Amount in BDT) - ' + new Date().toLocaleDateString(),
+                        fontSize: 16,
+                        bold: true,
+                        alignment: 'center',
+                        margin: [0, 0, 0, 20]
+                    });
+                    
+                    // Replace $ with ৳ in the document
+                    if (doc.content && doc.content[1] && doc.content[1].table) {
+                        doc.content[1].table.body.forEach((row, rowIndex) => {
+                            row.forEach((cell, cellIndex) => {
+                                if (typeof cell === 'string' && cell.includes('$')) {
+                                    row[cellIndex] = cell.replace(/\$/g, '৳');
+                                }
+                            });
+                        });
+                    }
+                },
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // Exclude Actions and Screenshot columns
+                    format: {
+                        body: function(data, row, column, node) {
+                            // Handle amount column - replace $ with ৳ if present
+                            if (column === 6) { // Amount column
+                                return data.replace(/\$/g, '৳');
+                            }
+                            return data;
+                        }
+                    }
+                }
             },
             {
                 extend: 'print',
                 text: '<i class="bi bi-printer"></i> Print',
-                className: 'dt-button'
+                className: 'dt-button',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] // Exclude Actions and Screenshot columns
+                }
             }
         ],
         pageLength: 10,
         lengthMenu: [5, 10, 25, 50, 100],
         order: [[0, 'asc']],
         columnDefs: [
-            { orderable: false, targets: [9] }
+            { orderable: false, targets: [11] }
         ],
         language: {
             search: "Search:",
@@ -739,6 +846,163 @@ $(document).ready(function() {
                 previous: '<i class="bi bi-chevron-left"></i>'
             }
         }
+    });
+
+    // Dedicated PDF download functionality
+    $('#downloadPdfBtn').click(function() {
+        // Get table data
+        const table = document.getElementById('callsTable');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        // Calculate summary statistics
+        let totalAmount = 0;
+        let totalPersons = 0;
+        
+        rows.forEach(row => {
+            const amountText = row.querySelector('td:nth-child(7) .amount-badge').textContent;
+            const amount = parseFloat(amountText.replace('৳', '').replace(/,/g, '').trim()) || 0;
+            const persons = parseInt(row.querySelector('td:nth-child(4)').textContent) || 1;
+            totalAmount += amount;
+            totalPersons += persons;
+        });
+        
+        // Create PDF content
+        let content = [];
+        
+        // Add header
+        content.push({
+            text: 'Meeting Call List Report',
+            fontSize: 20,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+        });
+        
+        // Add date and time
+        content.push({
+            text: 'Generated on: ' + new Date().toLocaleString('en-BD', { timeZone: 'Asia/Dhaka' }),
+            alignment: 'center',
+            margin: [0, 0, 0, 20],
+            fontSize: 10,
+            color: '#666666'
+        });
+        
+        // Add summary section
+        content.push({
+            text: 'Summary Statistics',
+            fontSize: 14,
+            bold: true,
+            margin: [0, 0, 0, 10]
+        });
+        
+        content.push({
+            ul: [
+                'Total Calls: ' + rows.length,
+                'Total Amount: ৳ ' + totalAmount.toFixed(2),
+                'Total Participants: ' + totalPersons
+            ],
+            margin: [0, 0, 0, 20]
+        });
+        
+        // Create table data
+        let tableData = [];
+        
+        // Add headers
+        const headers = ['#', 'Company', 'Person', 'Persons', 'Phone', 'Email', 'Amount (৳)', 'Payment', 'Transaction ID', 'Payout Number'];
+        tableData.push(headers);
+        
+        // Add row data
+        rows.forEach((row, index) => {
+            const rowData = [];
+            // Get specific cells (excluding actions and screenshot)
+            rowData.push(row.querySelector('td:nth-child(1)').innerText); // #
+            rowData.push(row.querySelector('td:nth-child(2) .company-name').innerText); // Company
+            rowData.push(row.querySelector('td:nth-child(3) .person-name').innerText); // Person
+            rowData.push(row.querySelector('td:nth-child(4)').innerText); // Persons
+            rowData.push(row.querySelector('td:nth-child(5) .phone-text').innerText); // Phone
+            rowData.push(row.querySelector('td:nth-child(6) .email-text').innerText); // Email
+            rowData.push(row.querySelector('td:nth-child(7) .amount-badge').innerText); // Amount
+            rowData.push(row.querySelector('td:nth-child(8) .payment-badge').innerText); // Payment
+            rowData.push(row.querySelector('td:nth-child(9) .transaction-id').innerText); // Transaction ID
+            rowData.push(row.querySelector('td:nth-child(10) .transaction-id').innerText); // Payout Number
+            tableData.push(rowData);
+        });
+        
+        // Add table to content
+        content.push({
+            text: 'Detailed Report',
+            fontSize: 14,
+            bold: true,
+            margin: [0, 20, 0, 10]
+        });
+        
+        content.push({
+            table: {
+                headerRows: 1,
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                body: tableData
+            },
+            layout: {
+                fillColor: function(rowIndex, node, columnIndex) {
+                    return rowIndex === 0 ? '#ffffff' : (rowIndex % 2 === 0 ? '#f3f4f6' : null);
+                },
+                hLineWidth: function(i, node) {
+                    return (i === 0 || i === node.table.body.length) ? 2 : 1;
+                },
+                vLineWidth: function(i, node) {
+                    return 1;
+                },
+                hLineColor: function(i, node) {
+                    return i === 0 ? '#4f46e5' : '#dddddd';
+                },
+                vLineColor: function(i, node) {
+                    return '#dddddd';
+                },
+                paddingLeft: function(i, node) {
+                    return 8;
+                },
+                paddingRight: function(i, node) {
+                    return 8;
+                },
+                paddingTop: function(i, node) {
+                    return 6;
+                },
+                paddingBottom: function(i, node) {
+                    return 6;
+                }
+            }
+        });
+        
+        // Add footer note
+        content.push({
+            text: 'This is a system-generated report. All amounts are in Bangladeshi Taka (৳). For any queries, please contact the administrator.',
+            margin: [0, 30, 0, 0],
+            fontSize: 8,
+            color: '#999999',
+            alignment: 'center'
+        });
+        
+        // Generate PDF
+        pdfMake.createPdf({
+            content: content,
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true
+                },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 11,
+                    color: 'white'
+                }
+            },
+            defaultStyle: {
+                font: 'Roboto'
+            },
+            pageOrientation: 'landscape',
+            pageSize: 'A4',
+            pageMargins: [40, 60, 40, 60]
+        }).download('meeting_call_list_bdt_' + new Date().toISOString().slice(0,10) + '.pdf');
     });
 });
 

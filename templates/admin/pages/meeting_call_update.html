@@ -9,10 +9,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <!-- Quill CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<!-- Cropper.js CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 
 <style>
   /* ==========================================================================
-     CLEAN PROFESSIONAL DESIGN - Add Meeting Call
+     CLEAN PROFESSIONAL DESIGN - Update Meeting Call
      ========================================================================== */
   :root {
     --primary-50: #eef2ff;
@@ -41,11 +43,13 @@
     
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.1);
     --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.1);
     
     --radius-sm: 6px;
     --radius-md: 8px;
     --radius-lg: 12px;
+    --radius-xl: 16px;
     
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
@@ -98,7 +102,7 @@
   }
 
   /* ==========================================================================
-     Header
+     Header - Update Variant
      ========================================================================== */
   .form-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -308,73 +312,119 @@
     color: var(--primary-600);
   }
   
-  /* Clock Interface */
+  /* ==========================================================================
+     PROFESSIONAL CLOCK INTERFACE - Redesigned Handles
+     ========================================================================== */
+  
+  /* Clock Interface Container */
   .clock-interface {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     background: white;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
+    border: none;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg), 0 20px 40px -10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    margin-top: 5px;
-    padding: 15px;
-    width: 300px;
+    margin-top: 8px;
+    padding: 20px;
+    width: 340px;
+    backdrop-filter: blur(10px);
+    animation: slideDown 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Clock Header */
   .clock-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--gray-100);
   }
-  
-  .clock-time-display {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--gray-800);
-  }
-  
-  .clock-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
+
+  .clock-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: var(--gray-600);
-    width: 30px;
-    height: 30px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .clock-header-left i {
+    color: var(--primary-500);
+    font-size: 1.1rem;
+  }
+
+  .clock-time-display {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+    font-feature-settings: "tnum";
+  }
+
+  .clock-close {
+    background: var(--gray-100);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-sm);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  
+
   .clock-close:hover {
-    background-color: var(--gray-100);
+    background: #fee2e2;
     color: #ef4444;
+    transform: rotate(90deg);
   }
-  
-  /* Analog Clock */
-  .analog-clock {
+
+  /* Analog Clock Container */
+  .analog-clock-container {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
+    background: linear-gradient(135deg, #f9fafc, #f1f5f9);
+    border-radius: 50%;
+    padding: 15px;
   }
-  
+
+  /* Modern Clock Face */
   .clock-face {
     position: relative;
-    width: 200px;
-    height: 200px;
-    border: 3px solid var(--gray-700);
+    width: 220px;
+    height: 220px;
+    border: 4px solid white;
     border-radius: 50%;
-    background: var(--gray-50);
+    background: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), inset 0 2px 5px rgba(0, 0, 0, 0.05);
     cursor: pointer;
   }
-  
+
+  /* Hour markers */
   .hour-marker {
     position: absolute;
     top: 50%;
@@ -386,148 +436,345 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    color: var(--gray-700);
+    font-weight: 600;
+    color: var(--gray-800);
     font-size: 14px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
   }
-  
+
+  .hour-marker:hover {
+    background: var(--primary-50);
+    color: var(--primary-600);
+    transform: scale(1.1);
+  }
+
+  /* ===== REDESIGNED CLOCK HANDS ===== */
+  /* Hour Hand - Bold & Short with Arrow Tip */
   .clock-hour-hand {
     position: absolute;
     top: 50%;
     left: 50%;
     width: 60px;
-    height: 4px;
-    background: var(--gray-700);
+    height: 6px;
+    background: linear-gradient(90deg, var(--gray-800), var(--gray-900));
     transform-origin: 0% 50%;
     transform: rotate(-90deg) translateX(-50%);
-    margin-top: -2px;
-    border-radius: 4px;
+    margin-top: -3px;
+    border-radius: 6px 0 0 6px;
     z-index: 2;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
+  /* Hour Hand Arrow Tip */
+  .clock-hour-hand::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid var(--gray-900);
+  }
+
+  /* Minute Hand - Thinner & Longer with Diamond Tip */
   .clock-minute-hand {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 80px;
-    height: 2px;
-    background: var(--primary-600);
+    width: 90px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-600), var(--primary-500));
     transform-origin: 0% 50%;
     transform: rotate(-90deg) translateX(-50%);
-    margin-top: -1px;
-    border-radius: 2px;
+    margin-top: -2px;
+    border-radius: 4px 0 0 4px;
     z-index: 1;
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.4);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
+  /* Minute Hand Diamond Tip */
+  .clock-minute-hand::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background: var(--primary-500);
+    border-radius: 2px;
+    transform: translateY(-50%) rotate(45deg);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.5);
+  }
+
+  /* Clock Center - Enhanced */
   .clock-center {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 10px;
-    height: 10px;
-    background: var(--gray-700);
-    border-radius: 50%;
     transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
     z-index: 3;
-  }
-  
-  /* Digital Time Picker */
-  .digital-time-picker {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--primary-200);
   }
-  
-  .time-select {
-    padding: 8px 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-family: var(--font-sans);
-    cursor: pointer;
-    background-color: white;
+
+  .center-dot {
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle at 30% 30%, var(--primary-400), var(--primary-600));
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Digital Time Picker */
+  .digital-time-picker {
+    background: linear-gradient(135deg, var(--gray-50), white);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--gray-200);
+  }
+
+  .time-picker-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .time-picker-label i {
+    color: var(--primary-500);
+    font-size: 0.875rem;
+  }
+
+  .time-picker-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .time-select-wrapper {
+    position: relative;
     flex: 1;
   }
-  
-  .time-select:hover {
-    border-color: var(--primary-500);
+
+  .time-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    color: var(--gray-800);
+    background: white;
+    cursor: pointer;
+    appearance: none;
+    transition: all 0.2s;
   }
-  
+
+  .time-select:hover {
+    border-color: var(--primary-400);
+  }
+
   .time-select:focus {
     outline: none;
     border-color: var(--primary-500);
-    box-shadow: var(--shadow-focus);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
   }
-  
+
+  .select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+    pointer-events: none;
+    font-size: 0.875rem;
+  }
+
   .time-separator {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--gray-600);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-500);
+    line-height: 1;
+    margin: 0 2px;
   }
-  
-  /* Quick Times */
+
+  /* Quick Time Buttons */
   .quick-times {
     display: flex;
-    gap: 5px;
-    margin-bottom: 15px;
+    gap: 8px;
+    margin-bottom: 20px;
   }
-  
+
   .quick-time {
     flex: 1;
-    padding: 8px 4px;
-    background: var(--gray-100);
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
+    padding: 10px 5px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 0.7rem;
+    font-weight: 600;
     color: var(--gray-700);
     transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
-  
+
+  .quick-time i {
+    font-size: 1rem;
+    color: var(--primary-500);
+    transition: all 0.2s;
+  }
+
   .quick-time:hover {
     background: var(--primary-50);
     border-color: var(--primary-500);
-    color: var(--primary-700);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
   }
-  
+
+  .quick-time:hover i {
+    color: var(--primary-600);
+    transform: scale(1.1);
+  }
+
   /* Action Buttons */
   .clock-actions {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+    border-top: 2px solid var(--gray-100);
+    padding-top: 16px;
   }
-  
+
   .clock-btn {
-    padding: 8px 16px;
+    padding: 10px 20px;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    font-weight: 500;
-    font-size: 13px;
+    font-weight: 600;
+    font-size: 0.875rem;
     font-family: var(--font-sans);
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.3px;
   }
-  
+
   .clock-btn-cancel {
-    background: var(--gray-100);
+    background: white;
     color: var(--gray-700);
     border: 1px solid var(--gray-300);
   }
-  
+
   .clock-btn-cancel:hover {
-    background: var(--gray-200);
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .clock-btn-ok {
-    background: var(--primary-600);
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
     color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   }
-  
+
   .clock-btn-ok:hover {
-    background: var(--primary-700);
+    background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+  }
+
+  .clock-btn i {
+    font-size: 1rem;
+  }
+
+  /* ==========================================================================
+     Current Image Display
+     ========================================================================== */
+  .current-image-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+  }
+
+  .current-image-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.75rem;
+  }
+
+  .current-image-label i {
+    color: var(--primary-500);
+  }
+
+  .current-image-box {
+    width: 150px;
+    height: 100px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 2px solid var(--primary-200);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .current-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .change-image-note {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: #e67e22;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: #fff4e5;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
   }
 
   /* ==========================================================================
@@ -748,6 +995,164 @@
   }
 
   /* ==========================================================================
+     Crop Modal
+     ========================================================================== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+
+  .modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .modal-header h3 i {
+    color: var(--primary-600);
+  }
+
+  .modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-500);
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover {
+    background: var(--gray-100);
+    color: #ef4444;
+  }
+
+  .modal-body {
+    padding: 2rem;
+  }
+
+  .crop-container {
+    max-height: 400px;
+    overflow: hidden;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--gray-300);
+    margin-bottom: 1.5rem;
+  }
+
+  .crop-container img {
+    max-width: 100%;
+    display: block;
+  }
+
+  .crop-info {
+    background: var(--primary-50);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--primary-700);
+    font-size: 0.9375rem;
+  }
+
+  .crop-info i {
+    font-size: 1.25rem;
+  }
+
+  .modal-footer {
+    padding: 1.5rem 2rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .crop-preview {
+    width: 300px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 3px solid var(--primary-500);
+    margin: 0 auto 1.5rem;
+    background: var(--gray-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .crop-preview::before {
+    content: "Preview";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--gray-400);
+    font-size: 0.875rem;
+    font-weight: 500;
+    z-index: 1;
+  }
+
+  .crop-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 2;
+  }
+
+  .btn-crop {
+    background: var(--primary-600);
+    color: white;
+  }
+
+  .btn-crop:hover {
+    background: var(--primary-700);
+  }
+
+  /* ==========================================================================
      Responsive
      ========================================================================== */
   @media (max-width: 640px) {
@@ -782,9 +1187,62 @@
     }
     
     .clock-interface {
-      width: 280px;
+      width: 300px;
       right: 0;
       left: auto;
+      padding: 15px;
+    }
+    
+    .clock-face {
+      width: 180px;
+      height: 180px;
+    }
+    
+    .hour-marker {
+      width: 25px;
+      height: 25px;
+      font-size: 12px;
+    }
+    
+    .clock-hour-hand {
+      width: 45px;
+      height: 5px;
+    }
+    
+    .clock-hour-hand::after {
+      right: -6px;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 9px solid var(--gray-900);
+    }
+    
+    .clock-minute-hand {
+      width: 70px;
+      height: 3px;
+    }
+    
+    .clock-minute-hand::after {
+      right: -8px;
+      width: 9px;
+      height: 9px;
+    }
+    
+    .quick-time {
+      padding: 8px 4px;
+    }
+    
+    .modal-content {
+      width: 95%;
+      margin: 1rem;
+    }
+    
+    .modal-header,
+    .modal-footer {
+      padding: 1rem;
+    }
+    
+    .modal-body {
+      padding: 1rem;
     }
   }
 </style>
@@ -794,13 +1252,14 @@
 <div class="page-wrapper">
     <div class="form-card">
         
-        <!-- Header -->
+        <!-- Header - Update Variant -->
         <div class="form-header">
             <div class="header-icon">
-                <i class="bi bi-calendar-plus"></i>
+                <i class="bi bi-pencil-square"></i>
             </div>
             <div class="header-text">
                 <h2>Update Meeting Call</h2>
+                <p>Edit meeting schedule details</p>
             </div>
         </div>
 
@@ -832,7 +1291,9 @@
                         Meeting Title
                         <span class="required-star">*</span>
                     </label>
-                    <input type="text" name="title" value = "meeting.title" class="form-input" placeholder="e.g., Quarterly Business Review" required>
+                    <input type="text" name="title" class="form-input" 
+                           value="{{ meeting.title }}"
+                           placeholder="e.g., Quarterly Business Review" required>
                     <div class="helper-text">
                         <i class="bi bi-info-circle"></i>
                         Enter a clear, descriptive title for the meeting
@@ -848,7 +1309,9 @@
                         Amount
                         <span class="required-star">*</span>
                     </label>
-                    <input type="number" name="amount" value = "meeting.amount" class="form-input" placeholder="e.g., 1000" required>
+                    <input type="number" name="amount" class="form-input" 
+                           value="{{ meeting.amount }}"
+                           placeholder="e.g., 1000" required>
                     <div class="helper-text">
                         <i class="bi bi-info-circle"></i>
                         Enter the meeting amount/cost
@@ -868,8 +1331,9 @@
                     <div class="row-custom">
                         <!-- Date -->
                         <div class="col-custom">
-                            <input type="text" name="expire_date_date"  value = "meeting.expire_date_date"  id="expiry-date"
+                            <input type="text" name="expire_date_date" id="expiry-date"
                                    class="form-input bg-white"
+                                   value="{{ meeting.expire_date|date:'Y-m-d' }}"
                                    placeholder="Select Date"
                                    required>
                         </div>
@@ -879,8 +1343,8 @@
                             <div class="clock-input-wrapper">
                                 <input type="text" name="expire_date_time" id="expiry-time"
                                        class="form-input bg-white"
+                                       value="{{ meeting.expire_date|date:'H:i' }}"
                                        placeholder="Select Time"
-                                       value = "meeting.expire_date_time" 
                                        readonly
                                        required>
                                 <button type="button" class="clock-button" id="clock-toggle">
@@ -888,99 +1352,141 @@
                                 </button>
                             </div>
                             
-                            <!-- Clock Interface -->
+                            <!-- Professional Clock Interface - Redesigned Handles -->
                             <div class="clock-interface" id="clock-interface" style="display: none;">
+                                <!-- Header -->
                                 <div class="clock-header">
-                                    <span class="clock-time-display" id="clock-display">12:00</span>
-                                    <button type="button" class="clock-close" id="clock-close">&times;</button>
+                                    <div class="clock-header-left">
+                                        <i class="bi bi-clock-history"></i>
+                                        <span>Select Time</span>
+                                    </div>
+                                    <div class="clock-time-display" id="clock-display">12:00</div>
+                                    <button type="button" class="clock-close" id="clock-close">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
                                 </div>
                                 
-                                <!-- Analog Clock -->
-                                <div class="analog-clock">
-                                    <div class="clock-face" id="clock-face">
-                                        <div class="clock-hour-hand" id="hour-hand"></div>
-                                        <div class="clock-minute-hand" id="minute-hand"></div>
-                                        <div class="clock-center"></div>
-                                        
-                                        <!-- Hour markers -->
-                                        <div class="hour-marker" style="transform: rotate(0deg) translateY(-80px)">12</div>
-                                        <div class="hour-marker" style="transform: rotate(30deg) translateY(-80px)">1</div>
-                                        <div class="hour-marker" style="transform: rotate(60deg) translateY(-80px)">2</div>
-                                        <div class="hour-marker" style="transform: rotate(90deg) translateY(-80px)">3</div>
-                                        <div class="hour-marker" style="transform: rotate(120deg) translateY(-80px)">4</div>
-                                        <div class="hour-marker" style="transform: rotate(150deg) translateY(-80px)">5</div>
-                                        <div class="hour-marker" style="transform: rotate(180deg) translateY(-80px)">6</div>
-                                        <div class="hour-marker" style="transform: rotate(210deg) translateY(-80px)">7</div>
-                                        <div class="hour-marker" style="transform: rotate(240deg) translateY(-80px)">8</div>
-                                        <div class="hour-marker" style="transform: rotate(270deg) translateY(-80px)">9</div>
-                                        <div class="hour-marker" style="transform: rotate(300deg) translateY(-80px)">10</div>
-                                        <div class="hour-marker" style="transform: rotate(330deg) translateY(-80px)">11</div>
+                                <!-- Analog Clock - Redesigned Handles -->
+                                <div class="analog-clock-container">
+                                    <div class="analog-clock">
+                                        <div class="clock-face" id="clock-face">
+                                            <!-- Hour markers -->
+                                            <div class="hour-marker" style="transform: rotate(0deg) translateY(-75px) rotate(0deg);">12</div>
+                                            <div class="hour-marker" style="transform: rotate(30deg) translateY(-75px) rotate(-30deg);">1</div>
+                                            <div class="hour-marker" style="transform: rotate(60deg) translateY(-75px) rotate(-60deg);">2</div>
+                                            <div class="hour-marker" style="transform: rotate(90deg) translateY(-75px) rotate(-90deg);">3</div>
+                                            <div class="hour-marker" style="transform: rotate(120deg) translateY(-75px) rotate(-120deg);">4</div>
+                                            <div class="hour-marker" style="transform: rotate(150deg) translateY(-75px) rotate(-150deg);">5</div>
+                                            <div class="hour-marker" style="transform: rotate(180deg) translateY(-75px) rotate(-180deg);">6</div>
+                                            <div class="hour-marker" style="transform: rotate(210deg) translateY(-75px) rotate(-210deg);">7</div>
+                                            <div class="hour-marker" style="transform: rotate(240deg) translateY(-75px) rotate(-240deg);">8</div>
+                                            <div class="hour-marker" style="transform: rotate(270deg) translateY(-75px) rotate(-270deg);">9</div>
+                                            <div class="hour-marker" style="transform: rotate(300deg) translateY(-75px) rotate(-300deg);">10</div>
+                                            <div class="hour-marker" style="transform: rotate(330deg) translateY(-75px) rotate(-330deg);">11</div>
+                                            
+                                            <!-- REDESIGNED CLOCK HANDS -->
+                                            <!-- Hour Hand with Arrow Tip -->
+                                            <div class="clock-hour-hand" id="hour-hand"></div>
+                                            <!-- Minute Hand with Diamond Tip -->
+                                            <div class="clock-minute-hand" id="minute-hand"></div>
+                                            <!-- Enhanced Center -->
+                                            <div class="clock-center">
+                                                <div class="center-dot"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Digital Time Picker -->
+                                <!-- Digital Time Picker (Hour & Minute only) -->
                                 <div class="digital-time-picker">
-                                    <select class="time-select" id="hour-select">
-                                        <option value="00">00</option>
-                                        <option value="01">01</option>
-                                        <option value="02">02</option>
-                                        <option value="03">03</option>
-                                        <option value="04">04</option>
-                                        <option value="05">05</option>
-                                        <option value="06">06</option>
-                                        <option value="07">07</option>
-                                        <option value="08">08</option>
-                                        <option value="09">09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                        <option value="21">21</option>
-                                        <option value="22">22</option>
-                                        <option value="23">23</option>
-                                    </select>
-                                    <span class="time-separator">:</span>
-                                    <select class="time-select" id="minute-select">
-                                        <option value="00">00</option>
-                                        <option value="05">05</option>
-                                        <option value="10">10</option>
-                                        <option value="15">15</option>
-                                        <option value="20">20</option>
-                                        <option value="25">25</option>
-                                        <option value="30">30</option>
-                                        <option value="35">35</option>
-                                        <option value="40">40</option>
-                                        <option value="45">45</option>
-                                        <option value="50">50</option>
-                                        <option value="55">55</option>
-                                    </select>
+                                    <div class="time-picker-label">
+                                        <i class="bi bi-clock"></i>
+                                        Set time
+                                    </div>
+                                    <div class="time-picker-controls">
+                                        <div class="time-select-wrapper">
+                                            <select class="time-select" id="hour-select">
+                                                <option value="00">00</option>
+                                                <option value="01">01</option>
+                                                <option value="02">02</option>
+                                                <option value="03">03</option>
+                                                <option value="04">04</option>
+                                                <option value="05">05</option>
+                                                <option value="06">06</option>
+                                                <option value="07">07</option>
+                                                <option value="08">08</option>
+                                                <option value="09">09</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                            </select>
+                                            <i class="bi bi-chevron-down select-arrow"></i>
+                                        </div>
+                                        <span class="time-separator">:</span>
+                                        <div class="time-select-wrapper">
+                                            <select class="time-select" id="minute-select">
+                                                <option value="00">00</option>
+                                                <option value="05">05</option>
+                                                <option value="10">10</option>
+                                                <option value="15">15</option>
+                                                <option value="20">20</option>
+                                                <option value="25">25</option>
+                                                <option value="30">30</option>
+                                                <option value="35">35</option>
+                                                <option value="40">40</option>
+                                                <option value="45">45</option>
+                                                <option value="50">50</option>
+                                                <option value="55">55</option>
+                                            </select>
+                                            <i class="bi bi-chevron-down select-arrow"></i>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <!-- Quick Time Buttons -->
                                 <div class="quick-times">
-                                    <button type="button" class="quick-time" data-time="00:00">Midnight</button>
-                                    <button type="button" class="quick-time" data-time="12:00">Noon</button>
-                                    <button type="button" class="quick-time" data-time="23:59">End of Day</button>
+                                    <button type="button" class="quick-time" data-time="00:00">
+                                        <i class="bi bi-moon-stars"></i>
+                                        <span>Midnight</span>
+                                    </button>
+                                    <button type="button" class="quick-time" data-time="12:00">
+                                        <i class="bi bi-brightness-high"></i>
+                                        <span>Noon</span>
+                                    </button>
+                                    <button type="button" class="quick-time" data-time="23:59">
+                                        <i class="bi bi-calendar-check"></i>
+                                        <span>End of Day</span>
+                                    </button>
                                 </div>
                                 
                                 <!-- Action Buttons -->
                                 <div class="clock-actions">
-                                    <button type="button" class="clock-btn clock-btn-cancel" id="clock-cancel">Cancel</button>
-                                    <button type="button" class="clock-btn clock-btn-ok" id="clock-ok">OK</button>
+                                    <button type="button" class="clock-btn clock-btn-cancel" id="clock-cancel">
+                                        <i class="bi bi-x"></i>
+                                        Cancel
+                                    </button>
+                                    <button type="button" class="clock-btn clock-btn-ok" id="clock-ok">
+                                        <i class="bi bi-check-lg"></i>
+                                        Apply
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Hidden combined -->
-                    <input type="hidden" name="expire_date" id="expiry-datetime">
+                    <input type="hidden" name="expire_date" id="expiry-datetime" value="{{ meeting.expire_date|date:'Y-m-d H:i' }}">
                     
                     <div class="helper-text">
                         <i class="bi bi-calendar"></i>
@@ -998,10 +1504,10 @@
                     </label>
                     
                     <div class="quill-wrapper">
-                        <div id="quill-editor" style="height: 200px;"></div>
+                        <div id="quill-editor" style="height: 200px;">{{ meeting.description|safe }}</div>
                     </div>
                     
-                    <input type="hidden" name="description"  value = "meeting.description" id="description-input">
+                    <input type="hidden" name="description" id="description-input" value="{{ meeting.description }}">
                     
                     <div class="helper-text">
                         <i class="bi bi-pencil"></i>
@@ -1009,21 +1515,37 @@
                     </div>
                 </div>
 
-                <!-- Image Field (Mandatory) -->
+                <!-- Image Field -->
                 <div class="form-group">
                     <label class="form-label">
                         <span class="label-icon">
                             <i class="bi bi-image"></i>
                         </span>
                         Meeting Image
-                        <span class="required-star">*</span>
                     </label>
                     
-                    <input type="file" name="image" value = "meeting.image.url"  class="file-input" accept="image/*" id="image-input" required>
+                    <!-- Current Image Display -->
+                    {% if meeting.image %}
+                    <div class="current-image-container">
+                        <div class="current-image-label">
+                            <i class="bi bi-image"></i>
+                            Current Image:
+                        </div>
+                        <div class="current-image-box">
+                            <img src="{{ meeting.image.url }}" alt="Current meeting image">
+                        </div>
+                        <div class="change-image-note">
+                            <i class="bi bi-info-circle-fill"></i>
+                            Upload a new image below to replace the current one
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <input type="file" name="image" class="file-input" accept="image/*" id="image-input">
                     
                     <div class="size-note">
                         <i class="bi bi-info-circle"></i>
-                        <strong>Note:</strong> Image size must be exactly <strong>300x200 pixels</strong>
+                        <strong>Note:</strong> Image size must be exactly <strong>300x200 pixels</strong>. If your image is larger, you'll be able to crop it.
                     </div>
                     
                     <div id="size-error" class="size-error" style="display: none;">
@@ -1031,6 +1553,7 @@
                         <span id="error-message"></span>
                     </div>
                     
+                    <!-- Preview for new image -->
                     <div id="preview-container" class="preview-container">
                         <img id="image-preview" src="" alt="Preview">
                     </div>
@@ -1045,10 +1568,43 @@
                 </a>
                 <button type="submit" class="btn btn-primary" id="submitBtn">
                     <i class="bi bi-check"></i>
-                    Save Meeting
+                    Update Meeting
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Crop Modal -->
+<div class="modal-overlay" id="cropModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>
+                <i class="bi bi-crop"></i>
+                Crop Image
+            </h3>
+            <button type="button" class="modal-close" id="closeCropModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="crop-info">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>Drag the crop area to select the portion you want to use. The final image will be 300x200 pixels.</span>
+            </div>
+            
+            <div class="crop-container">
+                <img id="crop-image" src="" alt="Crop Image">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelCrop">
+                <i class="bi bi-x"></i>
+                Cancel
+            </button>
+            <button type="button" class="btn btn-crop" id="applyCrop">
+                <i class="bi bi-check"></i>
+                Apply Crop
+            </button>
+        </div>
     </div>
 </div>
 
@@ -1056,6 +1612,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!-- Quill JS -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<!-- Cropper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -1066,12 +1624,14 @@ document.addEventListener("DOMContentLoaded", function() {
         minDate: "today",
         altInput: true,
         altFormat: "F j, Y",
+        defaultDate: "{{ meeting.expire_date|date:'Y-m-d' }}",
         onChange: function() {
             updateHiddenDateTime();
         }
     });
 
-    // ==================== CLOCK INTERFACE ====================
+    // ==================== PROFESSIONAL CLOCK INTERFACE ====================
+    // Only Hour & Minute - NO SECOND HAND
     const timeInput = document.getElementById('expiry-time');
     const clockInterface = document.getElementById('clock-interface');
     const clockToggle = document.getElementById('clock-toggle');
@@ -1090,10 +1650,17 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentHour = 12;
     let currentMinute = 0;
     
-    // Initialize time to current time
-    const now = new Date();
-    currentHour = now.getHours();
-    currentMinute = Math.floor(now.getMinutes() / 5) * 5; // Round to nearest 5 minutes
+    {% if meeting.expire_date %}
+        // Parse initial time from meeting object
+        const initialTime = "{{ meeting.expire_date|date:'H:i' }}".split(':');
+        currentHour = parseInt(initialTime[0]);
+        currentMinute = parseInt(initialTime[1]);
+    {% else %}
+        // Initialize time to current time
+        const now = new Date();
+        currentHour = now.getHours();
+        currentMinute = Math.floor(now.getMinutes() / 5) * 5; // Round to nearest 5 minutes
+    {% endif %}
     
     // Update displays
     updateTimeDisplay();
@@ -1145,7 +1712,7 @@ document.addEventListener("DOMContentLoaded", function() {
         updateHiddenDateTime();
     }
     
-    // Update analog clock hands
+    // Update analog clock hands - ONLY HOUR AND MINUTE
     function updateAnalogClock() {
         if (hourHand && minuteHand) {
             const hourAngle = (currentHour % 12) * 30 + (currentMinute * 0.5) - 90;
@@ -1225,11 +1792,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
-    // Update hidden datetime
+    // Update hidden datetime - WITHOUT SECONDS
     function updateHiddenDateTime() {
         if (dateInput && dateInput.value && timeInput && timeInput.value) {
-            // Format: YYYY-MM-DD HH:MM:SS
-            hiddenDateTime.value = dateInput.value + ' ' + timeInput.value + ':00';
+            // Format: YYYY-MM-DD HH:MM (without seconds)
+            hiddenDateTime.value = dateInput.value + ' ' + timeInput.value;
             console.log('Hidden datetime:', hiddenDateTime.value);
         }
     }
@@ -1259,34 +1826,95 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // ==================== IMAGE PREVIEW & VALIDATION ====================
+    // ==================== IMAGE CROP FUNCTIONALITY ====================
     const imageInput = document.getElementById('image-input');
     const preview = document.getElementById('image-preview');
     const container = document.getElementById('preview-container');
     const sizeError = document.getElementById('size-error');
     const errorMessage = document.getElementById('error-message');
-
+    
+    // Crop modal elements
+    const cropModal = document.getElementById('cropModal');
+    const closeCropModal = document.getElementById('closeCropModal');
+    const cancelCrop = document.getElementById('cancelCrop');
+    const applyCrop = document.getElementById('applyCrop');
+    const cropImage = document.getElementById('crop-image');
+    
+    let cropper = null;
+    let currentFile = null;
+    
+    // Open crop modal
+    function openCropModal(imageSrc) {
+        cropModal.classList.add('active');
+        
+        // Initialize cropper after image loads
+        cropImage.onload = function() {
+            if (cropper) {
+                cropper.destroy();
+            }
+            
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 300 / 200, // 3:2 aspect ratio (300x200)
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+                ready: function() {
+                    // Set crop box to match aspect ratio
+                    const cropBoxData = {
+                        width: 300,
+                        height: 200
+                    };
+                    cropper.setCropBoxData(cropBoxData);
+                }
+            });
+        };
+        
+        cropImage.src = imageSrc;
+    }
+    
+    // Close crop modal
+    function closeCropModalFunc() {
+        cropModal.classList.remove('active');
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    }
+    
+    // Handle file selection
     if (imageInput) {
-        imageInput.addEventListener('change', function(event){
+        imageInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
-            if(file){
+            if (file) {
+                currentFile = file;
                 const img = new Image();
                 const objectUrl = URL.createObjectURL(file);
-
+                
                 img.onload = function() {
-                    if (this.width !== 300 || this.height !== 200) {
-                        if (errorMessage) {
-                            errorMessage.innerHTML = `Invalid image dimensions! Upload exactly 300x200 pixels.<br>Your image: ${this.width}x${this.height}`;
-                        }
-                        if (sizeError) sizeError.style.display = 'flex';
-                        imageInput.value = ""; 
-                        if (container) container.style.display = 'none';
-                    } else {
+                    // Check if image dimensions are exactly 300x200
+                    if (this.width === 300 && this.height === 200) {
+                        // Perfect size, just show preview
                         if (preview) preview.src = objectUrl;
                         if (container) container.style.display = 'block';
                         if (sizeError) sizeError.style.display = 'none';
+                        URL.revokeObjectURL(objectUrl);
+                    } else {
+                        // Image needs cropping
+                        if (sizeError) {
+                            errorMessage.innerHTML = `Image dimensions (${this.width}x${this.height}) don't match 300x200. Please crop the image.`;
+                            sizeError.style.display = 'flex';
+                        }
+                        
+                        // Open crop modal
+                        openCropModal(objectUrl);
                     }
-                    URL.revokeObjectURL(objectUrl);
                 };
                 img.src = objectUrl;
             } else {
@@ -1295,6 +1923,71 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+    
+    // Close modal events
+    if (closeCropModal) {
+        closeCropModal.addEventListener('click', closeCropModalFunc);
+    }
+    
+    if (cancelCrop) {
+        cancelCrop.addEventListener('click', function() {
+            closeCropModalFunc();
+            // Clear file input
+            imageInput.value = '';
+            container.style.display = 'none';
+            sizeError.style.display = 'none';
+        });
+    }
+    
+    // Apply crop
+    if (applyCrop) {
+        applyCrop.addEventListener('click', function() {
+            if (cropper) {
+                // Get cropped canvas
+                const canvas = cropper.getCroppedCanvas({
+                    width: 300,
+                    height: 200
+                });
+                
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    // Create a new file from blob
+                    const croppedFile = new File([blob], currentFile.name, {
+                        type: currentFile.type,
+                        lastModified: Date.now()
+                    });
+                    
+                    // Update file input with cropped file
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(croppedFile);
+                    imageInput.files = dataTransfer.files;
+                    
+                    // Show preview
+                    if (preview) {
+                        preview.src = canvas.toDataURL();
+                    }
+                    if (container) {
+                        container.style.display = 'block';
+                    }
+                    
+                    // Hide error
+                    if (sizeError) {
+                        sizeError.style.display = 'none';
+                    }
+                    
+                    // Close modal
+                    closeCropModalFunc();
+                }, currentFile.type);
+            }
+        });
+    }
+    
+    // Close modal when clicking outside
+    cropModal.addEventListener('click', function(e) {
+        if (e.target === cropModal) {
+            closeCropModalFunc();
+        }
+    });
 
     // ==================== FORM SUBMISSION ====================
     const form = document.getElementById('meetingForm');
@@ -1302,11 +1995,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Combine Date + Time
+            // Combine Date + Time - WITHOUT SECONDS
             const date = document.getElementById('expiry-date').value;
             const time = document.getElementById('expiry-time').value;
             if (date && time) {
-                document.getElementById('expiry-datetime').value = date + " " + time + ":00";
+                // Format: YYYY-MM-DD HH:MM (without seconds)
+                document.getElementById('expiry-datetime').value = date + " " + time;
             }
 
             // Save Quill content
@@ -1315,15 +2009,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 descriptionInput.value = quill.root.innerHTML;
             }
 
-            // Image validation (mandatory)
-            if (!imageInput || !imageInput.files[0]) {
-                alert("Please upload a meeting image!");
-                e.preventDefault();
-                return false;
-            }
-
-            if (sizeError && sizeError.style.display === "flex") {
-                alert("Please fix the image size to 300x200 pixels!");
+            // Check if modal is open (crop in progress)
+            if (cropModal.classList.contains('active')) {
+                alert("Please finish cropping the image before submitting!");
                 e.preventDefault();
                 return false;
             }

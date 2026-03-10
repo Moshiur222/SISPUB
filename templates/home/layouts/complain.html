@@ -248,51 +248,55 @@ textarea {
 
   <div class="complain-section">
     <h1>Let Us Know Your Complaint</h1>
-    <form action="{% url 'complain' %}" method="post" class="complain-form">
+    <form action="{% url 'complain' %}" method="post" class="complain-form" id="complaintForm">
       {% csrf_token %}
       
       <div class="double-input">
         <div class="input-wrapper">
-          <input type="text" name="name" placeholder=" " required>
-          <label>Name</label>
+          <input type="text" name="name" id="name" placeholder=" " required>
+          <label for="name">Name <span class="required-star">*</span></label>
+          <div class="error-message" id="name-error"></div>
         </div>
         <div class="input-wrapper">
-          <input type="email" name="email" placeholder=" " required>
-          <label>Email Address</label>
+          <input type="email" name="email" id="email" placeholder=" " required>
+          <label for="email">Email Address <span class="required-star">*</span></label>
+          <div class="error-message" id="email-error"></div>
         </div>
       </div>
 
       <div class="double-input">
         <div class="input-wrapper">
-          <input type="text" name="phone" placeholder=" " required>
-          <label>Phone Number</label>
+          <input type="tel" name="phone" id="phone" placeholder=" " required pattern="[0-9]{10,15}" title="Please enter a valid phone number (10-15 digits)">
+          <label for="phone">Phone Number <span class="required-star">*</span></label>
+          <div class="error-message" id="phone-error"></div>
         </div>
         <div class="input-wrapper">
-          <select name="aggregator" required onchange="this.setAttribute('value', this.value);">
+          <select name="aggregator" id="aggregator" required onchange="this.setAttribute('value', this.value);">
             <option value="" disabled selected></option>
             {% for aggregator in aggregators %}
             {% if aggregator.is_aggregator == "Yes" %}
             <option value="{{ aggregator.id }}">{{ aggregator.name }}</option>
-            {% else %}
             {% endif %}
             {% endfor %}
           </select>
-          <label>Aggregator Name</label>
+          <label for="aggregator">Aggregator Name <span class="required-star">*</span></label>
+          <div class="error-message" id="aggregator-error"></div>
         </div>
       </div>
 
       <div class="input-wrapper">
-        <textarea name="issue" rows="5" placeholder=" " required></textarea>
-        <label>Complaint</label>
+        <textarea name="issue" id="issue" rows="5" placeholder=" " required></textarea>
+        <label for="issue">Complaint <span class="required-star">*</span></label>
+        <div class="error-message" id="issue-error"></div>
       </div>
 
       <div class="input-wrapper">
-        <textarea name="suggestion" rows="5" placeholder=" "></textarea>
-        <label>Suggestion (Optional)</label>
+        <textarea name="suggestion" id="suggestion" rows="5" placeholder=" "></textarea>
+        <label for="suggestion">Suggestion <span class="optional-text">(Optional)</span></label>
       </div>
 
       <div class="form-group">
-        <button type="submit" class="submit-btn">Submit Complaint</button>
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Complaint</button>
       </div>
     </form>
   </div>
@@ -310,7 +314,21 @@ body {
 .complain-wrapper {
   max-width: 900px;
   margin: 50px auto;
-  padding: 0 15px; /* Mobile Friendly Padding */
+  padding: 0 15px;
+}
+
+/* --- Required Star --- */
+.required-star {
+  color: #dc2626;
+  font-size: 16px;
+  margin-left: 2px;
+}
+
+.optional-text {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: normal;
+  margin-left: 5px;
 }
 
 /* --- Alerts --- */
@@ -339,13 +357,13 @@ body {
 
 .complain-section h1 {
   text-align: center;
-  font-size: 28px; /* Slightly smaller for better fit */
+  font-size: 28px;
   margin-bottom: 35px;
   color: #111827;
   font-weight: 600;
 }
 
-/* --- Double Input Layout (Flexible) --- */
+/* --- Double Input Layout --- */
 .double-input {
   display: flex;
   gap: 20px;
@@ -356,10 +374,10 @@ body {
   flex: 1;
 }
 
-/* --- Responsive Layout (Mobile First) --- */
+/* --- Responsive Layout --- */
 @media (max-width: 768px) {
   .double-input {
-    flex-direction: column; /* মোবাইলে একটির নিচে আরেকটি আসবে */
+    flex-direction: column;
     gap: 0;
   }
   
@@ -375,7 +393,7 @@ body {
 /* --- Floating Labels & Inputs --- */
 .input-wrapper {
   position: relative;
-  margin-bottom: 25px; /* Increased spacing */
+  margin-bottom: 25px;
 }
 
 .input-wrapper input,
@@ -387,7 +405,7 @@ body {
   border: 1px solid #ddd;
   font-size: 15px;
   background: #f9fafb;
-  box-sizing: border-box; /* Padding won't break width */
+  box-sizing: border-box;
   transition: all 0.3s ease;
 }
 
@@ -400,16 +418,33 @@ body {
   box-shadow: 0 0 8px rgba(22,163,74,0.1);
 }
 
+/* Invalid state */
+.input-wrapper input:invalid:not(:placeholder-shown),
+.input-wrapper select:invalid:not(:focus),
+.input-wrapper textarea:invalid:not(:placeholder-shown) {
+  border-color: #dc2626;
+}
+
+.input-wrapper input:invalid:not(:placeholder-shown):focus,
+.input-wrapper select:invalid:not(:focus):focus,
+.input-wrapper textarea:invalid:not(:placeholder-shown):focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 8px rgba(220,38,38,0.1);
+}
+
 .input-wrapper label {
   position: absolute;
   left: 15px;
-  top: 15px; /* Matches padding */
+  top: 15px;
   background: #fff;
   padding: 0 8px;
   color: #9ca3af;
   font-size: 14px;
   pointer-events: none;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 /* Floating Label Animation */
@@ -421,9 +456,24 @@ body {
 .input-wrapper select:not([value=""]) + label {
   top: -12px;
   left: 12px;
-  font-size: 13px;
+  font-size: 12px;
   color: #16a34a;
   font-weight: 600;
+}
+
+/* Error message styling */
+.error-message {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 5px;
+  margin-left: 15px;
+  display: none;
+}
+
+.input-wrapper input:invalid:not(:placeholder-shown) ~ .error-message,
+.input-wrapper select:invalid:not(:focus) ~ .error-message,
+.input-wrapper textarea:invalid:not(:placeholder-shown) ~ .error-message {
+  display: block;
 }
 
 /* --- Submit Button --- */
@@ -441,10 +491,40 @@ body {
   transition: all 0.3s ease;
 }
 
-.submit-btn:hover {
+.submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(22, 163, 74, 0.3);
   filter: brightness(1.05);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading state */
+.submit-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.submit-btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid white;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .alert.hide {
@@ -455,13 +535,111 @@ body {
 </style>
 
 <script>
-
+  // Auto-dismiss alerts
   setTimeout(function() {
     document.querySelectorAll('.alert').forEach(alert => {
       alert.classList.add('hide'); 
       setTimeout(() => alert.remove(), 500); 
     });
-  }, 3000);
+  }, 5000);
+
+  // Form validation
+  document.getElementById('complaintForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    let isValid = true;
+    
+    // Clear previous custom error messages
+    const errorMessages = document.querySelectorAll('.error-message');
+    errorMessages.forEach(msg => msg.style.display = 'none');
+    
+    // Validate Name
+    const name = document.getElementById('name');
+    if (!name.value.trim()) {
+      showError('name', 'Name is required');
+      isValid = false;
+    }
+    
+    // Validate Email
+    const email = document.getElementById('email');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.value.trim()) {
+      showError('email', 'Email is required');
+      isValid = false;
+    } else if (!emailPattern.test(email.value)) {
+      showError('email', 'Please enter a valid email address');
+      isValid = false;
+    }
+    
+    // Validate Phone
+    const phone = document.getElementById('phone');
+    const phonePattern = /^[0-9]{10,15}$/;
+    if (!phone.value.trim()) {
+      showError('phone', 'Phone number is required');
+      isValid = false;
+    } else if (!phonePattern.test(phone.value.replace(/[\s\-]/g, ''))) {
+      showError('phone', 'Please enter a valid phone number (10-15 digits)');
+      isValid = false;
+    }
+    
+    // Validate Aggregator
+    const aggregator = document.getElementById('aggregator');
+    if (!aggregator.value) {
+      showError('aggregator', 'Please select an aggregator');
+      isValid = false;
+    }
+    
+    // Validate Issue
+    const issue = document.getElementById('issue');
+    if (!issue.value.trim()) {
+      showError('issue', 'Please describe your complaint');
+      isValid = false;
+    }
+    
+    if (!isValid) {
+      e.preventDefault();
+      // Scroll to first error
+      const firstError = document.querySelector('.error-message[style*="display: block"]');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      // Add loading state
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+    }
+  });
+  
+  function showError(fieldId, message) {
+    const errorDiv = document.getElementById(fieldId + '-error');
+    if (errorDiv) {
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+  }
+  
+  // Real-time validation for email and phone
+  document.getElementById('email').addEventListener('input', function() {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const errorDiv = document.getElementById('email-error');
+    if (this.value && !emailPattern.test(this.value)) {
+      errorDiv.textContent = 'Please enter a valid email address';
+      errorDiv.style.display = 'block';
+    } else {
+      errorDiv.style.display = 'none';
+    }
+  });
+  
+  document.getElementById('phone').addEventListener('input', function() {
+    const phonePattern = /^[0-9]{10,15}$/;
+    const errorDiv = document.getElementById('phone-error');
+    const cleanPhone = this.value.replace(/[\s\-]/g, '');
+    if (this.value && !phonePattern.test(cleanPhone)) {
+      errorDiv.textContent = 'Please enter a valid phone number (10-15 digits)';
+      errorDiv.style.display = 'block';
+    } else {
+      errorDiv.style.display = 'none';
+    }
+  });
 </script>
 			
 			</div><div class="et_pb_column et_pb_column_1_3 et_pb_column_8  et_pb_css_mix_blend_mode_passthrough et-last-child et_pb_column_empty">

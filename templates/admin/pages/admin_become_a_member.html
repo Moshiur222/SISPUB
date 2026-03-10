@@ -26,20 +26,43 @@ body{font-family:var(--font-sans);background:var(--gray-50);color:var(--gray-900
 .header-text p{font-size:0.875rem;color:var(--gray-500);margin:0;}
 .date-badge{background:white;border:1px solid var(--gray-200);border-radius:50px;padding:0.5rem 1.25rem;font-size:0.875rem;color:var(--gray-600);display:flex;align-items:center;gap:0.5rem;}
 .date-badge i{color:var(--primary-500);}
-.btn-add-sponsor{background:var(--primary-600);color:white;border:none;border-radius:50px;padding:0.6rem 1.5rem;font-size:0.875rem;font-weight:500;display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;transition:all 0.2s;}
-.btn-add-sponsor:hover{background:var(--primary-700);color:white;transform:translateY(-1px);box-shadow:var(--shadow-md);}
+
+/* Dynamic Button Styles */
+.btn-add{background:var(--success-500);color:white;border:none;border-radius:50px;padding:0.6rem 1.5rem;font-size:0.875rem;font-weight:500;display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;transition:all 0.2s;}
+.btn-add:hover{background:#059669;color:white;transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.btn-edit{background:var(--primary-600);color:white;border:none;border-radius:50px;padding:0.6rem 1.5rem;font-size:0.875rem;font-weight:500;display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;transition:all 0.2s;}
+.btn-edit:hover{background:var(--primary-700);color:white;transform:translateY(-1px);box-shadow:var(--shadow-md);}
+
 .main-card{background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;}
 .card-header{padding:1.25rem 1.5rem;background:var(--gray-50);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
 .card-header h5{font-size:1rem;font-weight:600;color:var(--gray-700);margin:0;text-transform:uppercase;letter-spacing:0.02em;}
+.card-body{padding:2rem;}
+
+/* Member Display Styles */
+.member-display{max-width:800px;margin:0 auto;}
+.member-title{font-size:2rem;font-weight:700;color:var(--gray-800);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--primary-200);}
+.member-description{font-size:1rem;line-height:1.7;color:var(--gray-700);margin-bottom:2rem;}
+.member-description h1,.member-description h2,.member-description h3{margin-top:1.5rem;margin-bottom:1rem;}
+.member-description p{margin-bottom:1rem;}
+.member-actions{display:flex;gap:1rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);}
+.empty-state{text-align:center;padding:4rem 2rem;}
+.empty-icon{width:80px;height:80px;background:var(--gray-100);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;color:var(--gray-400);font-size:2.5rem;}
+.empty-state h3{font-size:1.5rem;color:var(--gray-700);margin-bottom:0.5rem;}
+.empty-state p{color:var(--gray-500);margin-bottom:2rem;}
 .table-clean{width:100%;border-collapse:collapse;}
 .table-clean thead th{background:var(--gray-50);padding:1rem 0.75rem;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;color:var(--gray-600);border-bottom:1px solid var(--gray-200);text-align:left;}
 .table-clean tbody td{padding:1rem 0.75rem;font-size:0.875rem;color:var(--gray-700);border-bottom:1px solid var(--gray-200);vertical-align:middle;}
 .table-clean tbody tr:hover td{background:var(--gray-50);}
 .btn-group{display:flex;gap:0.25rem;justify-content:center;flex-wrap:wrap;}
-.btn-edit{padding:0.25rem 0.5rem;background:var(--primary-600);color:white;border:none;border-radius:4px;font-size:0.7rem;font-weight:500;display:inline-flex;align-items:center;gap:0.25rem;text-decoration:none;transition:background 0.2s;}
-.btn-edit:hover{background:var(--primary-700);}
-.btn-delete{padding:0.25rem 0.5rem;background:var(--danger-500);color:white;border:none;border-radius:4px;font-size:0.7rem;font-weight:500;display:inline-flex;align-items:center;gap:0.25rem;text-decoration:none;transition:background 0.2s;cursor:pointer;}
-.btn-delete:hover{background:#dc2626;color:white;}
+.btn-edit-small{padding:0.25rem 0.5rem;background:var(--primary-600);color:white;border:none;border-radius:4px;font-size:0.7rem;font-weight:500;display:inline-flex;align-items:center;gap:0.25rem;text-decoration:none;transition:background 0.2s;}
+.btn-edit-small:hover{background:var(--primary-700);}
+.btn-delete-small{padding:0.25rem 0.5rem;background:var(--danger-500);color:white;border:none;border-radius:4px;font-size:0.7rem;font-weight:500;display:inline-flex;align-items:center;gap:0.25rem;text-decoration:none;transition:background 0.2s;cursor:pointer;}
+.btn-delete-small:hover{background:#dc2626;color:white;}
+.alert-modern{margin-bottom:1.5rem;padding:1rem 1.5rem;background:var(--success-50);border:1px solid #bbf7d0;border-radius:var(--radius-md);display:flex;align-items:center;gap:0.75rem;}
+.alert-modern i{color:var(--success-500);font-size:1.25rem;}
+.alert-modern span{flex:1;color:#166534;font-size:0.9375rem;}
+.alert-modern button{background:transparent;border:none;color:#86efac;cursor:pointer;padding:0.25rem;border-radius:4px;transition:all 0.2s;}
+.alert-modern button:hover{background:rgba(255,255,255,0.5);color:#166534;}
 </style>
 {% endblock custom_css %}
 
@@ -50,13 +73,25 @@ body{font-family:var(--font-sans);background:var(--gray-50);color:var(--gray-900
         <div class="header-left">
             <div class="header-icon"><i class="bi bi-star-fill"></i></div>
             <div class="header-text">
-                <h1>Become A Member Directory</h1>
-                <p>Manage your members</p>
+                <h1>Become A Member</h1>
+                <p>Manage member information</p>
             </div>
         </div>
         <div style="display:flex;gap:1rem;align-items:center;">
             <div class="date-badge"><i class="bi bi-calendar3"></i> {% now "F j, Y" %}</div>
-            <a href="{% url 'create' %}" class="btn-add-sponsor"><i class="bi bi-plus-circle"></i> Add</a>
+            
+            <!-- Dynamic Button: Show Add if no member exists, Show Edit if member exists -->
+            {% if mem %}
+                {% for sponsor in mem %}
+                    <a href="{% url 'update' sponsor.id %}" class="btn-edit">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                {% endfor %}
+            {% else %}
+                <a href="{% url 'create' %}" class="btn-add">
+                    <i class="bi bi-plus-circle"></i> Add
+                </a>
+            {% endif %}
         </div>
     </div>
 
@@ -71,10 +106,11 @@ body{font-family:var(--font-sans);background:var(--gray-50);color:var(--gray-900
         {% endfor %}
     {% endif %}
 
-    <!-- Main Table Card -->
-    <div class="main-card">
+    <!-- Optional: Display as Table if you want to show history -->
+    {% if mem %}
+    <div class="main-card" style="margin-top:2rem;">
         <div class="card-header">
-            <h5><i class="bi bi-list-ul" style="margin-right:0.5rem;"></i>Become A Member</h5>
+            <h5><i class="bi bi-list-ul" style="margin-right:0.5rem;"></i>Member Records</h5>
         </div>
         <div class="table-responsive">
             <table id="sponsorsTable" class="table-clean">
@@ -89,31 +125,29 @@ body{font-family:var(--font-sans);background:var(--gray-50);color:var(--gray-900
                     {% for sponsor in mem %}
                     <tr>
                         <td>{{ sponsor.title }}</td>
-                        <td>{{ sponsor.description|safe|default:"—" }}</td>
+                        <td>{{ sponsor.description|safe|truncatewords:20 }}</td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <a href="{% url 'update_sponsor' sponsor.id %}" class="btn-edit"><i class="bi bi-pencil"></i></a>
-                                <button onclick="confirmDelete('{{ sponsor.id }}', '{{ sponsor.title|escapejs }}')" class="btn-delete"><i class="bi bi-trash"></i></button>
+                                <a href="{% url 'update' sponsor.id %}" class="btn-edit-small"><i class="bi bi-pencil"></i></a>
                             </div>
                         </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center">No members found. <a href="{% url 'create' %}">Add now</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header"><h5 class="modal-title">Confirm Delete</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
             <div class="modal-body">
                 Are you sure you want to delete <strong id="deleteSponsorName"></strong>?
                 <p class="text-danger mt-2"><small>This action cannot be undone.</small></p>
@@ -130,8 +164,6 @@ body{font-family:var(--font-sans);background:var(--gray-50);color:var(--gray-900
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-<!-- Buttons -->
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
@@ -140,21 +172,25 @@ body{font-family:var(--font-sans);background:var(--gray-50);color:var(--gray-900
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
-<!-- Quill JS -->
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-
 <script>
 $(document).ready(function() {
-    $('#sponsorsTable').DataTable({
-        dom: '<"row"<"col-md-6"B><"col-md-6"f>>rtip',
-        buttons: ['copy','csv','excel','pdf','print'],
-        order:[[0,'asc']],
-        pageLength:10
-    });
+    // Only initialize DataTable if table exists
+    if ($('#sponsorsTable').length) {
+        $('#sponsorsTable').DataTable({
+            dom: '<"row"<"col-md-6"B><"col-md-6"f>>rtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            order: [[0, 'asc']],
+            pageLength: 10,
+            language: {
+                emptyTable: "No member records found"
+            }
+        });
+    }
 });
 
-function confirmDelete(sponsorId, sponsorName){
+function confirmDelete(sponsorId, sponsorName) {
     document.getElementById('deleteSponsorName').textContent = sponsorName;
+    // Update this URL with your actual delete URL name
     document.getElementById('confirmDeleteBtn').href = "{% url 'delete_become_a_member' 0 %}".replace('0', sponsorId);
     var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
     deleteModal.show();

@@ -71,8 +71,14 @@
                                     <span class="input-group-text bg-transparent border-end-0">
                                         <i class="bi bi-telephone text-primary"></i>
                                     </span>
-                                    <input name="phone" type="text" pattern="\d*" inputmode="numeric" value="{{ company.phone }}" class="form-control border-start-0 ps-0" placeholder="Enter digits only" maxlength="15" required>
+                                    <input name="phone" type="text" value="{{ company.phone }}" 
+                                        class="form-control border-start-0 ps-0" 
+                                        placeholder="+880-1958-666999" 
+                                        pattern="\+\d{1,3}-\d{4}-\d{6}" 
+                                        maxlength="16" 
+                                        required>
                                 </div>
+                                <small class="text-muted d-block mt-1">Format: +880-1958-666999</small>
                             </div>
 
                             <div class="col-md-6">
@@ -222,49 +228,84 @@
 
 <!-- Scripts -->
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dayOffSelect = document.querySelector('select[name="day_off"]');
-
-    dayOffSelect.addEventListener('change', function() {
-        if (this.selectedOptions.length > 2) {
-            alert("You can select maximum 2 day offs.");
-            this.options[this.selectedIndex].selected = false;
-        }
-    });
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Max 2 day offs
-    const dayOffSelect = document.querySelector('select[name="day_off"]');
-    const selectedCount = document.getElementById('selectedCount');
-
-    dayOffSelect.addEventListener('change', function() {
-        if (this.selectedOptions.length > 2) {
-            alert("You can select maximum 2 day offs.");
-            this.options[this.selectedIndex].selected = false;
-        }
-        selectedCount.textContent = "Selected: " + this.selectedOptions.length + "/2";
-    });
-
-    // Auto-save indicator simulation
-    let autoSaveIndicator = document.querySelector('.bi.bi-clock.me-1').parentNode;
-    setInterval(() => {
-        autoSaveIndicator.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i> Saved just now';
-        setTimeout(() => {
-            autoSaveIndicator.innerHTML = '<i class="bi bi-clock me-1"></i> Auto-saves every 30 seconds';
-        }, 3000);
-    }, 30000);
-});
-</script>
+<!-- Phone number formatting script - WITH FIXED +880- PREFIX AND NO LIMITS -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const phoneInput = document.querySelector('input[name="phone"]');
+    if (!phoneInput) return;
 
-    phoneInput.addEventListener('input', function() {
-        this.value = this.value.replace(/\D/g, ''); // remove non-digit characters
+    // Set initial value with +880- prefix if empty
+    if (!phoneInput.value) {
+        phoneInput.value = '+880-';
+    } else if (!phoneInput.value.startsWith('+880-')) {
+        // If value exists but doesn't start with +880-, add it
+        phoneInput.value = '+880-' + phoneInput.value.replace(/[^\d]/g, '');
+    }
+
+    phoneInput.addEventListener('input', function(e) {
+        let cursorPosition = this.selectionStart;
+        let oldLength = this.value.length;
+        
+        // Get current value
+        let value = this.value;
+        
+        // Always ensure +880- prefix is present
+        if (!value.startsWith('+880-')) {
+            // Remove any non-digits and add prefix
+            const digits = value.replace(/[^\d]/g, '');
+            value = '+880-' + digits;
+        } else {
+            // Keep prefix and only modify the part after it
+            const prefix = '+880-';
+            const afterPrefix = value.substring(prefix.length).replace(/[^\d]/g, '');
+            
+            // Format the remaining digits - NO LIMITS
+            let formatted = afterPrefix;
+            if (afterPrefix.length > 4) {
+                // Split after first 4 digits, then add ALL remaining digits
+                formatted = afterPrefix.substring(0, 4) + '-' + afterPrefix.substring(4);
+            }
+            
+            value = prefix + formatted;
+        }
+        
+        this.value = value;
+        
+        // Keep cursor at the end of input
+        this.selectionStart = this.selectionEnd = this.value.length;
+    });
+
+    // Prevent deleting or modifying the prefix
+    phoneInput.addEventListener('keydown', function(e) {
+        const prefix = '+880-';
+        const cursorPos = this.selectionStart;
+        
+        // If trying to delete/modify the prefix
+        if (cursorPos < prefix.length) {
+            // Allow backspace/delete only if whole input is selected
+            if (this.selectionStart === 0 && this.selectionEnd === this.value.length) {
+                // Allow full select+delete, then we'll restore prefix in input event
+                return;
+            }
+            
+            // Block deletion of prefix
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                // Move cursor to after prefix
+                this.selectionStart = this.selectionEnd = prefix.length;
+            }
+        }
+    });
+
+    // Validate on form submit - FLEXIBLE VALIDATION
+    phoneInput.form.addEventListener('submit', function(e) {
+        // Check format: +880-XXXX-XXXXX... (any number of digits in last part)
+        const phonePattern = /^\+880-\d{4}-\d+$/;  // Changed from {5,10} to + for any number of digits
+        if (!phonePattern.test(phoneInput.value)) {
+            e.preventDefault();
+            alert('Please enter mobile number in format: +880-1958-666999 (any number of digits in last part)');
+            phoneInput.focus();
+        }
     });
 });
 </script>

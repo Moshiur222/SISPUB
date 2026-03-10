@@ -480,7 +480,7 @@
                     
                     <!-- Quill Editor -->
                     <div class="quill-wrapper">
-                        <div id="description_editor" style="height: 150px;"></div>
+                        <div id="description_editor" style="height: 40px;"></div>
                     </div>
                     
                     <div class="helper-text">
@@ -535,16 +535,7 @@
 <script>
     // Initialize Quill editors with custom toolbar
     var descriptionQuill = new Quill('#description_editor', {
-        theme: 'snow',
         placeholder: 'Enter a description for this rule...',
-        modules: {
-            toolbar: [
-                [{ 'header': [2, 3, 4, false] }],
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link', 'clean']
-            ]
-        }
     });
 
     var rulesQuill = new Quill('#rules_editor', {

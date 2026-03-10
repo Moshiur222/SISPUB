@@ -512,32 +512,35 @@
                 </div>
 
                 <!-- Description Section -->
-                <div class="form-section">
-                    <div class="section-title">
-                        <div class="section-icon">
-                            <i class="bi bi-card-text"></i>
-                        </div>
-                        <h6>Description</h6>
-                    </div>
-                    
-                    <div class="form-group">
-                        <!-- Hidden textarea -->
-                        <textarea name="description" id="description" hidden></textarea>
-                        
-                        <!-- Quill Editor -->
-                        <div class="quill-wrapper">
-                            <div id="descriptionEditor" style="height: 180px;">
-                                {{ membership.description|safe }}
-                            </div>
-                        </div>
-                        
-                        <div class="helper-text">
-                            <i class="bi bi-pencil"></i>
-                            Provide an overview or context for this rule (optional)
-                        </div>
-                    </div>
-                </div>
+<div class="form-section">
+    <div class="section-title">
+        <div class="section-icon">
+            <i class="bi bi-card-text"></i>
+        </div>
+        <h6>Description</h6>
+    </div>
 
+    <div class="form-group">
+        <label class="form-label">
+            Rule Description
+        </label>
+
+        <!-- Hidden textarea -->
+        <textarea name="description" id="description" hidden></textarea>
+
+        <!-- Quill Editor -->
+        <div class="quill-wrapper">
+            <div id="descriptionEditor" style="height:50px;">
+                {{ membership.description|safe }}
+            </div>
+        </div>
+
+        <div class="helper-text">
+            <i class="bi bi-pencil"></i>
+            Provide an overview or context for this rule (optional)
+        </div>
+    </div>
+</div>
                 <!-- Rules Section -->
                 <div class="form-section">
                     <div class="section-title">
@@ -589,16 +592,7 @@
 <script>
     // Initialize Quill editors with custom toolbar
     var descriptionQuill = new Quill('#descriptionEditor', {
-        theme: 'snow',
-        placeholder: 'Enter a description for this rule...',
-        modules: {
-            toolbar: [
-                [{ 'header': [2, 3, 4, false] }],
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link', 'clean']
-            ]
-        }
+        placeholder: 'Enter a description for this rule...'
     });
 
     var rulesQuill = new Quill('#rulesEditor', {

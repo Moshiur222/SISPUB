@@ -117,7 +117,7 @@
         }
         
         .logo-img {
-            max-height: 50px; /* Scale logo on mobile */
+            max-height: 150px; /* Scale logo on mobile */
         }
     }
     /* Top bar member search adjustments */
@@ -210,24 +210,34 @@
 
 }
 
-@media (max-width: 768px){
-
-    .main-nav{
-        margin: 10px;
-        border-radius: 12px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-        background: #fff;
-    }
-
-    .nav-container{
+@media (max-width: 768px) {
+    .nav-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center; 
+        align-items: center;
         padding: 12px 18px;
+        position: relative;
     }
 
-    .logo-img{
-        max-height: 30px;
-        padding-left: 140px;
+    .logo-container {
+        display: flex;
+        justify-content: center; 
+        width: 100%;
     }
 
+    .nav-actions {
+        position: absolute; /* Put toggle button on right side */
+        right: 18px;        /* Align to right padding */
+        display: flex;
+        justify-content: flex-end;
+        top: 50%;
+        transform: translateY(-50%); /* Vertically center */
+    }
+
+    .logo-img {
+        max-height: 120px; /* Adjust logo size */
+    }
 }
 
 /* Mobile Search Under Navbar */
@@ -291,7 +301,7 @@
                             <a href="tel:{{ info.phone }}" class="contact-item" style = "text-decoration: none; color: #333;">
                                 Call:
                                 
-                                <span>+{{ info.phone }}</span>
+                                <span>{{ info.phone }}</span>
                             </a>
                         </span>
                         <span class="contact-item">
