@@ -3,170 +3,159 @@
 
 {% block extra_css %}
 <style>
+
+/* ===== Page Title Spacing ===== */
 .page-title {
     text-align: center;
     margin-top: 150px;
     margin-bottom: 60px;
-    font-weight: 700;
 }
 
-/* Row */
-.et_pb_row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start; /* changed from space-between to flex-start */
-    gap: 15px; /* Add small horizontal gap instead of space-between */
-    margin-bottom: 50px;
+/* ===== Grid Layout ===== */
+.founder-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-bottom: 60px;
 }
 
-/* Column / Card */
-.et_pb_column {
-    flex: 0 0 calc(33.33% - 10px); /* 3 per row with small gap */
-    max-width: calc(33.33% - 10px);
-    box-sizing: border-box;
-    padding: 0; /* remove extra padding */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.passport-photo {
-    width: 400px;
-    height: 500px;
+/* ===== Card Design ===== */
+.founder-card {
+    background: #ffffff;
+    border-radius: 14px;
     overflow: hidden;
-    border-radius: 6px;
-    background: #f5f5f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
-.passport-photo img {
+.founder-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+/* ===== Image ===== */
+.card-image {
+    width: 100%;
+    height: 420px;
+    overflow: hidden;
+}
+
+.card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.et_pb_column > div:last-child {
-    width: 400px;
-    text-align: left;
-    margin: 10px auto 0;
-    padding: 0;
+/* ===== Card Body with Reduced Gaps ===== */
+.card-body {
+    padding: 15px 10px 15px 10px;
 }
 
-.et_pb_column > div:last-child > div p {
-    line-height: 1.4;
+.card-body .company {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+    line-height: 1.5;
     margin: 0;
 }
 
-.et_pb_column > div:last-child > div p span:first-child {
-    font-size: 20px;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.et_pb_column > div:last-child > div p span:last-child {
-    font-size: 14px;
-    line-height: 1.4;
-    color: #666;
-}
-
-.et_pb_column > div:last-child > div p span:last-child a {
+.card-body .company strong {
     color: #0073aa;
-    text-decoration: none;
+    font-weight: 700;
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-    .et_pb_column { flex: 0 0 48%; max-width: 48%; }
-    .passport-photo, .et_pb_column > div:last-child { width: 380px; }
+/* Name styling - first line */
+.card-body .company br:first-of-type {
+    content: "";
+    margin: 5px 0;
+    display: block;
 }
 
-@media (max-width: 768px) {
-    .et_pb_column { flex: 0 0 100%; max-width: 100%; }
-    .passport-photo { width: 90%; height: 500px; max-width: 400px; }
-    .et_pb_column > div:last-child { width: 90%; max-width: 400px; text-align: center; }
-}
-
-/* Pagination */
+/* ===== Pagination ===== */
 .pagination-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 20px;
+    gap: 25px;
     margin-bottom: 80px;
 }
 
 .page-btn {
-    padding: 10px 20px;
+    padding: 10px 25px;
     background: #0073aa;
     color: #fff;
     text-decoration: none;
     border-radius: 6px;
+    transition: 0.3s ease;
 }
 
 .page-btn:hover {
     background: #005f8d;
 }
 
-.page-info {
-    font-weight: 500;
-    color: #333;
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+    .founder-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .founder-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card-image {
+        height: 350px;
+    }
+    
+    .card-body {
+        padding: 12px 8px 12px 8px;
+    }
+    
+    .card-body .company {
+        font-size: 16px;
+        line-height: 1.4;
+    }
 }
 
 </style>
 {% endblock extra_css %}
 
+
 {% block main %}
+
 <section class="container">
 
     <div class="page-title">
-        <h2>Current Executive Committee</h2>
+        <h2>SISPAB Previous Executive Committees</h2>
     </div>
 
-    <div class="et_pb_row">
-        {% for commitees in commitees %}
-        <div class="et_pb_column">
+    <!-- Founder Cards -->
+    <div class="founder-grid">
+        {% for founder in commitees %}
+            <div class="founder-card">
 
-            <div class="passport-photo">
-                <img src="{{ commitees.image.url }}" alt="{{ commitees.name }}">
-            </div>
+                <div class="card-image">
+                    <img src="{{ founder.image.url }}"
+                         alt="{{ founder.name }}">
+                </div>
 
-            <div>
-                <div>
-                    <p>
-                        <span>{{ commitees.name }}</span>
-                        <span>
-                            Position: {{ commitees.position }}<br>
-                            Company Designation: {{ commitees.designation }}<br>
-                            Company Name: <a href="#">{{ commitees.company }}</a>
-                        </span>
+                <div class="card-body">
+                    <p class="company" style="margin: 0; padding: 0; line-height: 1.6;">
+                        <strong style="font-size: 18px; font-weight: bold; display: block; margin-bottom: 2px;">{{ founder.name }}</strong>
+                        <span style="font-size: 14px; font-weight: normal; display: block; margin-bottom: 2px;">{{ founder.company }}</span>
+                        <span style="font-size: 14px; font-weight: normal; display: block; margin-bottom: 2px;">{{ founder.designation }}</span>
+                        <span style="font-size: 14px; font-weight: normal; display: block;">{{ founder.position }}</span>
                     </p>
                 </div>
-            </div>
 
-        </div>
+            </div>
         {% empty %}
-        <p>No committee members found.</p>
+            <p>No founders found.</p>
         {% endfor %}
     </div>
 
-    <!-- Pagination -->
-    <div class="pagination-container">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">← Previous</a>
-        {% endif %}
-
-        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="page-btn">Next →</a>
-        {% endif %}
-    </div>
-
 </section>
+
 {% endblock main %}

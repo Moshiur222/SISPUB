@@ -4,8 +4,6 @@
 {% load static %}
 <head>
 
-    <title>{{ meta_title|default:"SiSPUB" }}</title>
-
     {% for s in seos %}
 	<meta name="description" content="{{ s.meta_description|default:'' }}">
     <meta name="keywords" content="{{ s.meta_keywords|default:'' }}">

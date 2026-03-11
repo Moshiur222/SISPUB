@@ -999,7 +999,7 @@
                         <td><span class="company-name" title="{{ member.company_name }}">{{ member.company_name|default:"—"|truncatechars:20 }}</span></td>
                         <td><span class="person-name">{{ member.name|default:"—" }}</span></td>
                         <td>{% if member.designation %}<span class="designation-badge" title="{{ member.designation }}">{{ member.designation|truncatechars:15 }}</span>{% else %}—{% endif %}</td>
-                        <td><span class="aggregator-badge yes">Yes</span></td>
+                        <td><span class="aggregator-badge No">No</span></td>
                         <td>{% if member.appoinment_letter %}<a href="{{ member.appoinment_letter.url }}" target="_blank" class="file-link"><i class="bi bi-file-pdf"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
                         <td>{% if member.cv %}<a href="{{ member.cv.url }}" target="_blank" class="file-link"><i class="bi bi-file-text"></i> View</a>{% else %}<span class="no-file">—</span>{% endif %}</td>
                         <td>

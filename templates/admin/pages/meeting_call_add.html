@@ -1955,5 +1955,23 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }, 5000);
 });
+
+
+// ==================== TITLE LIVE ALERT ====================
+const titleInput = document.getElementById("title-input");
+
+if (titleInput) {
+    titleInput.addEventListener("input", function () {
+
+        if (this.value.length > 80) {
+
+            alert("Title cannot be more than 80 characters!");
+
+            this.value = this.value.substring(0, 80);
+        }
+
+    });
+}
+
 </script>
 {% endblock content %}

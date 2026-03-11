@@ -45,20 +45,19 @@
 }
 
 .card-body {
-    padding: 20px;
+    padding-bottom: 20px;
+    padding-top: 20px;
 }
 
 .card-body h3 {
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 8px;
     color: #222;
 }
 
 .card-body p {
     font-size: 14px;
     color: #666;
-    margin: 0;
 }
 
 /* Responsive */
@@ -117,37 +116,18 @@
             <div class="card-image">
                 <img src="{{ commitees.image.url }}" alt="{{ commitees.name }}">
             </div>
-
+            
             <div class="card-body">
-                <h3>{{ commitees.name }}</h3>
-                <p>Position: {{ commitees.position }}</p>
-            </div>
+                    <p class="company" style="margin: 0; padding: 0; line-height: 1.6;">
+                        <strong style="font-size: 18px; font-weight: bold; display: block; margin-bottom: 2px;">{{ commitees.name }}</strong>
+                        <span style="font-size: 14px; font-weight: normal; display: block; margin-bottom: 2px;">Position: {{ commitees.position }}</span>
+                    </p>
+                </div>
 
         </div>
         {% empty %}
         <p>No committee members found.</p>
         {% endfor %}
-    </div>
-
-    <!-- Pagination -->
-    <div class="pagination-container">
-
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">
-                ← Previous
-            </a>
-        {% endif %}
-
-        <span class="page-info">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="page-btn">
-                Next →
-            </a>
-        {% endif %}
-
     </div>
 
 </section>

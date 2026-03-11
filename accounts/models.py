@@ -512,22 +512,29 @@ class Photo(models.Model):
         super().save(*args, **kwargs)
 
 
+
 class MeetingTitle(models.Model):
-    title = models.CharField(max_length=255, null=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)
-    amount = models.IntegerField(null=True)
-    description = models.TextField(null=True)
-    image = models.ImageField(upload_to="image/", null=True)
-    expire_date = models.DateTimeField(null=True)
+    title = models.CharField(max_length=80, null=True, blank=False)
+    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
+    amount = models.IntegerField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)  # TextField for long text
+    image = models.ImageField(upload_to="image/", null=True, blank=True)
+    expire_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.slug and self.title:
-            self.slug = slugify(self.title)
+            # Generate base slug from title
+            base_slug = slugify(self.title)[:75]  # reserve space for uniqueness
+            slug = base_slug
+            # Ensure slug is unique
+            while MeetingTitle.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{uuid.uuid4().hex[:5]}"
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.title
+        return self.title if self.title else "No Title"
 
 
 class MeetingCall(models.Model):

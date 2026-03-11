@@ -6,7 +6,7 @@ from django.core.cache import cache
 
 
 SMS_API_URL = "http://sms.iglweb.com/api/v1/send"
-SMS_API_KEY = "4451764741797151764741797"
+SMS_API_KEY = "4451773204203151773204203"
 SMS_SENDER_ID = "01844532630"
 
 
@@ -94,7 +94,7 @@ def send_otp(mobile):
 
     # Send SMS
     if send_sms(mobile, f"""Welcome to SiSPAB, Your OTP Is: {otp}, Expire for 5 Min, Don't Share With Any One.
-                SiSPAB.org"""):
+SISPAB.org"""):
         return True, otp
 
     return False, "Failed to send OTP"

@@ -123,7 +123,7 @@
 
     <!-- Founder Cards -->
     <div class="founder-grid">
-        {% for founder in founders %}
+        {% for founder in founders_list %}
             <div class="founder-card">
 
                 <div class="card-image">
@@ -132,39 +132,16 @@
                 </div>
 
                 <div class="card-body">
-                    <h3>{{ founder.founder_name }}</h3>
-
-                    <p class="designation">
-                        {{ founder.designation }}
-                    </p>
-
-                    <p class="company">
-                        {{ founder.company }}
+                    <p class="company" style="margin: 0; padding: 0; line-height: 1.6;">
+                        <strong style="font-size: 18px; font-weight: bold; display: block; margin-bottom: 2px;">{{ founder.founder_name }}</strong>
+                        <span style="font-size: 14px; font-weight: normal; color: #000; display: block; margin-bottom: 2px;">{{ founder.designation }}</span>
+                        <span style="font-size: 14px; font-weight: normal; color: #000; display: block; margin-bottom: 2px;">{{ founder.company }}</span> <span style="font-size: 14px; font-weight: normal; display: block;">{{ founder.position }}</span>
                     </p>
                 </div>
-
             </div>
         {% empty %}
             <p>No founders found.</p>
         {% endfor %}
-    </div>
-
-
-    <!-- Pagination -->
-    <div class="pagination-container">
-
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">
-                ← Previous
-            </a>
-        {% endif %}
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="page-btn">
-                Next →
-            </a>
-        {% endif %}
-
     </div>
 
 </section>

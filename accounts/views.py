@@ -6,15 +6,15 @@ from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.templatetags.static import static
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.db.models import Sum, Q
+from django.db.models import Sum
 from collections import defaultdict
 from django.contrib import messages
 from django.utils import timezone
 from django.db import transaction
 from datetime import datetime
-from itertools import chain
 from .models import *
 from .utils import *
 import random
@@ -61,43 +61,31 @@ def mission(request):
 def founder_view(request):
     founders_list = FoundersInfo.objects.all().order_by('id')
 
-    paginator = Paginator(founders_list, 6)
-
-    page_number = request.GET.get('page') 
-    founders = paginator.get_page(page_number)  
     context = {
-        'founders': founders,
-        'page_obj': founders
-    }
+        'founders_list': founders_list,
+        }
     return render(request, "home/layouts/founder.html", context)
 
 
 def current_executive_commitee(request):
     commitees_list = SispabExecutiveCom.objects.all().order_by('id') 
-    paginator = Paginator(commitees_list, 6)  # 6 cards per page
-
-    page_number = request.GET.get('page')
-    commitees = paginator.get_page(page_number)  # SAFE (no crash)
-
+   
+    
     context = {
-        'commitees': commitees,  # for template loop
-        'page_obj': commitees    # for pagination buttons
+        'commitees': commitees_list, 
     }
     return render(request, "home/layouts/current_executive_commitee.html", context)
 
 def previous_committee(request):
-    commitees_list = PreviousExecutiveCommittee.objects.all().order_by('id')  # QuerySet
-    paginator = Paginator(commitees_list, 6)  # 6 members per page
+    commitees_list = PreviousExecutiveCommittee.objects.all().order_by('id')  
 
-    page_number = request.GET.get('page')
-    commitees = paginator.get_page(page_number)  # safe
 
     context = {
-        'commitees': commitees,  # for looping through
-        'page_obj': commitees    # for pagination controls
+        'commitees': commitees_list, 
     }
     return render(request, "home/layouts/previous_committee.html", context)
-
+    
+    
 def membership_rules(request):
     rules_titles = MembershipRules.objects.all()
     context = {
@@ -419,11 +407,50 @@ def meeting_calls(request):
     upcoming_meetings = upcoming_paginator.get_page(upcoming_page_number)
     previous_meetings = previous_paginator.get_page(previous_page_number)
 
+    # Get attendee counts and details for each meeting
+    for meeting in upcoming_meetings:
+        # Count total attendees (sum of no_of_person from all MeetingCall entries)
+        meeting_calls = MeetingCall.objects.filter(title=meeting)
+        meeting.attendee_count = meeting_calls.aggregate(total=Sum('no_of_person'))['total'] or 0
+        
+        # Get recent attendees (distinct names)
+        recent_calls = meeting_calls.order_by('-created_at')[:3]
+        meeting.recent_attendees = []
+        for call in recent_calls:
+            # Create a simple user-like object for each attendee
+            meeting.recent_attendees.append({
+                'name': call.name,
+                'initials': ''.join([n[0].upper() for n in call.name.split()[:2]]),
+                'company': call.company_name
+            })
+        
+        # Calculate total amount collected
+        meeting.total_amount = meeting_calls.aggregate(total=Sum('amount'))['total'] or 0
+        
+        # Count number of bookings
+        meeting.total_bookings = meeting_calls.count()
+    
+    for meeting in previous_meetings:
+        # Count total attendees for previous meetings
+        meeting_calls = MeetingCall.objects.filter(title=meeting)
+        meeting.attendee_count = meeting_calls.aggregate(total=Sum('no_of_person'))['total'] or 0
+        
+        # Calculate average rating (if you have a rating model, otherwise use random or placeholder)
+        # For now, we'll use a placeholder based on attendee count
+        if meeting.attendee_count > 0:
+            meeting.avg_rating = min(5, round(3.5 + (meeting.attendee_count / 20), 1))
+        else:
+            meeting.avg_rating = 0
+            
+        meeting.rating_count = meeting_calls.count()
+        
+        # Calculate total amount collected
+        meeting.total_amount = meeting_calls.aggregate(total=Sum('amount'))['total'] or 0
+
     return render(request, "home/layouts/meeting_calls.html", {
         'upcoming_meetings': upcoming_meetings,
         'previous_meetings': previous_meetings
     })
-
 User = get_user_model()
 
 def get_aggregator_info(request):
@@ -473,6 +500,15 @@ def meeting_call(request, slug):
     # Get the event/meeting
     last_title = get_object_or_404(MeetingTitle, slug=slug)
 
+    # Create SEO data
+    seos = [{
+        'meta_title': f"{last_title.title} - Registration | SiSPAB",
+        'meta_description': last_title.description[:160] if last_title.description else "Register for this meeting with SiSPAB",
+        'meta_keywords': "meeting, registration, sispab, event",
+        'meta_url': request.build_absolute_uri(),
+        'meta_image': request.build_absolute_uri(last_title.image.url) if last_title.image else request.build_absolute_uri(static('home/images/default-meeting-og.jpg')),
+    }]
+
     # Default form data
     context_data = {
         'company_name': '',
@@ -486,26 +522,19 @@ def meeting_call(request, slug):
     }
 
     if request.method == 'POST':
-        # Fill context_data with submitted values
+
         for field in context_data:
             context_data[field] = request.POST.get(field, '').strip()
 
-        mobile = context_data['mobile'].strip()
-        mobile_last10 = mobile[-10:]  # Take last 10 digits for matching
-
-        # Check if mobile exists in Aggregator or TempMember
-        if not (Aggregator.objects.filter(mobile__endswith=mobile_last10).exists() 
-                or TempMember.objects.filter(mobile__endswith=mobile_last10).exists()):
-            messages.error(request, "Registration failed: Mobile number not found in member list.")
-            return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **context_data})
+        mobile = context_data['mobile']
 
         try:
-            # Number of persons and total price
+            # persons & price
             no_of_person = int(context_data['no_of_person'] or 1)
             total_price = (last_title.amount or 0) * no_of_person
             screenshot = request.FILES.get('screenshot')
 
-            # Save MeetingCall
+            # save registration
             MeetingCall.objects.create(
                 title=last_title,
                 company_name=context_data['company_name'],
@@ -520,27 +549,32 @@ def meeting_call(request, slug):
                 amount=total_price
             )
 
-            # Send confirmation SMS
+            # SMS message
             message = f"""
-                        Dear {context_data['name']},
-                        Congratulations! Your registration has been successfully completed.
-                        Persons: {no_of_person}
-                        Amount: {total_price} BDT
-                        Thank you for being with us.
-                        sispab.org
-                    """
+Dear {context_data['name']},
+Congratulations! Your registration has been successfully completed.
+
+Persons: {no_of_person}
+Amount: {total_price} BDT
+
+Thank you for being with us
+"""
+
             if send_sms(mobile, message):
                 messages.success(request, "Submitted successfully! SMS sent.")
             else:
                 messages.warning(request, "Submitted successfully, but SMS was not sent.")
 
-            # Redirect back to same meeting page
             return redirect('meeting_call', slug=slug)
 
         except Exception as e:
             messages.error(request, f"Error: {e}")
 
-    return render(request, 'home/layouts/meeting_call.html', {'title': last_title, **context_data})
+    return render(request, 'home/layouts/meeting_call.html', {
+        'title': last_title,
+        'seos': seos,
+        **context_data
+    })
 
 def contact_view(request):
     

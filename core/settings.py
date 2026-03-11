@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ydi4np)g!^w76^1)6t7k++h%66z1j-p_kusyb53#_$lf%642o)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -94,6 +94,19 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql', 
+    #     'NAME': 'sispab_sispab_db',
+    #     'USER': 'sispab_sispab_db',
+    #     'PASSWORD': 'sispab_sispab_db',
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '3306',
+    #     'OPTIONS': {
+    #         'charset': 'utf8mb4',       
+    #         'use_unicode': True,
+    #         'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
+    #     },
+    # }
 }
 
 
