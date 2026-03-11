@@ -427,7 +427,7 @@ def meeting_calls(request):
         # Calculate total amount collected
         meeting.total_amount = meeting_calls.aggregate(total=Sum('amount'))['total'] or 0
         
-        # Count number of bookings
+        # Count number of bookings (FIXED)
         meeting.total_bookings = meeting_calls.count()
     
     for meeting in previous_meetings:
@@ -451,6 +451,7 @@ def meeting_calls(request):
         'upcoming_meetings': upcoming_meetings,
         'previous_meetings': previous_meetings
     })
+
 User = get_user_model()
 
 def get_aggregator_info(request):

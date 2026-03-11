@@ -6,7 +6,7 @@ from django.core.cache import cache
 
 
 SMS_API_URL = "http://sms.iglweb.com/api/v1/send"
-SMS_API_KEY = "4451773204203151773204203"
+SMS_API_KEY = "4451551156257761551156257"
 SMS_SENDER_ID = "01844532630"
 
 

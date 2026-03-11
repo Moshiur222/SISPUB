@@ -362,7 +362,7 @@
                                     <p style="color: #000; font-weight: bold; font-size: 15px; margin-bottom: 10px;">Our Team</p>
                                     <a href="{% url 'current_executive_commitee' %}" class="dropdown-item {% active 'current_executive_commitee' %}" style="height: 30px;">Current Executive Committee</a>
                                     <a href="{% url 'previous_committee' %}" class="dropdown-item {% active 'previous_committee' %}" style="height: 30px;">Previous Executive Committee</a>
-                                    <a href="{% url 'sisbup_secretariat' %}" class="dropdown-item {% active 'sisbup_secretariat' %}" style="height: 30px;">SISPAB Secretariat</a>
+                                    {% comment %} <a href="{% url 'sisbup_secretariat' %}" class="dropdown-item {% active 'sisbup_secretariat' %}" style="height: 30px;">SISPAB Secretariat</a> {% endcomment %}
                                 </div>
                             </div>
                         </div>

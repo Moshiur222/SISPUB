@@ -1,5 +1,6 @@
 import re, os
 import hashlib
+import uuid
 from django.db import models
 from django.utils.text import slugify
 from django.core.validators import RegexValidator
