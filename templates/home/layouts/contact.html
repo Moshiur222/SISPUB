@@ -33,7 +33,14 @@
             <div class="icon-circle">🕒</div>
             <div class="card-info">
               <label>Business Hours</label>
-              <span>Sat – Thu: {{info.office_hours}}<br><small style="color: #ef4444;">Friday: {{info.friday}}</small></span>
+              <span>Sat – Thu: {{info.office_hours}}<br><small style="color: #ef4444;">Day off: 
+                  {% if info.day_off.all %}
+                      {% for day in info.day_off.all %}
+                          {{ day.day }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                  {% else %}
+                      —
+                  {% endif %}</small></span>
             </div>
           </div>
         </div>
