@@ -4,6 +4,7 @@ from django.contrib import admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     # home_url start
     
     path('', home_view, name = 'home' ),
@@ -61,6 +62,7 @@ urlpatterns = [
     #home_url end
 
 
+
     #admin_url start
     
     path('dashboard/', dashboard, name = 'dashboard' ),
@@ -112,23 +114,23 @@ urlpatterns = [
     path('founder_delete/<int:id>/', founder_delete, name='founder_delete'),
     
 
-    path('sispab_executive_com', sispab_executive_com, name='sispab_executive_com'),
-    path('add_sispab_executive_com', add_sispab_executive_com, name='add_sispab_executive_com'),
+    path('sispab_executive_com//', sispab_executive_com, name='sispab_executive_com'),
+    path('add_sispab_executive_com//', add_sispab_executive_com, name='add_sispab_executive_com'),
     path('sispab_executive_com_update/<int:id>/', sispab_executive_com_update, name='sispab_executive_com_update'),
     path('sispab_executive_com_delete/<int:id>/', sispab_executive_com_delete, name='sispab_executive_com_delete'),
 
 
 
-    path('previous_executive_committee', previous_executive_committee, name='previous_executive_committee'),
-    path('add_previous_executive_committee', add_previous_executive_committee, name='add_previous_executive_committee'),
+    path('previous_executive_committee/', previous_executive_committee, name='previous_executive_committee'),
+    path('add_previous_executive_committee/', add_previous_executive_committee, name='add_previous_executive_committee'),
     path('previous_executive_committee_update/<int:id>/', previous_executive_committee_update, name='previous_executive_committee_update'),
     path('previous_executive_committee_delete/<int:id>/', previous_executive_committee_delete, name='previous_executive_committee_delete'),
 
 
-    path('AdminEvents', AdminEvents, name='AdminEvents'),
+    path('AdminEvents/', AdminEvents, name='AdminEvents'),
 
-    path('admin_video_gallery', admin_video_gallery, name='admin_video_gallery'),
-    path('upload_video', upload_video, name='upload_video'),
+    path('admin_video_gallery/', admin_video_gallery, name='admin_video_gallery'),
+    path('upload_video/', upload_video, name='upload_video'),
     path('video_update/<int:id>/', video_update, name='video_update'),
     path('video_delete/<int:id>/', video_delete, name='video_delete'),
     
@@ -150,11 +152,11 @@ urlpatterns = [
     
     
     
-    path('AdminCampain', AdminCampain, name='AdminCampain'),
+    path('AdminCampain/', AdminCampain, name='AdminCampain'),
     path('complain_update/<int:id>/', complain_update, name='complain_update'),
     path('complain_delete/<int:id>/', complain_delete, name='complain_delete'),
     
-    path('AdminContact', AdminContact, name='AdminContact'),
+    path('AdminContact/', AdminContact, name='AdminContact'),
     path('contact_update/<int:id>/', contact_update, name='contact_update'),
     path('contact_delete/<int:id>/', contact_delete, name='contact_delete'),
     
@@ -188,7 +190,7 @@ urlpatterns = [
     path('news_delete/<int:id>',AdminNewswDelete, name='news_delete'),
 
 
-    path('meeting_call_list/<int:id>', meeting_call_list, name = 'meeting_call_list'),
+    path('meeting_call_list/<int:id>/', meeting_call_list, name = 'meeting_call_list'),
     path('admin_meeting_call/', admin_meeting_call, name = 'admin_meeting_call'),
     path('meeting_call_add/', meeting_call_add, name = 'meeting_call_add'),
     path('meeting_call_update/<int:id>/', meeting_call_update, name = 'meeting_call_update'),
@@ -230,7 +232,4 @@ urlpatterns = [
     path('add_seo/', add_seo, name = 'add_seo'),
     path('edit_seo/<int:id>/', edit_seo, name = 'edit_seo'),
     #admin_url end
-
-
-
 ]
