@@ -514,19 +514,25 @@ class Photo(models.Model):
 
 
 
+def meeting_image_upload(instance, filename):
+    ext = filename.split('.')[-1]  # get file extension
+    title_slug = slugify(instance.title) if instance.title else "meeting"
+    filename = f"{title_slug}.{ext}"
+    return os.path.join("image/", filename)
+
 class MeetingTitle(models.Model):
     title = models.CharField(max_length=80, null=True, blank=False)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     amount = models.IntegerField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)  # TextField for long text
-    image = models.ImageField(upload_to="image/", null=True, blank=True)
+    image = models.ImageField(upload_to=meeting_image_upload, null=True, blank=True)
     expire_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.slug and self.title:
             # Generate base slug from title
-            base_slug = slugify(self.title)[:75]  # reserve space for uniqueness
+            base_slug = slugify(self.title)[:75]  
             slug = base_slug
             # Ensure slug is unique
             while MeetingTitle.objects.filter(slug=slug).exists():
